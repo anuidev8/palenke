@@ -53,7 +53,9 @@ export default function CoDesign() {
           </div>
 
           <Link
-            href="mailto:contacto@ejemplo.com" // Placeholder email
+            href="https://wa.me/573206456179?text=Coordinar%20pr%C3%B3xima%20reuni%C3%B3n%20de%20co-dise%C3%B1o.%20Revisemos%20juntos%20el%20alcance%20del%20MVP."
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block px-10 py-5 bg-[#2D1B14] text-[#FFF8EA] font-bold text-lg rounded-full hover:bg-[#1A5C38] transition-all transform hover:scale-105 shadow-lg"
           >
             Coordinar próxima reunión de co-diseño
