@@ -2,14 +2,20 @@ import Link from "next/link";
 import {
   CampaignCard,
   EmptyState,
-  FilterChip,
   SectionHeader,
   SiteLayout,
   SkeletonGrid,
 } from "@/components/mock/ui";
+import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
 import DocumentCard from "@/components/palenke/DocumentCard";
 import { getGeneratedImage } from "@/lib/generate-image";
-import { getVisibleCampaigns, getVisibleDocuments, instrumentTypes, librarySections, territories } from "@/lib/mock-data";
+import {
+  getVisibleCampaigns,
+  getVisibleDocuments,
+  instrumentTypes,
+  librarySections,
+  territories,
+} from "@/lib/mock-data";
 import { filterDocuments, getDocumentYears, type LibraryFilters } from "@/lib/mock-queries";
 import { getFirstParam, getMultiParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
@@ -32,6 +38,7 @@ export default async function BibliotecaPage({
   const params = await searchParams;
   const role = getViewerRole(params);
   const filters = parseFilters(params);
+  const initialSearchQuery = getFirstParam(params.aiq) ?? "";
   const state = getFirstParam(params.state);
   const visibleDocuments = getVisibleDocuments(role).toSorted((a, b) => b.year - a.year);
   const featuredCampaigns = getVisibleCampaigns(role, "biblioteca");
@@ -51,6 +58,16 @@ export default async function BibliotecaPage({
         { label: "Inicio", href: "/" },
         { label: "Biblioteca Base" },
       ]}
+      floatingPanel={
+        <BibliotecaAiSearchPanel
+          role={role}
+          documents={results}
+          initialQuery={initialSearchQuery}
+          activeFilters={activeFilters}
+          clearFiltersHref={withRole("/biblioteca", role)}
+          showInlineSummary={false}
+        />
+      }
     >
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:hidden">
@@ -74,34 +91,7 @@ export default async function BibliotecaPage({
             </div>
           </aside>
 
-          <div className="space-y-6">
-            <div className="surface-card">
-              <div className="flex flex-col gap-4 border-b border-[color:var(--border-soft)] pb-5 lg:flex-row lg:items-end lg:justify-between">
-                <div className="space-y-3">
-                  <SectionHeader
-                    eyebrow="Biblioteca Base"
-                    title="Resultados documentales"
-                    description="Las fichas públicas e internas respetan el filtro automático por visibilidad."
-                  />
-                  <p className="text-sm text-[color:var(--muted)]">{results.length} documentos encontrados</p>
-                </div>
-                <div className="rounded-full bg-[color:var(--sand-strong)] px-4 py-2 text-sm text-[color:var(--forest)]">
-                  Ordenar por: Más reciente
-                </div>
-              </div>
-
-              {activeFilters.length > 0 ? (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {activeFilters.map((filter) => (
-                    <FilterChip key={filter.label} label={filter.label} href={filter.href} />
-                  ))}
-                  <Link href={withRole("/biblioteca", role)} className="button-ghost">
-                    Limpiar filtros
-                  </Link>
-                </div>
-              ) : null}
-            </div>
-
+          <div className="space-y-6 pb-44">
             {state === "loading" ? (
               <SkeletonGrid count={6} />
             ) : results.length > 0 ? (
@@ -122,11 +112,11 @@ export default async function BibliotecaPage({
                 <div className="flex items-center justify-between rounded-[28px] border border-[color:var(--border-soft)] bg-white px-5 py-4 text-sm text-[color:var(--muted-strong)]">
                   <span>Paginación mockup</span>
                   <div className="flex items-center gap-2">
-                    <button type="button" className="button-ghost">
+                    <button type="button" className="button-ghost" aria-label="Página anterior">
                       ←
                     </button>
-                    <span className="chip">1</span>
-                    <button type="button" className="button-ghost">
+                    <span className="chip" aria-current="page">1</span>
+                    <button type="button" className="button-ghost" aria-label="Página siguiente">
                       →
                     </button>
                   </div>
@@ -178,8 +168,11 @@ function FilterForm({
     <form action="/biblioteca" className="grid gap-6">
       {role !== "public" ? <input type="hidden" name="role" value={role} /> : null}
       <div>
-        <label className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Buscar</label>
+        <label htmlFor="filter-q" className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">
+          Buscar
+        </label>
         <input
+          id="filter-q"
           type="search"
           name="q"
           defaultValue={filters.query}
@@ -200,8 +193,8 @@ function FilterForm({
 
       <div className="grid gap-4">
         <div>
-          <label className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Territorio</label>
-          <select name="territory" defaultValue={filters.territory} className="input-shell">
+          <label htmlFor="filter-territory" className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Territorio</label>
+          <select id="filter-territory" name="territory" defaultValue={filters.territory} className="input-shell">
             <option value="">Todos</option>
             {territories.map((territory) => (
               <option key={territory} value={territory}>
@@ -212,8 +205,8 @@ function FilterForm({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Tipo de instrumento</label>
-          <select name="type" defaultValue={filters.type} className="input-shell">
+          <label htmlFor="filter-type" className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Tipo de instrumento</label>
+          <select id="filter-type" name="type" defaultValue={filters.type} className="input-shell">
             <option value="">Todos</option>
             {instrumentTypes.map((type) => (
               <option key={type} value={type}>
@@ -224,8 +217,8 @@ function FilterForm({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Año</label>
-          <select name="year" defaultValue={filters.year} className="input-shell">
+          <label htmlFor="filter-year" className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">Año</label>
+          <select id="filter-year" name="year" defaultValue={filters.year} className="input-shell">
             <option value="">Todos</option>
             {years.map((year) => (
               <option key={year} value={year}>

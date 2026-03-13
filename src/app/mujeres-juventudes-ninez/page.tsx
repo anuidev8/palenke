@@ -3,7 +3,6 @@ import {
   CampaignCard,
   SectionHeader,
   SiteLayout,
-  StoryCard,
   Callout,
 } from "@/components/mock/ui";
 import HeroSection from "@/components/palenke/HeroSection";
@@ -11,6 +10,7 @@ import DocumentCard from "@/components/palenke/DocumentCard";
 import { getGeneratedImage } from "@/lib/generate-image";
 import { getVisibleCampaigns, getVisibleMjnDocuments, mjnContext, mjnQuote, mjnStories } from "@/lib/mock-data";
 import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { PiezasAutorizadasSection } from "@/components/PiezasAutorizadasSection";
 
 export default async function MjnPage({
   searchParams,
@@ -39,8 +39,8 @@ export default async function MjnPage({
   const campaigns = getVisibleCampaigns(role, "mjn");
 
   const heroImage = await getGeneratedImage(
-    "mjn-hero", 
-    "A stunning, elegant cinematic close-up photograph of strong, intricate mangrove roots dipping into calm, dark waters under a warm, glowing sunset. Symbolizing intergenerational strength, women, and deep community roots. Deep forest greens, rich earthy browns, and soft golden light highlighting the textures. Premium editorial photography, highly detailed, moody, and sophisticated. Perfect for a professional, institutional website header background. No people, no text.",
+    "mjn-hero-v3", 
+    "A breathtaking and vibrant digital illustration representing Afro-Colombian women, youth, and childhood. Featuring a beautiful stylized composition of traditional woven palm textures, flowing river currents, and tropical lush leaves. Warm sunset colors blending with rich earth tones, golden yellows, terracotta, and deep forest green. Symbolizing intergenerational connection, ancestral knowledge, and care for the territory. Modern, elegant, highly detailed, institutional graphic art style. No people faces to remain abstract and inclusive. Perfect for a website hero background. No text.",
     "16:9"
   );
 
@@ -49,9 +49,21 @@ export default async function MjnPage({
     "A beautiful, elegant minimalist icon-style illustration of a mangrove tree root system meeting a river. Deep emerald green and warm gold colors. Clean, balanced, sophisticated. No text, perfect for a document cover thumbnail."
   );
 
+  // Filter mjnStories just like the previous inline filter
+  const visibleStories = mjnStories.filter((story) => {
+    if (!story.publicationAuthorized) {
+      return false;
+    }
+    if (story.visibility === "internal") {
+      return role !== "public";
+    }
+    return true;
+  });
+
   return (
     <SiteLayout role={role}>
       <HeroSection
+        eyebrow="Agenda Estratégica"
         title={<>Mujeres, <br />Juventudes y Niñez</>}
         description="Espacio editorial para contexto político, materiales pedagógicos, memorias autorizadas y campañas activas de la agenda MJN."
         generatedImageUrl={heroImage}
@@ -122,18 +134,9 @@ export default async function MjnPage({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <SectionHeader
-          eyebrow="Memoria y relatos"
-          title="Piezas autorizadas"
-          description="Solo se muestran testimonios, audios, fotos o videos cuando existe autorización de publicación."
-        />
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {mjnStories.map((story) => (
-            <StoryCard key={story.id} story={story} />
-          ))}
-        </div>
-      </section>
+      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <PiezasAutorizadasSection stories={visibleStories} />
+      </div>
 
       {campaigns.length > 0 ? (
         <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">

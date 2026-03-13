@@ -34,6 +34,7 @@ type SiteLayoutProps = {
   simplifiedHeader?: boolean;
   footerMinimal?: boolean;
   banner?: ReactNode;
+  floatingPanel?: ReactNode;
 };
 
 function SiteHeader({
@@ -73,7 +74,7 @@ function SiteHeader({
 
         {simplified ? null : (
           <>
-            <nav className="hidden items-center gap-6 text-sm font-medium text-[color:var(--forest)] lg:flex">
+            <nav aria-label="Navegación principal" className="hidden items-center gap-6 text-sm font-medium text-[color:var(--forest)] lg:flex">
               {navItems.map((item) => (
                 <Link key={item.href} href={withRole(item.href, role)} className="transition hover:text-[color:var(--gold-700)]">
                   {item.label}
@@ -194,6 +195,9 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
                 <Link href={withRole("/politica-de-datos", role)} className="transition hover:text-white">
                   Política de tratamiento de datos
                 </Link>
+                <Link href={withRole("/accesibilidad", role)} className="transition hover:text-white">
+                  Declaración de accesibilidad
+                </Link>
                 <a href="mailto:datos@palenke.org" className="transition hover:text-white">
                   Contacto
                 </a>
@@ -216,9 +220,16 @@ export function SiteLayout({
   simplifiedHeader,
   footerMinimal,
   banner,
+  floatingPanel,
 }: SiteLayoutProps) {
   return (
     <div className="min-h-screen bg-[color:var(--page)] text-[color:var(--forest)]">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-[color:var(--forest)] focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-[color:var(--sand)]"
+      >
+        Saltar al contenido principal
+      </a>
       <SiteHeader role={role} simplified={simplifiedHeader} />
       {banner ? <div className="border-b border-[color:var(--border-soft)] bg-[color:var(--sand-strong)]">{banner}</div> : null}
       {breadcrumbs?.length ? (
@@ -228,7 +239,8 @@ export function SiteLayout({
           </div>
         </div>
       ) : null}
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
+      {floatingPanel}
       <SiteFooter role={role} minimal={footerMinimal} />
     </div>
   );
@@ -237,18 +249,23 @@ export function SiteLayout({
 export function Breadcrumbs({ crumbs, role }: { crumbs: Crumb[]; role: ViewerRole }) {
   return (
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--muted-strong)]">
-      {crumbs.map((crumb, index) => (
-        <span key={`${crumb.label}-${index}`} className="flex items-center gap-2">
-          {crumb.href ? (
-            <Link href={withRole(crumb.href, role)} className="transition hover:text-[color:var(--forest)]">
-              {crumb.label}
-            </Link>
-          ) : (
-            <span className="font-medium text-[color:var(--forest)]">{crumb.label}</span>
-          )}
-          {index < crumbs.length - 1 ? <span className="text-[color:var(--muted)]">/</span> : null}
-        </span>
-      ))}
+      {crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1;
+        return (
+          <span key={`${crumb.label}-${index}`} className="flex items-center gap-2">
+            {crumb.href && !isLast ? (
+              <Link href={withRole(crumb.href, role)} className="transition hover:text-[color:var(--forest)]">
+                {crumb.label}
+              </Link>
+            ) : (
+              <span aria-current={isLast ? "page" : undefined} className="font-medium text-[color:var(--forest)]">
+                {crumb.label}
+              </span>
+            )}
+            {!isLast ? <span aria-hidden="true" className="text-[color:var(--muted)]">/</span> : null}
+          </span>
+        );
+      })}
     </nav>
   );
 }
@@ -281,8 +298,9 @@ export function Callout({
   title?: string;
   children: ReactNode;
 }) {
+  const ariaRole = tone === "danger" || tone === "warning" ? "alert" : "status";
   return (
-    <div className={`callout callout-${tone}`}>
+    <div role={ariaRole} className={`callout callout-${tone}`}>
       {title ? <p className="mb-1 font-semibold">{title}</p> : null}
       <div className="space-y-2 text-sm leading-6">{children}</div>
     </div>
@@ -468,7 +486,7 @@ export function CampaignCard({
 
 export function StoryCard({ story }: { story: StoryRecord }) {
   const labels = {
-    text: "Documento",
+    testimony: "Testimonio",
     audio: "Audio",
     video: "Video",
     photo: "Foto",
@@ -489,8 +507,26 @@ export function StoryCard({ story }: { story: StoryRecord }) {
       </div>
       <div className="mt-auto flex items-center justify-between gap-3">
         <span className="chip">{story.duration ?? labels[story.kind]}</span>
-        <button type="button" className="button-secondary">
-          {story.kind === "audio" ? "Escuchar" : story.kind === "video" ? "Ver video" : "Abrir"}
+        <button
+          type="button"
+          className="button-secondary"
+          aria-label={`${
+            story.kind === "audio"
+              ? "Escuchar"
+              : story.kind === "video"
+                ? "Ver video"
+                : story.kind === "testimony"
+                  ? "Leer testimonio"
+                  : "Abrir"
+          }: ${story.title}`}
+        >
+          {story.kind === "audio"
+            ? "Escuchar"
+            : story.kind === "video"
+              ? "Ver video"
+              : story.kind === "testimony"
+                ? "Leer"
+                : "Abrir"}
         </button>
       </div>
     </article>
@@ -522,9 +558,9 @@ export function EmptyState({
 
 export function SkeletonGrid({ count = 3 }: { count?: number }) {
   return (
-    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div aria-busy="true" aria-label="Cargando resultados…" className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="surface-card animate-pulse">
+        <div key={index} aria-hidden="true" className="surface-card animate-pulse">
           <div className="mb-5 h-7 w-28 rounded-full bg-[color:var(--sand-strong)]" />
           <div className="mb-3 h-9 w-4/5 rounded-2xl bg-[color:var(--sand-strong)]" />
           <div className="mb-2 h-4 w-1/2 rounded-full bg-[color:var(--sand-strong)]" />
@@ -578,7 +614,7 @@ export function FilterChip({ label, href }: { label: string; href?: string }) {
   }
 
   return (
-    <Link href={href} className="chip transition hover:border-[color:var(--gold-500)]">
+    <Link href={href} className="chip transition hover:border-[color:var(--gold-500)]" aria-label={`Quitar filtro: ${label}`}>
       {content}
     </Link>
   );
@@ -588,14 +624,16 @@ export function InputLabel({
   label,
   required,
   hint,
+  htmlFor,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
+  htmlFor?: string;
 }) {
   return (
     <div className="mb-2">
-      <label className="block text-sm font-semibold text-[color:var(--forest)]">
+      <label htmlFor={htmlFor} className="block text-sm font-semibold text-[color:var(--forest)]">
         {label}
         {required ? <span className="ml-1 text-[color:var(--danger)]">*</span> : null}
       </label>
@@ -619,8 +657,16 @@ export function Field({
 }) {
   return (
     <div>
-      <InputLabel label={label} required={required} hint={hint} />
-      {children}
+      <label className="block">
+        <span className="mb-2 block text-sm font-semibold text-[color:var(--forest)]">
+          {label}
+          {required ? <span className="ml-1 text-[color:var(--danger)]">*</span> : null}
+        </span>
+        {hint ? (
+          <span className="mb-2 mt-1 block text-xs leading-5 text-[color:var(--muted)]">{hint}</span>
+        ) : null}
+        {children}
+      </label>
       {error ? (
         <p role="alert" className="mt-2 text-sm text-[color:var(--danger)]">
           {error}
@@ -806,11 +852,12 @@ export function AdminLayout({
         <aside className="surface-card h-fit p-4">
           <details className="lg:hidden">
             <summary className="list-none text-sm font-semibold text-[color:var(--forest)]">Secciones del panel</summary>
-            <nav className="mt-4 grid gap-2">
+            <nav aria-label="Panel de administración" className="mt-4 grid gap-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={withRole(item.href, role)}
+                  aria-current={active === item.id ? "page" : undefined}
                   className={`rounded-2xl px-4 py-3 text-sm font-medium ${
                     active === item.id ? "bg-[color:var(--forest)] text-[color:var(--sand)]" : "bg-[color:var(--sand-strong)] text-[color:var(--forest)]"
                   }`}
@@ -821,11 +868,12 @@ export function AdminLayout({
             </nav>
           </details>
 
-          <nav className="hidden gap-2 lg:grid">
+          <nav aria-label="Panel de administración" className="hidden gap-2 lg:grid">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={withRole(item.href, role)}
+                aria-current={active === item.id ? "page" : undefined}
                 className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
                   active === item.id
                     ? "bg-[color:var(--forest)] text-[color:var(--sand)]"

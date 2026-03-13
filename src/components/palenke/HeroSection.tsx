@@ -6,12 +6,14 @@ import { motion } from 'framer-motion';
 const easePalenke: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function HeroSection({ 
-  generatedImageUrl, 
+  generatedImageUrl,
+  eyebrow,
   title, 
   description, 
   actions 
 }: { 
   generatedImageUrl?: string;
+  eyebrow?: string;
   title: React.ReactNode;
   description: React.ReactNode;
   actions: React.ReactNode;
@@ -49,6 +51,18 @@ export default function HeroSection({
         
         {/* Text Content */}
         <div className="flex flex-col space-y-8 max-w-3xl">
+          {eyebrow && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: easePalenke }}
+              className="inline-flex items-center gap-3 w-fit"
+            >
+              <span className="h-px w-8 bg-[color:var(--sand)]/60" />
+              <span className="uppercase tracking-widest text-sm font-semibold text-[color:var(--sand)]/90">{eyebrow}</span>
+            </motion.div>
+          )}
+
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

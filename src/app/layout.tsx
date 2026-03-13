@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Public_Sans } from "next/font/google";
+import { Suspense } from "react";
+import GlobalBibliotecaSearchDock from "@/components/palenke/GlobalBibliotecaSearchDock";
+import { getVisibleDocuments } from "@/lib/mock-data";
 import "./globals.css";
 
 const publicSans = Public_Sans({
@@ -18,6 +21,8 @@ export const metadata: Metadata = {
     "Mock interactivo del MVP Palenke con flujo público, interno y panel administrativo basado en el blueprint de diseño.",
 };
 
+const globalSearchDocuments = getVisibleDocuments("public").toSorted((a, b) => b.year - a.year);
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,8 +30,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${publicSans.variable} ${fraunces.variable} antialiased`}>{children}</body>
+      <body className={`${publicSans.variable} ${fraunces.variable} antialiased`}>
+        {children}
+        <Suspense fallback={null}>
+          <GlobalBibliotecaSearchDock documents={globalSearchDocuments} />
+        </Suspense>
+      </body>
     </html>
   );
 }
-

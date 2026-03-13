@@ -1,5 +1,6 @@
 export type ViewerRole = "public" | "internal" | "admin";
 export type Visibility = "public" | "internal" | "sensitive";
+export type StoryKind = "audio" | "video" | "testimony" | "photo";
 
 export type DocumentRecord = {
   id: string;
@@ -27,12 +28,21 @@ export type DocumentRecord = {
 
 export type StoryRecord = {
   id: string;
-  kind: "text" | "audio" | "video" | "photo";
+  kind: StoryKind;
   title: string;
   territory: string;
+  community: string;
+  contributor: string;
   year: number;
   description: string;
   duration?: string;
+  tags: string[];
+  visibility: Extract<Visibility, "public" | "internal">;
+  publicationAuthorized: boolean;
+  authorizationLabel: string;
+  mediaUrl?: string;
+  thumbnailUrl?: string;
+  relatedIds: string[];
 };
 
 export type CampaignMaterial = {
@@ -353,38 +363,182 @@ export const documents: DocumentRecord[] = [
 
 export const mjnStories: StoryRecord[] = [
   {
-    id: "story-audio",
+    id: "story-audio-manglar",
     kind: "audio",
-    title: "Testimonio sonoro sobre cuidado del manglar",
+    title: "Voces de cuidadoras del manglar",
     territory: "Bajo Baudó",
+    community: "Consejo Comunitario del Bajo Baudó",
+    contributor: "Colectivo de Mujeres Cuidadoras",
     year: 2024,
-    description: "Relato breve sobre memoria ambiental y trabajo colectivo de mujeres cuidadoras.",
+    description:
+      "Testimonio sonoro sobre memoria ambiental y trabajo colectivo de mujeres cuidadoras del manglar.",
     duration: "12 min",
+    tags: ["Cuidado colectivo", "Manglar", "Mujeres"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización comunitaria registrada · Acta MJN-014",
+    mediaUrl: "https://www.w3schools.com/html/horse.mp3",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-photo-guardianas-rio", "story-testimony-comadres-territorio", "story-video-escuela-naya"],
   },
   {
-    id: "story-video",
+    id: "story-video-escuela-naya",
     kind: "video",
     title: "Escuela de liderazgos juveniles del río Naya",
     territory: "Cuenca del Naya",
+    community: "Consejo Comunitario del río Naya",
+    contributor: "Escuela Popular de Comunicación Juvenil",
     year: 2023,
-    description: "Registro audiovisual de formación política y comunicación comunitaria.",
+    description:
+      "Registro audiovisual de formación política, cuidado del río y comunicación comunitaria intergeneracional.",
     duration: "8 min",
+    tags: ["Juventudes", "Formación política", "Memoria audiovisual"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización de vocerías y uso público · Formato MJN-021",
+    mediaUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ?rel=0",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-audio-ninez-rio", "story-photo-juventudes-cocina", "story-testimony-jovenes-guapi"],
   },
   {
-    id: "story-text",
-    kind: "text",
-    title: "Memoria escrita de comadres que sostienen el territorio",
+    id: "story-testimony-comadres-territorio",
+    kind: "testimony",
+    title: "Comadres que sostienen el territorio",
     territory: "Litoral Sanquianga",
+    community: "Red de Consejos Comunitarios del Sanquianga",
+    contributor: "Mesa de Mujeres del Sanquianga",
     year: 2022,
-    description: "Extracto editorial sobre prácticas de cuidado, liderazgo y organización comunitaria.",
+    description:
+      "Relato editorial sobre prácticas de cuidado, liderazgo y organización para la protección colectiva del territorio.",
+    tags: ["Testimonio", "Liderazgo", "Cuidado"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización para publicación editorial · Consentimiento informado",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-audio-manglar", "story-photo-guardianas-rio", "story-testimony-lideresas-sanquianga"],
   },
   {
-    id: "story-photo",
+    id: "story-photo-guardianas-rio",
     kind: "photo",
     title: "Archivo fotográfico de guardianas del río",
     territory: "Guapi",
+    community: "Proceso de Consejos Comunitarios de Guapi",
+    contributor: "Archivo Comunitario de Guapi",
     year: 2024,
-    description: "Selección curada de imágenes publicables con autorización previa.",
+    description:
+      "Selección curada de imágenes publicables sobre jornadas de cuidado del río y trabajo comunitario de mujeres.",
+    tags: ["Foto", "Archivo comunitario", "Río"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización de imagen y publicación comunitaria · Carpeta 2024",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-audio-manglar", "story-photo-juventudes-cocina", "story-video-escuela-naya"],
+  },
+  {
+    id: "story-audio-ninez-rio",
+    kind: "audio",
+    title: "Niñez y cuidado del río",
+    territory: "Cuenca del Naya",
+    community: "Consejo Comunitario del río Naya",
+    contributor: "Escuela radial comunitaria",
+    year: 2025,
+    description:
+      "Audio de circulación interna con experiencias de niñas y niños sobre cuidado del agua y memoria familiar.",
+    duration: "9 min",
+    tags: ["Niñez", "Radio comunitaria", "Escuelas de río"],
+    visibility: "internal",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización de uso interno para formación comunitaria",
+    mediaUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-video-escuela-naya", "story-testimony-jovenes-guapi", "story-photo-juventudes-cocina"],
+  },
+  {
+    id: "story-video-cantos-guapi",
+    kind: "video",
+    title: "Cantos y memoria de mujeres en Guapi",
+    territory: "Guapi",
+    community: "Proceso de Consejos Comunitarios de Guapi",
+    contributor: "Colectivo de Comunicadoras Populares",
+    year: 2024,
+    description:
+      "Video comunitario sobre encuentros de canto, cocina y memoria como formas de cuidado colectivo.",
+    duration: "11 min",
+    tags: ["Mujeres", "Memoria audiovisual", "Cantos tradicionales"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización de publicación colectiva · Registro audiovisual MJN",
+    mediaUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-testimony-lideresas-sanquianga", "story-photo-guardianas-rio", "story-audio-manglar"],
+  },
+  {
+    id: "story-testimony-jovenes-guapi",
+    kind: "testimony",
+    title: "Jóvenes que organizan memoria viva",
+    territory: "Guapi",
+    community: "Proceso de Consejos Comunitarios de Guapi",
+    contributor: "Semillero Juvenil de Memoria",
+    year: 2025,
+    description:
+      "Testimonio sobre cómo las juventudes documentan procesos comunitarios sin exponer información sensible.",
+    tags: ["Juventudes", "Memoria", "Comunicación comunitaria"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización individual y de comité de comunicaciones",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-video-escuela-naya", "story-audio-ninez-rio", "story-photo-juventudes-cocina"],
+  },
+  {
+    id: "story-photo-juventudes-cocina",
+    kind: "photo",
+    title: "Cocinas colectivas y juventudes",
+    territory: "Litoral Sanquianga",
+    community: "Red de Consejos Comunitarios del Sanquianga",
+    contributor: "Archivo Comunitario de Juventudes",
+    year: 2025,
+    description:
+      "Serie fotográfica de encuentros intergeneracionales en cocinas comunitarias y espacios de cuidado.",
+    tags: ["Juventudes", "Foto", "Cuidado colectivo"],
+    visibility: "public",
+    publicationAuthorized: true,
+    authorizationLabel: "Autorización de imagen vigente para galería pública",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-video-escuela-naya", "story-testimony-jovenes-guapi", "story-photo-guardianas-rio"],
+  },
+  {
+    id: "story-testimony-lideresas-sanquianga",
+    kind: "testimony",
+    title: "Lideresas y tejido de acompañamiento",
+    territory: "Litoral Sanquianga",
+    community: "Red de Consejos Comunitarios del Sanquianga",
+    contributor: "Mesa de Acompañamiento Territorial",
+    year: 2026,
+    description:
+      "Relato de acompañamiento entre lideresas para sostener procesos organizativos y rutas de cuidado.",
+    tags: ["Mujeres", "Acompañamiento", "Organización"],
+    visibility: "internal",
+    publicationAuthorized: true,
+    authorizationLabel: "Publicación de uso interno aprobada por comité de protección",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: ["story-video-cantos-guapi", "story-testimony-comadres-territorio", "story-audio-manglar"],
+  },
+  {
+    id: "story-photo-borrador",
+    kind: "photo",
+    title: "Borrador de registro no publicado",
+    territory: "Bajo Baudó",
+    community: "Consejo Comunitario del Bajo Baudó",
+    contributor: "Equipo de documentación",
+    year: 2026,
+    description:
+      "Material en revisión editorial y de autorización; no debe aparecer en la grilla pública.",
+    tags: ["Borrador"],
+    visibility: "internal",
+    publicationAuthorized: false,
+    authorizationLabel: "Sin autorización de publicación",
+    thumbnailUrl: "/generated/doc-thumbnail.png",
+    relatedIds: [],
   },
 ];
 
@@ -794,6 +948,18 @@ export function getVisibleMjnDocuments(role: ViewerRole) {
   return getVisibleDocuments(role).filter(
     (document) => document.genderFocus || document.mjnTags.length > 0,
   );
+}
+
+export function getVisibleMjnStories(role: ViewerRole) {
+  return mjnStories.filter((story) => {
+    if (!story.publicationAuthorized) {
+      return false;
+    }
+    if (story.visibility === "internal") {
+      return role !== "public";
+    }
+    return true;
+  });
 }
 
 export function findDocumentBySlug(slug: string) {

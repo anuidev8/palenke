@@ -20,6 +20,13 @@
   --danger-soft: #f8d5d5;
   --success: #d8ead2;
   --success-strong: #21542c;
+  --search-surface: #ecf5f8;
+  --search-surface-strong: #e1eff4;
+  --search-accent: #1f556e;
+  --search-accent-strong: #2f6179;
+  --search-border: rgba(47, 97, 121, 0.24);
+  --search-border-strong: rgba(47, 97, 121, 0.34);
+  --search-ring: rgba(47, 97, 121, 0.12);
   --border-soft: rgba(13, 31, 10, 0.1);
   --border-strong: rgba(13, 31, 10, 0.22);
   --shadow-card: 0 20px 60px rgba(13, 31, 10, 0.08);
@@ -43,6 +50,18 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Visible focus ring for keyboard navigation (WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Suppress outline for mouse/touch users */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {
@@ -224,4 +243,3 @@ h6 {
     color: var(--danger);
   }
 }
-

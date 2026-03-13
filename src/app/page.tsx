@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CampaignCard, Callout, PageBanner, SectionHeader, SiteLayout } from "@/components/mock/ui";
 import HeroSection from "@/components/palenke/HeroSection";
+import OpenSearchHeroButton from "@/components/palenke/OpenSearchHeroButton";
 import { getGeneratedImage } from "@/lib/generate-image";
 import { getVisibleCampaigns, homeIntro } from "@/lib/mock-data";
 import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
@@ -29,14 +30,13 @@ export default async function HomePage({
       }
     >
       <HeroSection
+        eyebrow="Portal de Conocimiento"
         title={<>Soberanía, <br /> Memoria y Cuidado.</>}
         description="Espacio digital para organizar, custodiar y comunicar el trabajo político, técnico y comunitario del Palenke y el PCN."
-        generatedImageUrl={await getGeneratedImage("hero-landing", "A breathtaking, ultra-realistic cinematic aerial photograph of a serene Colombian Pacific river winding through dense mangrove forests at twilight. Moody, elegant, and highly sophisticated. Deep emerald greens, rich dark waters, and soft warm golden hour sunlight breaking through a light mist. Premium editorial landscape photography, high contrast, perfect for a high-end institutional website background. No people, no text, highly professional and expansive.", "16:9")}
+        generatedImageUrl={await getGeneratedImage("hero-landing-v2", "A breathtaking, stylized vector-art illustration of the Colombian Pacific landscape. Featuring sweeping, elegant curves of a dark river weaving through lush, abstract emerald green mangrove forests and tropical foliage. Warm golden hour sunlight illuminating the scene with a soft, ethereal glow. A sense of deep ancestral connection, sovereignty, and care for the territory. Deep forest greens, rich earthy browns, terracotta, and warm gold. Modern, highly detailed, institutional graphic art style, perfect for a high-end website hero background. No people, no text, expansive and majestic.", "16:9")}
         actions={
           <>
-            <Link href={withRole("/biblioteca", role)} className="button-primary">
-              Explorar la Biblioteca
-            </Link>
+            <OpenSearchHeroButton />
             <Link href={withRole("/mujeres-juventudes-ninez", role)} className="button-secondary">
               Ver agenda MJN
             </Link>

@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: "AIzaSyDqsYOhiKjQ4qcEt3M0BHFscWjb3Lvxn40"});
 
 export async function getGeneratedImage(promptId: string, promptText: string, aspectRatio: string = '1:1'): Promise<string> {
   const filename = `${promptId}.png`;
