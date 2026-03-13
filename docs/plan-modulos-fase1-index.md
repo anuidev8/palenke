@@ -1,0 +1,17 @@
+# Índice de planes Fase 1
+
+- [01 · Página inicial / Presentación](./plan-pagina-inicial-presentacion.md)
+- [x] [02 · Biblioteca Base – Gobierno Propio](./plan-biblioteca-gobierno-propio.md)
+- [x] [03 · Biblioteca Base – Planes (uso, manejo, etnodesarrollo)](./plan-biblioteca-planes.md)
+- [x] [04 · Biblioteca Base – Rutas de litigio estratégico](./plan-biblioteca-rutas-litigio.md)
+- [x] [05 · Biblioteca Base – Producción técnica y política](./plan-biblioteca-produccion-tecnica-politica.md)
+- [x] [06 · Biblioteca Base – Material pedagógico y comunitario](./plan-biblioteca-material-pedagogico-comunitario.md)
+- [x] [07 · Página MJN – Texto de contexto político](./plan-mjn-texto-contexto-politico.md)
+- [x] [08 · Página MJN – Documentos y rutas](./plan-mjn-documentos-rutas.md)
+- [x] [09 · Página MJN – Memoria y relatos](./plan-mjn-memoria-relatos.md)
+- [x] [10 · Bloque de contenidos destacados (campañas)](./plan-campanas-contenidos-destacados.md)
+- [x] [11 · Módulo Estadísticas y Tableros – Power BI](./plan-estadisticas-tableros-power-bi.md)
+- [x] [12 · Módulo Geoportal Interno – Acceso SIG](./plan-geoportal-interno-acceso-sig.md)
+- [x] [13 · Área interna – Usuarios, roles y cuentas](./plan-usuarios-roles-cuentas.md)
+- [14 · Área interna – Fichas de ACC priorizadas](./plan-acc-priorizadas.md)
+- [15 · Política de tratamiento de datos personales](./plan-politica-tratamiento-datos-personales.md)

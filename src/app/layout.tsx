@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, Syne } from "next/font/google";
+import { Fraunces, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const syne = Syne({ subsets: ["latin"], variable: "--font-syne", weight: ["400", "500", "600", "700", "800"] });
+const publicSans = Public_Sans({
+  subsets: ["latin"],
+  variable: "--font-public-sans",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+});
 
 export const metadata: Metadata = {
-  title: "Plataforma Palenke | Infraestructura digital para pensar y defender el territorio",
-  description: "Propuesta de MVP afroterritorial, construida con el PCN y sus comunidades.",
+  title: "Plataforma Palenke | MVP mockup blueprint",
+  description:
+    "Mock interactivo del MVP Palenke con flujo público, interno y panel administrativo basado en el blueprint de diseño.",
 };
 
 export default function RootLayout({
@@ -17,9 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${syne.variable} font-sans bg-[#FFF8EA] text-[#1E1E1E] antialiased`}>
-        {children}
-      </body>
+      <body className={`${publicSans.variable} ${fraunces.variable} antialiased`}>{children}</body>
     </html>
   );
 }
+

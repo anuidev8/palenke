@@ -47,7 +47,7 @@ export default function Objective() {
           >
             <Quote className="absolute top-4 left-4 w-12 h-12 text-[#D9A441] opacity-30" />
             <p className="relative z-10 text-xl font-syne font-semibold italic leading-relaxed">
-              "Los actores comunitarios no son 'usuarios finales', sino sujetos políticos y productores de conocimiento."
+              &quot;Los actores comunitarios no son &apos;usuarios finales&apos;, sino sujetos políticos y productores de conocimiento.&quot;
             </p>
             <div className="mt-6 flex items-center">
               <div className="w-12 h-1 bg-[#D9A441] mr-4"></div>

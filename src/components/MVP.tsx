@@ -109,7 +109,7 @@ export default function MVP() {
                     <h3 className="text-lg font-bold text-[#D9A441] font-syne">Narrativa y Estética</h3>
                 </div>
                 <p className="text-sm opacity-90 mb-4">
-                    Estética afro contemporánea con raíz territorial. Espacios pensados para fotografía comunitaria real, evitando la folclorización y lo "afro decorativo".
+                    Estética afro contemporánea con raíz territorial. Espacios pensados para fotografía comunitaria real, evitando la folclorización y lo &quot;afro decorativo&quot;.
                 </p>
             </motion.div>
         </div>

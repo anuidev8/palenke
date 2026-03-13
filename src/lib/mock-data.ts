@@ -1,0 +1,829 @@
+export type ViewerRole = "public" | "internal" | "admin";
+export type Visibility = "public" | "internal" | "sensitive";
+
+export type DocumentRecord = {
+  id: string;
+  slug: string;
+  title: string;
+  section: string;
+  type: string;
+  description: string;
+  territory: string;
+  council: string;
+  department: string;
+  municipality: string;
+  year: number;
+  validity: string;
+  visibility: Visibility;
+  keywords: string[];
+  genderFocus: boolean;
+  mjnTags: string[];
+  action: "file" | "external" | "video";
+  fileLabel: string;
+  fileSize?: string;
+  url: string;
+  riskFlag?: boolean;
+};
+
+export type StoryRecord = {
+  id: string;
+  kind: "text" | "audio" | "video" | "photo";
+  title: string;
+  territory: string;
+  year: number;
+  description: string;
+  duration?: string;
+};
+
+export type CampaignMaterial = {
+  id: string;
+  type: "Afiche" | "Cartilla" | "Video" | "Otro";
+  title: string;
+  action: "download" | "watch";
+  url: string;
+};
+
+export type CampaignRecord = {
+  id: string;
+  slug: string;
+  title: string;
+  intro: string;
+  body: string[];
+  startDate: string;
+  endDate?: string;
+  visibility: Extract<Visibility, "public" | "internal">;
+  active: boolean;
+  placements: Array<"home" | "mjn" | "biblioteca" | "all">;
+  materials: CampaignMaterial[];
+};
+
+export type DashboardRecord = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  topic: string;
+  territory: string;
+  period: string;
+  audience: string;
+  frequency: string;
+  visibility: Extract<Visibility, "public" | "internal">;
+  status: "Activo" | "En actualización" | "Desactivado temporalmente";
+  embedUrl: string;
+};
+
+export type AccRecord = {
+  id: string;
+  name: string;
+  nickname?: string;
+  council: string;
+  basin: string;
+  municipalities: string;
+  departments: string;
+  hectares?: number;
+  description: string;
+  inGeoportal: boolean;
+  geoportalLayer?: string;
+  linkedDashboardId?: string;
+  linkedDocumentIds: string[];
+  linkedToMeta3030: boolean;
+  visibility: Extract<Visibility, "public" | "internal">;
+};
+
+export type UserRecord = {
+  id: string;
+  name: string;
+  email: string;
+  role: "Admin" | "Interno";
+  organization: string;
+  isPrimaryAdmin: boolean;
+  active: boolean;
+  mustChangePassword: boolean;
+  lastLoginAt?: string; // ISO date string, undefined = never logged in
+};
+
+export const USER_LIMIT = 15;
+
+export type ActivityRecord = {
+  id: string;
+  title: string;
+  section: string;
+  editedBy: string;
+  editedAt: string;
+  kind?: "content" | "user_created" | "user_deactivated" | "user_role_changed" | "password_reset";
+};
+
+export const librarySections = [
+  "Gobierno Propio",
+  "Planes de uso y manejo",
+  "Planes de etnodesarrollo",
+  "Rutas de litigio estratégico",
+  "Producción técnica/política",
+  "Material pedagógico/comunitario",
+] as const;
+
+export const territories = [
+  "Cuenca del Naya",
+  "Bajo Baudó",
+  "Guapi",
+  "Litoral Sanquianga",
+] as const;
+
+export const instrumentTypes = [
+  "Reglamento interno",
+  "Plan de manejo",
+  "Plan de etnodesarrollo",
+  "Ruta de litigio",
+  "Cartilla",
+  "Video",
+  "Informe",
+  "Pronunciamiento",
+  "Estudio",
+] as const;
+
+export const documents: DocumentRecord[] = [
+  {
+    id: "doc-reglamento-naya",
+    slug: "reglamento-interno-rio-naya-2021",
+    title: "Reglamento interno del Consejo Comunitario del río Naya",
+    section: "Gobierno Propio",
+    type: "Reglamento interno",
+    description:
+      "Versión aprobada del reglamento interno con lineamientos de autoridad, manejo territorial y mecanismos de decisión comunitaria.",
+    territory: "Cuenca del Naya",
+    council: "Consejo Comunitario del río Naya",
+    department: "Cauca",
+    municipality: "López de Micay",
+    year: 2021,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["gobierno propio", "Naya", "reglamento", "2021"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "3.2 MB",
+    url: "#",
+  },
+  {
+    id: "doc-manglar-baudó",
+    slug: "plan-uso-manejo-manglar-baudo-2023",
+    title: "Plan de uso y manejo del manglar en Bajo Baudó",
+    section: "Planes de uso y manejo",
+    type: "Plan de manejo",
+    description:
+      "Herramienta comunitaria para acordar usos, restauración y vigilancia del manglar sin publicar coordenadas sensibles.",
+    territory: "Bajo Baudó",
+    council: "Consejo Comunitario del Bajo Baudó",
+    department: "Chocó",
+    municipality: "Bajo Baudó",
+    year: 2023,
+    validity: "En actualización",
+    visibility: "internal",
+    keywords: ["manglar", "Bajo Baudó", "manejo", "restauración"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "5.8 MB",
+    url: "#",
+  },
+  {
+    id: "doc-etnodesarrollo-guapi",
+    slug: "lineamientos-etnodesarrollo-guapi-2022",
+    title: "Lineamientos de etnodesarrollo para consejos comunitarios de Guapi",
+    section: "Planes de etnodesarrollo",
+    type: "Plan de etnodesarrollo",
+    description:
+      "Síntesis operativa de prioridades económicas, educativas y organizativas con enfoque de fortalecimiento comunitario.",
+    territory: "Guapi",
+    council: "Proceso de Consejos Comunitarios de Guapi",
+    department: "Cauca",
+    municipality: "Guapi",
+    year: 2022,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["etnodesarrollo", "Guapi", "planificación", "prioridades"],
+    genderFocus: true,
+    mjnTags: ["Juventudes", "MJN general"],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "2.9 MB",
+    url: "#",
+  },
+  {
+    id: "doc-ruta-defensoras",
+    slug: "ruta-litigio-defensoras-territorio",
+    title: "Ruta de litigio y protección para defensoras del territorio",
+    section: "Rutas de litigio estratégico",
+    type: "Ruta de litigio",
+    description:
+      "Documento de trabajo con pasos de acompañamiento jurídico y psicosocial para casos activos vinculados a lideresas y comunidades en riesgo.",
+    territory: "Litoral Sanquianga",
+    council: "Red de Consejos Comunitarios del Sanquianga",
+    department: "Nariño",
+    municipality: "Olaya Herrera",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["litigio", "defensoras", "protección", "acompañamiento"],
+    genderFocus: true,
+    mjnTags: ["Mujeres"],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "1.6 MB",
+    url: "#",
+    riskFlag: true,
+  },
+  {
+    id: "doc-cartilla-cuidado",
+    slug: "cartilla-cuidado-colectivo-mujeres-jovenes",
+    title: "Cartilla de cuidado colectivo para mujeres y jóvenes del territorio",
+    section: "Material pedagógico/comunitario",
+    type: "Cartilla",
+    description:
+      "Material pedagógico para talleres de cuidado, liderazgo y prevención de violencias con lenguaje comunitario y práctico.",
+    territory: "Cuenca del Naya",
+    council: "Consejo Comunitario del río Naya",
+    department: "Cauca",
+    municipality: "López de Micay",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["cartilla", "cuidado colectivo", "mujeres", "jóvenes"],
+    genderFocus: true,
+    mjnTags: ["Mujeres", "Juventudes"],
+    action: "external",
+    fileLabel: "Ver recurso",
+    url: "https://example.com/cartilla-cuidado",
+  },
+  {
+    id: "doc-video-memoria",
+    slug: "memoria-audiovisual-juventudes-rio-naya",
+    title: "Memoria audiovisual de juventudes del río Naya",
+    section: "Material pedagógico/comunitario",
+    type: "Video",
+    description:
+      "Pieza audiovisual autorizada para uso público sobre memoria, cuidado del río y procesos organizativos juveniles.",
+    territory: "Cuenca del Naya",
+    council: "Consejo Comunitario del río Naya",
+    department: "Cauca",
+    municipality: "López de Micay",
+    year: 2023,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["video", "memoria", "juventudes", "Naya"],
+    genderFocus: true,
+    mjnTags: ["Juventudes", "Niñez"],
+    action: "video",
+    fileLabel: "Ver video",
+    url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  },
+  {
+    id: "doc-pronunciamiento-pcn-2024",
+    slug: "pronunciamiento-pcn-derechos-etnicos-2024",
+    title: "Pronunciamiento del Palenke/PCN sobre derechos étnicos y soberanía territorial",
+    section: "Producción técnica/política",
+    type: "Pronunciamiento",
+    description:
+      "Posición pública del proceso organizativo frente a las amenazas al territorio, los derechos colectivos y la autonomía de los pueblos negros en el Pacífico colombiano.",
+    territory: "Guapi",
+    council: "Palenke de Pensamiento / PCN",
+    department: "Cauca",
+    municipality: "Guapi",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["pronunciamiento", "derechos étnicos", "PCN", "Pacífico"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "0.8 MB",
+    url: "#",
+  },
+  {
+    id: "doc-estudio-conflicto-naya-2023",
+    slug: "estudio-conflicto-territorial-naya-2023",
+    title: "Estudio sobre conflictos territoriales y gobernanza comunitaria en la cuenca del Naya",
+    section: "Producción técnica/política",
+    type: "Estudio",
+    description:
+      "Análisis técnico de uso interno sobre tensiones en el gobierno propio, presión extractiva y capacidades organizativas de los consejos comunitarios del río Naya.",
+    territory: "Cuenca del Naya",
+    council: "Consejo Comunitario del río Naya",
+    department: "Cauca",
+    municipality: "López de Micay",
+    year: 2023,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["estudio", "conflicto territorial", "Naya", "gobernanza"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "4.1 MB",
+    url: "#",
+  },
+  {
+    id: "doc-sensible",
+    slug: "inventario-zonas-riesgo-territorial",
+    title: "Inventario interno de zonas de riesgo territorial",
+    section: "Producción técnica/política",
+    type: "Informe",
+    description:
+      "Documento reservado para coordinación con referencias sensibles sobre conflictos y alertas territoriales.",
+    territory: "Bajo Baudó",
+    council: "Consejo Comunitario del Bajo Baudó",
+    department: "Chocó",
+    municipality: "Bajo Baudó",
+    year: 2025,
+    validity: "Vigente",
+    visibility: "sensitive",
+    keywords: ["riesgo", "alertas", "territorio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "7.4 MB",
+    url: "#",
+    riskFlag: true,
+  },
+];
+
+export const mjnStories: StoryRecord[] = [
+  {
+    id: "story-audio",
+    kind: "audio",
+    title: "Testimonio sonoro sobre cuidado del manglar",
+    territory: "Bajo Baudó",
+    year: 2024,
+    description: "Relato breve sobre memoria ambiental y trabajo colectivo de mujeres cuidadoras.",
+    duration: "12 min",
+  },
+  {
+    id: "story-video",
+    kind: "video",
+    title: "Escuela de liderazgos juveniles del río Naya",
+    territory: "Cuenca del Naya",
+    year: 2023,
+    description: "Registro audiovisual de formación política y comunicación comunitaria.",
+    duration: "8 min",
+  },
+  {
+    id: "story-text",
+    kind: "text",
+    title: "Memoria escrita de comadres que sostienen el territorio",
+    territory: "Litoral Sanquianga",
+    year: 2022,
+    description: "Extracto editorial sobre prácticas de cuidado, liderazgo y organización comunitaria.",
+  },
+  {
+    id: "story-photo",
+    kind: "photo",
+    title: "Archivo fotográfico de guardianas del río",
+    territory: "Guapi",
+    year: 2024,
+    description: "Selección curada de imágenes publicables con autorización previa.",
+  },
+];
+
+export const campaigns: CampaignRecord[] = [
+  {
+    id: "camp-escuelas",
+    slug: "escuelas-de-cuidado-territorial",
+    title: "Escuelas de cuidado territorial",
+    intro:
+      "Serie de encuentros y materiales para fortalecer el autocuidado, la formación política y la prevención de violencias en comunidades negras.",
+    body: [
+      "La campaña articula encuentros locales, materiales pedagógicos y piezas de memoria para acompañar a lideresas, jóvenes y personas cuidadoras del territorio.",
+      "En esta fase del MVP la plataforma solo publica materiales autorizados y fichas resumidas de campaña para facilitar el acceso sin comprometer la seguridad comunitaria.",
+    ],
+    startDate: "2025-09-12",
+    visibility: "public",
+    active: true,
+    placements: ["home", "mjn", "biblioteca"],
+    materials: [
+      {
+        id: "camp-escuelas-afiche",
+        type: "Afiche",
+        title: "Afiche de convocatoria",
+        action: "download",
+        url: "#",
+      },
+      {
+        id: "camp-escuelas-cartilla",
+        type: "Cartilla",
+        title: "Cartilla base de cuidado",
+        action: "download",
+        url: "#",
+      },
+      {
+        id: "camp-escuelas-video",
+        type: "Video",
+        title: "Video de apertura",
+        action: "watch",
+        url: "https://example.com/video-campana",
+      },
+    ],
+  },
+  {
+    id: "camp-tejidos",
+    slug: "tejidos-de-acompanamiento-seguro",
+    title: "Tejidos de acompañamiento seguro",
+    intro:
+      "Campaña interna de circulación limitada para acompañar casos activos con materiales de apoyo y coordinación.",
+    body: [
+      "Esta campaña solo es visible para integrantes autenticados porque incluye orientaciones operativas de acompañamiento y rutas de articulación interna.",
+      "El mockup la incluye para demostrar el comportamiento de visibilidad entre Home, MJN y el panel de gestión.",
+    ],
+    startDate: "2026-01-20",
+    endDate: "2026-06-30",
+    visibility: "internal",
+    active: true,
+    placements: ["home", "mjn"],
+    materials: [
+      {
+        id: "camp-tejidos-guia",
+        type: "Otro",
+        title: "Guía interna de articulación",
+        action: "download",
+        url: "#",
+      },
+    ],
+  },
+  {
+    id: "camp-inactiva",
+    slug: "mapeo-de-memorias-del-litoral",
+    title: "Mapeo de memorias del litoral",
+    intro: "Campaña archivada para pruebas de visibilidad y estado.",
+    body: ["No debería verse en Home ni en MJN porque está inactiva."],
+    startDate: "2024-04-02",
+    endDate: "2024-12-10",
+    visibility: "public",
+    active: false,
+    placements: ["mjn"],
+    materials: [],
+  },
+];
+
+export const dashboards: DashboardRecord[] = [
+  {
+    id: "dash-biodiversidad-naya",
+    slug: "biodiversidad-cuenca-naya",
+    title: "Monitoreo de biodiversidad en la cuenca del Naya",
+    description:
+      "Resume coberturas, ecosistemas estratégicos y alertas de transformación para apoyar decisiones comunitarias.",
+    topic: "Biodiversidad",
+    territory: "Cuenca del Naya",
+    period: "2020-2025",
+    audience: "Público general",
+    frequency: "Mensual",
+    visibility: "public",
+    status: "Activo",
+    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=demo-biodiversidad-naya",
+  },
+  {
+    id: "dash-justicia-climatica",
+    slug: "justicia-climatica-litoral-pacifico",
+    title: "Indicadores de justicia climática en el litoral Pacífico",
+    description:
+      "Agrupa información pública útil para incidencia, seguimiento territorial y conversación con aliados.",
+    topic: "Justicia climática",
+    territory: "Litoral Pacífico",
+    period: "2021-2024",
+    audience: "Público general",
+    frequency: "Trimestral",
+    visibility: "public",
+    status: "Activo",
+    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=demo-justicia-climatica",
+  },
+  {
+    id: "dash-acc-interno",
+    slug: "seguimiento-acc-priorizadas",
+    title: "Seguimiento a ACCs priorizadas",
+    description:
+      "Tablero interno para revisar avances, articulaciones y estado de fichas de ACC sin mostrar datos geográficos sensibles.",
+    topic: "ACCs",
+    territory: "Cuenca del Naya, Bajo Baudó",
+    period: "2024-2026",
+    audience: "Equipo Palenke/Hileros",
+    frequency: "Mensual",
+    visibility: "internal",
+    status: "En actualización",
+    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=demo-acc-interno",
+  },
+];
+
+export const accs: AccRecord[] = [
+  {
+    id: "acc-naya",
+    name: "ACC Manglares y esteros del Naya",
+    nickname: "ACC Naya",
+    council: "Consejo Comunitario del río Naya",
+    basin: "Cuenca del Naya",
+    municipalities: "López de Micay",
+    departments: "Cauca",
+    hectares: 12450,
+    description:
+      "Área priorizada por su relación entre manglar, bosque húmedo y pesca artesanal, articulada al gobierno propio.",
+    inGeoportal: true,
+    geoportalLayer: "ACC_Naya_Priorizada",
+    linkedDashboardId: "dash-biodiversidad-naya",
+    linkedDocumentIds: ["doc-reglamento-naya", "doc-etnodesarrollo-guapi"],
+    linkedToMeta3030: true,
+    visibility: "public",
+  },
+  {
+    id: "acc-baudo",
+    name: "ACC Bosques de transición del Bajo Baudó",
+    council: "Consejo Comunitario del Bajo Baudó",
+    basin: "Bajo Baudó",
+    municipalities: "Bajo Baudó",
+    departments: "Chocó",
+    hectares: 9320,
+    description:
+      "Ficha interna priorizada para seguimiento técnico con énfasis en restauración y acuerdos de manejo.",
+    inGeoportal: true,
+    geoportalLayer: "ACC_Baudo_Seguimiento",
+    linkedDashboardId: "dash-acc-interno",
+    linkedDocumentIds: ["doc-manglar-baudó"],
+    linkedToMeta3030: true,
+    visibility: "internal",
+  },
+  {
+    id: "acc-sanquianga",
+    name: "ACC Corredor comunitario Sanquianga",
+    council: "Red de Consejos Comunitarios del Sanquianga",
+    basin: "Litoral Sanquianga",
+    municipalities: "Olaya Herrera, Mosquera",
+    departments: "Nariño",
+    description:
+      "Ficha pública de referencia para explicar vínculos entre conservación, pesca y justicia climática.",
+    inGeoportal: false,
+    linkedDocumentIds: ["doc-cartilla-cuidado"],
+    linkedToMeta3030: false,
+    visibility: "public",
+  },
+];
+
+export const organizations = [
+  "Coordinación Palenke",
+  "Equipo SIG Hileros",
+  "Comité MJN",
+  "Equipo técnico",
+] as const;
+
+export const users: UserRecord[] = [
+  {
+    id: "user-maria",
+    name: "María Torres",
+    email: "maria@palenke.org",
+    role: "Admin",
+    organization: "Coordinación Palenke",
+    isPrimaryAdmin: true,
+    active: true,
+    mustChangePassword: false,
+    lastLoginAt: "2026-03-10T14:32:00Z",
+  },
+  {
+    id: "user-carlos",
+    name: "Carlos Riascos",
+    email: "carlos@hileros.org",
+    role: "Interno",
+    organization: "Equipo SIG Hileros",
+    isPrimaryAdmin: false,
+    active: true,
+    mustChangePassword: false,
+    lastLoginAt: "2026-03-09T09:15:00Z",
+  },
+  {
+    id: "user-ana",
+    name: "Ana Perea",
+    email: "ana@pcn.org",
+    role: "Interno",
+    organization: "Comité MJN",
+    isPrimaryAdmin: false,
+    active: false,
+    mustChangePassword: false,
+    lastLoginAt: "2026-02-12T11:00:00Z",
+  },
+  {
+    id: "user-luz",
+    name: "Luz Angulo",
+    email: "luz@palenke.org",
+    role: "Admin",
+    organization: "Equipo técnico",
+    isPrimaryAdmin: false,
+    active: true,
+    mustChangePassword: true,
+    lastLoginAt: undefined, // never logged in
+  },
+];
+
+export const recentActivity: ActivityRecord[] = [
+  {
+    id: "act-1",
+    title: "Ruta de litigio y protección para defensoras del territorio",
+    section: "Biblioteca",
+    editedBy: "María Torres",
+    editedAt: "10 Mar 2026",
+    kind: "content",
+  },
+  {
+    id: "act-user-1",
+    title: "Luz Angulo — cuenta creada",
+    section: "Usuarios",
+    editedBy: "María Torres",
+    editedAt: "09 Mar 2026",
+    kind: "user_created",
+  },
+  {
+    id: "act-2",
+    title: "Seguimiento a ACCs priorizadas",
+    section: "Dashboards",
+    editedBy: "Luz Angulo",
+    editedAt: "08 Mar 2026",
+    kind: "content",
+  },
+  {
+    id: "act-user-2",
+    title: "Ana Perea — cuenta desactivada",
+    section: "Usuarios",
+    editedBy: "María Torres",
+    editedAt: "07 Mar 2026",
+    kind: "user_deactivated",
+  },
+  {
+    id: "act-3",
+    title: "ACC Bosques de transición del Bajo Baudó",
+    section: "ACCs",
+    editedBy: "Carlos Riascos",
+    editedAt: "06 Mar 2026",
+    kind: "content",
+  },
+  {
+    id: "act-user-3",
+    title: "Carlos Riascos — contraseña restablecida",
+    section: "Usuarios",
+    editedBy: "María Torres",
+    editedAt: "04 Mar 2026",
+    kind: "password_reset",
+  },
+  {
+    id: "act-4",
+    title: "Escuelas de cuidado territorial",
+    section: "Campañas",
+    editedBy: "Ana Perea",
+    editedAt: "03 Mar 2026",
+    kind: "content",
+  },
+  {
+    id: "act-5",
+    title: "Cartilla de cuidado colectivo para mujeres y jóvenes del territorio",
+    section: "Biblioteca",
+    editedBy: "María Torres",
+    editedAt: "01 Mar 2026",
+    kind: "content",
+  },
+];
+
+export const homeIntro = [
+  "La Plataforma Palenke organiza, custodia y comunica el trabajo político, técnico y comunitario del Palenke de Pensamiento y Cuidadores del Territorio / Proceso de Comunidades Negras (PCN).",
+  "Este MVP prioriza una Biblioteca Base, una agenda de Mujeres, Juventudes y Niñez, el acceso a tableros de estadísticas y un punto de entrada al geoportal del equipo SIG de Hileros/PCN.",
+  "El sistema de visibilidad es estructural: lo público se comparte, lo interno requiere autenticación y lo sensible nunca circula en la web.",
+];
+
+export const mjnContext = [
+  "La agenda de Mujeres, Juventudes y Niñez reúne documentos, materiales pedagógicos, campañas y piezas de memoria que fortalecen el liderazgo comunitario y el cuidado del territorio.",
+  "El bloque editorial debe poder actualizarse desde el panel administrativo, permitiendo contextualizar prioridades políticas, procesos organizativos y llamados públicos a la acción.",
+  "Las piezas de memoria solo aparecen cuando existe autorización y cuando su publicación no compromete la seguridad de las personas involucradas.",
+];
+
+export const mjnQuote =
+  "La memoria, el cuidado y la organización también son infraestructura política del territorio.";
+
+const DEFAULT_GEOPORTAL_URL = "https://example.com/geoportal";
+
+function resolveGeoportalUrl() {
+  const candidate = process.env.NEXT_PUBLIC_GEOPORTAL_URL?.trim();
+
+  if (!candidate) {
+    return DEFAULT_GEOPORTAL_URL;
+  }
+
+  try {
+    const parsed = new URL(candidate);
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return parsed.toString();
+    }
+  } catch {
+    // Fallback to default when env value is not a valid URL.
+  }
+
+  return DEFAULT_GEOPORTAL_URL;
+}
+
+export const geoportalCopy = {
+  title: "Geoportal territorial - Hileros/PCN",
+  description:
+    "Acceso controlado al geoportal administrado por el equipo SIG. El MVP no almacena datos espaciales dentro de la plataforma: solo orienta y enlaza al sistema fuente.",
+  layers: ["ACCs priorizadas", "Maritorios", "Ecosistemas estratégicos", "Asentamientos generales"],
+  url: resolveGeoportalUrl(),
+};
+
+export const policyItems = [
+  "Responsable del tratamiento: Palenke de Pensamiento y Cuidadores del Territorio / PCN.",
+  "Datos recopilados: nombre, correo electrónico y metadatos mínimos para gestionar cuentas autenticadas.",
+  "Finalidad: habilitar el acceso a contenidos internos y la administración de la plataforma.",
+  "Derechos del titular: acceso, corrección, actualización y supresión de datos personales.",
+  "Canal de contacto: datos@palenke.org para solicitudes relacionadas con tratamiento y privacidad.",
+  "Fecha de vigencia de este mockup: 11 de marzo de 2026.",
+];
+
+export const adminQuickStats = [
+  { label: "Documentos", value: documents.length.toString() },
+  { label: "Dashboards", value: dashboards.length.toString() },
+  { label: "ACCs", value: accs.length.toString() },
+  { label: "Usuarios", value: `${users.length} / ${USER_LIMIT}` },
+];
+
+export function getVisibleDocuments(role: ViewerRole) {
+  return documents.filter((document) => {
+    if (document.visibility === "sensitive") {
+      return false;
+    }
+    if (document.visibility === "internal") {
+      return role !== "public";
+    }
+    return true;
+  });
+}
+
+export function getVisibleDashboards(role: ViewerRole) {
+  return dashboards.filter((dashboard) => {
+    if (dashboard.visibility === "internal") {
+      return role !== "public";
+    }
+    return true;
+  });
+}
+
+export function getVisibleCampaigns(
+  role: ViewerRole,
+  placement: "home" | "mjn" | "biblioteca",
+) {
+  return campaigns.filter((campaign) => {
+    if (!campaign.active) {
+      return false;
+    }
+    const matchesPlacement =
+      campaign.placements.includes(placement) || campaign.placements.includes("all");
+
+    if (!matchesPlacement) {
+      return false;
+    }
+    if (campaign.visibility === "internal") {
+      return role !== "public";
+    }
+    return true;
+  });
+}
+
+export function getVisibleMjnDocuments(role: ViewerRole) {
+  return getVisibleDocuments(role).filter(
+    (document) => document.genderFocus || document.mjnTags.length > 0,
+  );
+}
+
+export function findDocumentBySlug(slug: string) {
+  return documents.find((document) => document.slug === slug);
+}
+
+export function findDashboardBySlug(slug: string) {
+  return dashboards.find((dashboard) => dashboard.slug === slug);
+}
+
+export function findCampaignBySlug(slug: string) {
+  return campaigns.find((campaign) => campaign.slug === slug);
+}
+
+export function findAccById(id: string) {
+  return accs.find((acc) => acc.id === id);
+}
+
+export function findUserById(id: string) {
+  return users.find((user) => user.id === id);
+}
+
+export function formatLastLogin(lastLoginAt: string | undefined): string {
+  if (!lastLoginAt) return "Nunca";
+  const date = new Date(lastLoginAt);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Hoy";
+  if (diffDays === 1) return "Ayer";
+  if (diffDays < 7) return `Hace ${diffDays} días`;
+  return Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "short", year: "numeric" }).format(date);
+}
