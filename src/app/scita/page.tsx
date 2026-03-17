@@ -52,6 +52,14 @@ const capas = [
     lightBg: "#fddede",
     active: false,
   },
+  {
+    id: "uso",
+    label: "Zonas de uso del territorio",
+    abbr: "Uso",
+    color: "#f57f17",
+    lightBg: "#fff3cd",
+    active: false,
+  },
 ];
 
 export default async function ScitaPage({
@@ -71,7 +79,7 @@ export default async function ScitaPage({
       <section className="border-b border-[#e8dfd3] bg-[#1a1a1a] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[1.5px] text-[#fbc02d]">
-            Sistema de Control e Información Territorial Ambiental
+            Sistema Comunitario de Información Territorial y Ambiental
           </p>
           <h1 className="font-display text-4xl text-white sm:text-5xl">SCITA</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-white/70">
@@ -168,6 +176,111 @@ export default async function ScitaPage({
         ) : null}
       </section>
 
+      {/* ── Video explicativo ── */}
+      <section className="bg-[#1a1a1a] px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center">
+          {/* Video thumbnail mockup */}
+          <div
+            className="relative overflow-hidden rounded-[28px]"
+            style={{ aspectRatio: "16/9" }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 30% 60%, rgba(46,125,50,0.55), transparent 55%), radial-gradient(ellipse at 75% 25%, rgba(21,101,192,0.35), transparent 50%), linear-gradient(155deg, #0d1f0d 0%, #152a35 60%, #0d1a1a 100%)",
+              }}
+            />
+            {/* map-like grid lines */}
+            <div className="absolute inset-0 opacity-[0.06]" aria-hidden="true">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span
+                  key={`v-${i}`}
+                  className="absolute top-0 h-full w-px bg-white"
+                  style={{ left: `${i * 12.5 + 6}%` }}
+                />
+              ))}
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span
+                  key={`h-${i}`}
+                  className="absolute left-0 h-px w-full bg-white"
+                  style={{ top: `${i * 20 + 10}%` }}
+                />
+              ))}
+            </div>
+            {/* SVG polygons */}
+            <svg
+              className="absolute inset-0 h-full w-full opacity-25"
+              viewBox="0 0 640 360"
+              preserveAspectRatio="xMidYMid slice"
+              aria-hidden="true"
+            >
+              <polygon
+                points="80,60 200,40 240,120 170,160 90,140"
+                fill="#2e7d32"
+                opacity="0.6"
+              />
+              <polygon
+                points="300,80 420,60 450,150 370,180 290,145"
+                fill="#1565c0"
+                opacity="0.45"
+              />
+              <circle cx="140" cy="100" r="5" fill="white" opacity="0.9" />
+              <circle cx="355" cy="115" r="5" fill="white" opacity="0.9" />
+            </svg>
+            {/* Play button */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-7 w-7 translate-x-0.5 fill-white"
+                  aria-hidden="true"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/55">
+                ¿Qué es el SCITA?
+              </span>
+            </div>
+            {/* Duration */}
+            <div className="absolute bottom-3 right-3 rounded-md bg-black/70 px-2 py-1 text-xs font-semibold text-white">
+              2:18
+            </div>
+          </div>
+
+          {/* Text */}
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#fbc02d]">
+              Sistema Comunitario de Información Territorial y Ambiental
+            </p>
+            <h2 className="font-display text-3xl text-white sm:text-4xl">
+              ¿Qué hace el SCITA?
+            </h2>
+            <p className="mt-4 text-base leading-7 text-white/70">
+              El SCITA es la infraestructura de información territorial del Palenke. Integra
+              datos geoespaciales, alertas ambientales y monitoreo comunitario en una sola
+              plataforma — para que las comunidades produzcan, gestionen y protejan información
+              sobre su propio territorio.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {[
+                "Generar información territorial propia para la toma de decisiones.",
+                "Monitorear ecosistemas, cobertura boscosa y dinámicas territoriales.",
+                "Identificar amenazas ambientales y territoriales desde el campo.",
+                "Fortalecer el control comunitario del territorio con soberanía de información.",
+                "Articular información para incidencia política a nivel nacional e internacional.",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-white/65">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* ── Capas de información ── */}
       <section className="bg-[#f8f5f2] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
@@ -220,48 +333,92 @@ export default async function ScitaPage({
       {/* ── Abrir SIG + Ver tableros ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Abrir SIG card */}
+          {/* SIG-A card (internal) / Formulario ambiental card (public) */}
           {isInternal(role) ? (
             <div className="rounded-[28px] border border-[#e8dfd3] bg-[#f0eae0] p-8">
-              <p className="eyebrow mb-3">Equipo SIG</p>
-              <h2 className="font-display text-2xl text-[#1a1a1a]">Abrir geoportal interno</h2>
+              <p className="eyebrow mb-3">SIG Afrodescendiente · SIG-A</p>
+              <h2 className="font-display text-2xl text-[#1a1a1a]">Enlace al SIG Afrodescendiente</h2>
               <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-                Accede al sistema de información geográfica del equipo Hileros/PCN — gestiona
-                capas, cartografía y análisis espacial del territorio.
+                Accede al visor geográfico comunitario del equipo Corporación Agencia Afrocolombiana
+                Hileros/PCN — consulta mapas, capas territoriales y análisis espacial con soberanía
+                de información afrodescendiente.
               </p>
               <Link
                 href={withRole("/geoportal", role)}
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333]"
               >
-                Ir al Geoportal
+                Abrir SIG-A
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           ) : (
-            <div className="rounded-[28px] border border-[#e8dfd3] bg-[#f0eae0] p-8">
-              <p className="eyebrow mb-3">Datos del territorio</p>
-              <h2 className="font-display text-2xl text-[#1a1a1a]">¿Qué es el SCITA?</h2>
+            <div className="rounded-[28px] border border-[#1b5e20] bg-[#d8f3dc] p-8">
+              <p className="eyebrow mb-3">Monitoreo comunitario</p>
+              <h2 className="font-display text-2xl text-[#1a1a1a]">Envía información ambiental</h2>
               <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-                El Sistema de Control e Información Territorial Ambiental centraliza la producción
-                de datos del equipo SIG de Hileros/PCN para respaldar la toma de decisiones en
-                los Consejos Comunitarios.
+                ¿Detectaste una amenaza ambiental, minería ilegal o daño hídrico en tu territorio?
+                Usa el formulario comunitario para enviar un reporte al equipo del Palenke desde
+                el campo.
               </p>
+              <Link
+                href="/scita/formulario"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#2e7d32] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
+              >
+                Abrir formulario
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
           )}
 
           {/* Ver tableros card */}
           <div className="rounded-[28px] border border-[#e8dfd3] bg-white p-8">
-            <p className="eyebrow mb-3">Mirador de datos</p>
-            <h2 className="font-display text-2xl text-[#1a1a1a]">Ver tableros territoriales</h2>
+            <div className="mb-3 flex items-center gap-2">
+              <p className="eyebrow">Mirador de datos · Power BI</p>
+              {/* Read-only badge for public */}
+              {!isInternal(role) ? (
+                <span className="rounded-full bg-[#f0eae0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#7a756e]">
+                  Solo lectura
+                </span>
+              ) : null}
+            </div>
+            <h2 className="font-display text-2xl text-[#1a1a1a]">Tableros territoriales</h2>
             <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-              Catálogo de tableros Power BI con indicadores sobre agua, territorio, cobertura
-              boscosa y demografía de los Consejos Comunitarios del Pacífico colombiano.
+              Indicadores sobre agua, territorio, cobertura boscosa y demografía de los Consejos
+              Comunitarios del Pacífico colombiano.
             </p>
+            {!isInternal(role) ? (
+              <p className="mt-2 text-xs leading-5 text-[#7a756e]">
+                Vista pública — solo métricas. Los botones de filtro y descarga están disponibles
+                para el equipo interno.
+              </p>
+            ) : null}
+            {/* Mock Power BI preview tiles */}
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              {[
+                { label: "Cobertura boscosa", val: "68%", color: "#2e7d32", bg: "#d8f3dc" },
+                { label: "Alertas activas", val: "12", color: "#d32f2f", bg: "#fddede" },
+                { label: "ACCs declaradas", val: "7", color: "#1565c0", bg: "#e3f2fd" },
+                { label: "Cuencas monitoreadas", val: "23", color: "#f57f17", bg: "#fff3cd" },
+              ].map((m) => (
+                <div
+                  key={m.label}
+                  className="rounded-[16px] p-3"
+                  style={{ background: m.bg }}
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: m.color }}>
+                    {m.label}
+                  </p>
+                  <p className="mt-1 font-display text-2xl" style={{ color: m.color }}>
+                    {m.val}
+                  </p>
+                </div>
+              ))}
+            </div>
             <Link
               href={withRole("/estadisticas", role)}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#2e7d32] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333]"
             >
-              Ver tableros
+              Ver todos los tableros
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
@@ -276,8 +433,9 @@ export default async function ScitaPage({
               Envía información ambiental desde el territorio
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
-              Tu aporte desde el territorio es valioso. Comparte observaciones sobre agua,
-              bosques, fauna o alertas ambientales con el equipo del Palenke/PCN.
+              El Sistema de Monitoreo Comunitario registra alertas territoriales, hace seguimiento
+              a amenazas extractivas y ambientales, y centraliza los reportes de campo de los
+              Consejos Comunitarios. Tu aporte es soberanía de información.
             </p>
           </div>
           <Link

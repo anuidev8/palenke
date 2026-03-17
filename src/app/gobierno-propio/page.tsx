@@ -12,7 +12,7 @@ const instruments = [
     icon: FileText,
     color: "#2e7d32",
     lightBg: "#d8f3dc",
-    href: "/biblioteca?section=Reglamentos",
+    href: "/gobierno-propio/reglamentos",
   },
   {
     id: "planes-uso",
@@ -22,7 +22,7 @@ const instruments = [
     icon: BookOpen,
     color: "#1565c0",
     lightBg: "#e3f2fd",
-    href: "/biblioteca?section=Planes+de+uso",
+    href: "/gobierno-propio/planes-uso",
   },
   {
     id: "litigio",
@@ -32,17 +32,17 @@ const instruments = [
     icon: Scale,
     color: "#d32f2f",
     lightBg: "#fddede",
-    href: "/biblioteca?section=Litigio",
+    href: "/gobierno-propio/litigio",
   },
   {
     id: "conservacion",
-    title: "Conservación",
+    title: "Áreas bioculturales de conservación comunitaria",
     description:
-      "Acuerdos de conservación, estrategias de biodiversidad y compromisos de manejo sostenible de ecosistemas estratégicos.",
+      "Declaratoria y gestión de zonas conservadas por las comunidades, integrando biodiversidad, cultura y espiritualidad del Pueblo Negro.",
     icon: Leaf,
     color: "#2e7d32",
     lightBg: "#d8f3dc",
-    href: "/biblioteca?section=Conservación",
+    href: "/gobierno-propio/conservacion",
   },
   {
     id: "etnodesarrollo",
@@ -52,7 +52,7 @@ const instruments = [
     icon: Gavel,
     color: "#f57f17",
     lightBg: "#fff3cd",
-    href: "/biblioteca?section=Etnodesarrollo",
+    href: "/gobierno-propio/etnodesarrollo",
   },
   {
     id: "proteccion-hidrica",
@@ -62,7 +62,45 @@ const instruments = [
     icon: Droplets,
     color: "#1565c0",
     lightBg: "#e3f2fd",
-    href: "/biblioteca?section=Protección+hídrica",
+    href: "/gobierno-propio/proteccion-hidrica",
+  },
+];
+
+const governmentFunctions = [
+  "Fortalece la capacidad de decisión de los Consejos Comunitarios sobre sus territorios colectivos.",
+  "Estructura y difunde instrumentos de gobernanza territorial para el uso, cuidado y defensa del territorio.",
+  "Acompaña la planificación comunitaria con reglamentos, planes y rutas de acción territorial.",
+  "Consolida la autoridad territorial afrodescendiente para incidencia política, jurídica y ambiental.",
+];
+
+const alliedProcesses = [
+  {
+    acronym: "PCN",
+    name: "Proceso de Comunidades Negras",
+    note: "Proceso articulador de gobierno propio y defensa territorial.",
+    accent: "#1a1a1a",
+    bg: "#f0eae0",
+  },
+  {
+    acronym: "HIL",
+    name: "Corporación Agencia Afrocolombiana Hileros",
+    note: "Soporte técnico y articulación operativa del Palenke.",
+    accent: "#2e7d32",
+    bg: "#d8f3dc",
+  },
+  {
+    acronym: "CC",
+    name: "Consejos Comunitarios",
+    note: "Autoridades territoriales y procesos organizativos del Pacífico.",
+    accent: "#1565c0",
+    bg: "#e3f2fd",
+  },
+  {
+    acronym: "PT",
+    name: "Procesos territoriales articulados",
+    note: "Espacios comunitarios y redes aliadas en construcción de autonomía.",
+    accent: "#d32f2f",
+    bg: "#fddede",
   },
 ];
 
@@ -116,18 +154,24 @@ export default async function GobiernoPropioPage({
           <div>
             <h2 className="font-display text-2xl text-[#1a1a1a]">¿Qué es el gobierno propio?</h2>
             <p className="mt-3 text-base leading-7 text-[#4a4540]">
-              El gobierno propio es la expresión viva de la autonomía de las comunidades negras. Se
-              ejerce a través de los Consejos Comunitarios como autoridades étnico-territoriales
-              reconocidas por la Ley 70 de 1993.
+              El Gobierno Propio es el conjunto de normas, decisiones y prácticas mediante las cuales
+              los Consejos Comunitarios ejercen autoridad sobre sus territorios colectivos. Este espacio
+              del Palenke organiza los instrumentos que materializan la autonomía territorial.
+            </p>
+            <p className="mt-3 rounded-[20px] bg-[#f8f5f2] px-4 py-3 text-sm leading-6 text-[#4a4540]">
+              Base legal: Ley 70 de 1993, Convenio 169 de la OIT y Constitución Política de Colombia.
             </p>
           </div>
           <div>
-            <h2 className="font-display text-2xl text-[#1a1a1a]">Base legal</h2>
-            <p className="mt-3 text-base leading-7 text-[#4a4540]">
-              Fundado en la Ley 70 de 1993, el Convenio 169 de la OIT y la Constitución Política de
-              Colombia, el gobierno propio garantiza los derechos colectivos sobre el territorio
-              ancestral y la autodeterminación cultural.
-            </p>
+            <h2 className="font-display text-2xl text-[#1a1a1a]">¿Qué hace?</h2>
+            <ul className="mt-3 space-y-3">
+              {governmentFunctions.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-base leading-7 text-[#4a4540]">
+                  <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -172,7 +216,7 @@ export default async function GobiernoPropioPage({
                   className="mt-auto inline-flex items-center gap-2 text-sm font-semibold transition"
                   style={{ color: item.color }}
                 >
-                  Ver documentos
+                  Ver instrumento
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </Link>
               </article>
@@ -181,24 +225,41 @@ export default async function GobiernoPropioPage({
         </div>
       </section>
 
-      {/* ── CTA band ── */}
-      <section className="bg-[#1a1a1a] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-display text-2xl text-white">
-              ¿Buscas un documento específico?
+      {/* ── Allies band ── */}
+      <section className="bg-white px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 max-w-2xl">
+            <p className="eyebrow mb-3">Aliados y procesos articulados</p>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">
+              Con aliados y procesos articulados con el PCN
             </h2>
-            <p className="mt-2 text-sm text-white/60">
-              Usa la búsqueda completa para filtrar por territorio, tipo de instrumento y año.
+            <p className="mt-3 text-base leading-7 text-[#4a4540]">
+              Franja de logos de referencia para las organizaciones y procesos que sostienen,
+              acompañan y usan los instrumentos de Gobierno propio.
             </p>
           </div>
-          <Link
-            href={withRole("/biblioteca", role)}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#2e7d32] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
-          >
-            Explorar biblioteca
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {alliedProcesses.map((ally) => (
+              <article
+                key={ally.name}
+                className="rounded-[24px] border border-[#e8dfd3] bg-[#f8f5f2] p-5"
+              >
+                <div
+                  className="flex h-20 items-center justify-center rounded-[20px] border border-dashed text-lg font-semibold tracking-[0.16em]"
+                  style={{ borderColor: ally.accent, background: ally.bg, color: ally.accent }}
+                >
+                  {ally.acronym}
+                </div>
+                <h3 className="mt-4 font-display text-xl text-[#1a1a1a]">{ally.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#4a4540]">{ally.note}</p>
+              </article>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs uppercase tracking-[0.14em] text-[#7a756e]">
+            Logotipos de referencia mientras se incorporan los artes finales entregados por cada aliado.
+          </p>
         </div>
       </section>
     </SiteLayout>

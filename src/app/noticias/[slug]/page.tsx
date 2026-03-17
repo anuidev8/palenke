@@ -2,122 +2,7 @@ import Link from "next/link";
 import { BookOpen, BarChart2, ShieldCheck } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
-
-// Mock article data keyed by slug
-const articulos: Record<
-  string,
-  {
-    slug: string;
-    categoria: string;
-    categoriaColor: string;
-    categoriaBg: string;
-    fecha: string;
-    territorio: string;
-    titulo: string;
-    cuerpo: {
-      intro: string;
-      cita: string;
-      citaAutor: string;
-      cuerpo1: string;
-      cuerpo2: string;
-    };
-    relacionados: Array<{
-      href: string;
-      icono: "doc" | "tablero" | "gobierno";
-      titulo: string;
-      modulo: string;
-      flecha: string;
-      flechaColor: string;
-    }>;
-  }
-> = {
-  "comunidades-del-pacifico-defienden-sus-rios": {
-    slug: "comunidades-del-pacifico-defienden-sus-rios",
-    categoria: "Pronunciamiento",
-    categoriaColor: "#2e7d32",
-    categoriaBg: "#d8f3dc",
-    fecha: "12 de marzo de 2026",
-    territorio: "Buenaventura, Valle del Cauca",
-    titulo: "Comunidades del Pacífico defienden sus ríos ante amenazas extractivas",
-    cuerpo: {
-      intro:
-        "Las comunidades negras del Pacífico colombiano se reunieron el pasado 10 de marzo en un encuentro territorial para analizar las amenazas a sus ríos por parte de proyectos extractivos. Más de 200 personas de 15 consejos comunitarios participaron en la jornada.",
-      cita:
-        "El agua no se negocia. Nuestros ríos son la vida del territorio y de las generaciones que vienen.",
-      citaAutor: "Representante del Consejo Comunitario de Río Anchicayá",
-      cuerpo1:
-        "Durante el encuentro se presentaron informes sobre la calidad del agua y se documentaron casos de contaminación. Los consejos comunitarios acordaron una ruta de acción conjunta que incluye litigio estratégico y acciones de protección territorial.",
-      cuerpo2:
-        "El equipo del Palenke/PCN acompañó la jornada con registro audiovisual y apoyo técnico para la sistematización de la información ambiental comunitaria.",
-    },
-    relacionados: [
-      {
-        href: "/biblioteca?section=Litigio",
-        icono: "doc",
-        titulo: "Informe de calidad hídrica 2025",
-        modulo: "Memoria Afroterritorial",
-        flecha: "→ Memoria",
-        flechaColor: "#2e7d32",
-      },
-      {
-        href: "/gobierno-propio",
-        icono: "gobierno",
-        titulo: "Ruta de litigio estratégico — Río Anchicayá",
-        modulo: "Gobierno propio",
-        flecha: "→ Gobierno",
-        flechaColor: "#d32f2f",
-      },
-      {
-        href: "/estadisticas",
-        icono: "tablero",
-        titulo: "Tablero: Calidad hídrica por región",
-        modulo: "Mirador de datos",
-        flecha: "→ Mirador",
-        flechaColor: "#f57f17",
-      },
-    ],
-  },
-};
-
-// Fallback article for slugs without specific data
-const fallbackArticulo = {
-  slug: "",
-  categoria: "Noticia",
-  categoriaColor: "#1a1a1a",
-  categoriaBg: "#f0eae0",
-  fecha: "Marzo 2026",
-  territorio: "Pacífico colombiano",
-  titulo: "Actualización del proceso territorial",
-  cuerpo: {
-    intro:
-      "El Proceso de Comunidades Negras continúa su trabajo de defensa territorial, documentando y acompañando a los Consejos Comunitarios del Pacífico colombiano.",
-    cita:
-      "El territorio es vida, y la vida del territorio es nuestra lucha.",
-    citaAutor: "Proceso de Comunidades Negras, PCN",
-    cuerpo1:
-      "Las actividades de acompañamiento incluyen talleres de formación en derechos étnicos, apoyo técnico para la gestión territorial y documentación de casos de vulneración de derechos.",
-    cuerpo2:
-      "El equipo del Palenke/PCN continúa construyendo herramientas digitales para el fortalecimiento organizativo de las comunidades.",
-  },
-  relacionados: [
-    {
-      href: "/biblioteca",
-      icono: "doc" as const,
-      titulo: "Ver documentos relacionados",
-      modulo: "Memoria Afroterritorial",
-      flecha: "→ Memoria",
-      flechaColor: "#2e7d32",
-    },
-    {
-      href: "/gobierno-propio",
-      icono: "gobierno" as const,
-      titulo: "Instrumentos de Gobierno propio",
-      modulo: "Gobierno propio",
-      flecha: "→ Gobierno",
-      flechaColor: "#d32f2f",
-    },
-  ],
-};
+import { fallbackNewsArticle, findNewsArticleBySlug } from "@/lib/newsroom";
 
 const iconMap = {
   doc: BookOpen,
@@ -148,7 +33,7 @@ export default async function DetalleNoticiaPage({
   const qp = await searchParams;
   const role = getViewerRole(qp);
 
-  const articulo = articulos[slug] ?? { ...fallbackArticulo, slug };
+  const articulo = findNewsArticleBySlug(slug) ?? { ...fallbackNewsArticle, slug };
 
   return (
     <SiteLayout
@@ -169,8 +54,11 @@ export default async function DetalleNoticiaPage({
             >
               {articulo.categoria}
             </span>
+            <span className="inline-block rounded-full bg-[#1a1a1a] px-4 py-1.5 text-xs font-semibold text-white">
+              {articulo.publisher}
+            </span>
             <span className="inline-block rounded-full bg-[#f0eae0] px-4 py-1.5 text-xs font-semibold text-[#4a4540]">
-              {articulo.fecha}
+              {articulo.fechaLarga}
             </span>
             <span className="inline-block rounded-full bg-[#f0eae0] px-4 py-1.5 text-xs font-semibold text-[#4a4540]">
               {articulo.territorio}
@@ -292,7 +180,7 @@ export default async function DetalleNoticiaPage({
               href={withRole("/memoria-afroterritorial", role)}
               className="inline-flex items-center gap-2 rounded-full border-2 border-[#2e7d32] px-5 py-2.5 text-sm font-semibold text-[#2e7d32] transition hover:bg-[#d8f3dc]"
             >
-              ← Volver a Memoria Afroterritorial
+              ← Volver a Memoria Afrodescendiente
             </Link>
           </div>
         </div>

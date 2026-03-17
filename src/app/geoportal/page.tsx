@@ -68,7 +68,7 @@ export default async function GeoportalPage({
             <p>
               <span className="font-semibold">Aviso: </span>
               Este enlace abre un sistema externo en nueva pestaña. El geoportal es administrado por
-              el equipo SIG de Hileros/PCN y puede requerir autenticación propia.
+              el equipo de la Corporación Agencia Afrocolombiana Hileros/PCN y puede requerir autenticación propia.
             </p>
           </div>
         </article>

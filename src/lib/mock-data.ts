@@ -23,6 +23,8 @@ export type DocumentRecord = {
   fileLabel: string;
   fileSize?: string;
   url: string;
+  /** URL to the official source page (Corte Constitucional, Senado, OIT, etc.) */
+  sourceUrl?: string;
   riskFlag?: boolean;
 };
 
@@ -124,6 +126,8 @@ export type ActivityRecord = {
 };
 
 export const librarySections = [
+  "Norma vigente",
+  "Memoria viva del territorio",
   "Gobierno Propio",
   "Planes de uso y manejo",
   "Planes de etnodesarrollo",
@@ -358,6 +362,171 @@ export const documents: DocumentRecord[] = [
     fileSize: "7.4 MB",
     url: "#",
     riskFlag: true,
+  },
+
+  // ── Norma vigente ─────────────────────────────────────────────────────────
+  {
+    id: "norma-ley70",
+    slug: "ley-70-1993-comunidades-negras",
+    title: "Ley 70 de 1993 — Comunidades Negras",
+    section: "Norma vigente",
+    type: "Ley",
+    description:
+      "Norma central que reconoce los derechos territoriales, la identidad, la participación y el desarrollo propio de las comunidades negras en Colombia.",
+    territory: "Nacional",
+    council: "Congreso de Colombia",
+    department: "Nacional",
+    municipality: "Bogotá",
+    year: 1993,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["Ley 70", "comunidades negras", "territorio colectivo", "1993"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver en Senado",
+    url: "http://www.secretariasenado.gov.co/senado/basedoc/ley_0070_1993.html",
+    sourceUrl: "http://www.secretariasenado.gov.co/senado/basedoc/ley_0070_1993.html",
+  },
+  {
+    id: "norma-convenio169",
+    slug: "convenio-169-oit-pueblos-indigenas-tribales",
+    title: "Convenio 169 OIT — Pueblos Indígenas y Tribales",
+    section: "Norma vigente",
+    type: "Instrumento internacional",
+    description:
+      "Convenio internacional que reconoce el derecho a territorio, consulta previa y autonomía de los pueblos indígenas y tribales, incorporado al derecho colombiano mediante Ley 21 de 1991.",
+    territory: "Internacional",
+    council: "Organización Internacional del Trabajo",
+    department: "Internacional",
+    municipality: "Ginebra",
+    year: 1989,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["Convenio 169", "OIT", "consulta previa", "pueblos tribales"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver en OIT",
+    url: "https://www.ilo.org/dyn/normlex/es/f?p=NORMLEXPUB:12100:0::NO::P12100_ILO_CODE:C169",
+    sourceUrl: "https://www.ilo.org/dyn/normlex/es/f?p=NORMLEXPUB:12100:0::NO::P12100_ILO_CODE:C169",
+  },
+  {
+    id: "norma-t622",
+    slug: "sentencia-t622-2016-rio-atrato",
+    title: "Sentencia T-622 de 2016 — Río Atrato como sujeto de derechos",
+    section: "Norma vigente",
+    type: "Jurisprudencia",
+    description:
+      "Decisión histórica de la Corte Constitucional que reconoció al Río Atrato como sujeto de derechos y ordenó medidas de protección de los territorios afrodescendientes.",
+    territory: "Chocó",
+    council: "Corte Constitucional de Colombia",
+    department: "Chocó",
+    municipality: "Quibdó",
+    year: 2016,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["T-622", "Río Atrato", "sujeto de derechos", "2016"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver en Corte Constitucional",
+    url: "https://www.corteconstitucional.gov.co/relatoria/2016/T-622-16.htm",
+    sourceUrl: "https://www.corteconstitucional.gov.co/relatoria/2016/T-622-16.htm",
+  },
+  {
+    id: "norma-decreto1745",
+    slug: "decreto-1745-1995-territorios-colectivos",
+    title: "Decreto 1745 de 1995 — Territorios colectivos y Consejos Comunitarios",
+    section: "Norma vigente",
+    type: "Decreto",
+    description:
+      "Reglamenta el Capítulo III de la Ley 70 de 1993 sobre el reconocimiento del derecho a la propiedad colectiva de las Comunidades Negras y sus Consejos Comunitarios.",
+    territory: "Nacional",
+    council: "Presidencia de la República",
+    department: "Nacional",
+    municipality: "Bogotá",
+    year: 1995,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["Decreto 1745", "territorios colectivos", "Consejos Comunitarios", "1995"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver en Senado",
+    url: "http://www.secretariasenado.gov.co/senado/basedoc/decreto_1745_1995.html",
+    sourceUrl: "http://www.secretariasenado.gov.co/senado/basedoc/decreto_1745_1995.html",
+  },
+  {
+    id: "norma-escazu",
+    slug: "acuerdo-escazu-derechos-ambientales",
+    title: "Acuerdo de Escazú — Acceso a la información ambiental",
+    section: "Norma vigente",
+    type: "Instrumento internacional",
+    description:
+      "Acuerdo regional de América Latina sobre acceso a la información, participación pública y justicia en asuntos ambientales, con protección especial para defensores ambientales.",
+    territory: "Internacional",
+    council: "CEPAL / Naciones Unidas",
+    department: "Internacional",
+    municipality: "Escazú",
+    year: 2018,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["Escazú", "acceso información", "justicia ambiental", "defensores"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver en CEPAL",
+    url: "https://repositorio.cepal.org/handle/11362/43559",
+    sourceUrl: "https://repositorio.cepal.org/handle/11362/43559",
+  },
+
+  // ── Memoria viva del territorio ───────────────────────────────────────────
+  {
+    id: "memoria-biodiversidad-tumaco",
+    slug: "biodiversidad-territorio-pacifico-sur-2023",
+    title: "Biodiversidad y territorio en el Pacífico sur",
+    section: "Memoria viva del territorio",
+    type: "Investigación",
+    description:
+      "Investigación sobre la relación entre biodiversidad, territorio y comunidades negras en el Pacífico sur colombiano, con énfasis en los municipios de Tumaco y Francisco Pizarro.",
+    territory: "Tumaco",
+    council: "Proceso de Comunidades Negras / PCN",
+    department: "Nariño",
+    municipality: "Tumaco",
+    year: 2023,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["biodiversidad", "Pacífico sur", "territorio", "investigación"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "4.2 MB",
+    url: "#",
+  },
+  {
+    id: "memoria-cantos-mayoras",
+    slug: "cantos-saberes-mayoras-atrato-2022",
+    title: "Cantos y saberes de las mayoras del Atrato",
+    section: "Memoria viva del territorio",
+    type: "Cultural",
+    description:
+      "Sistematización de la tradición oral, cantos y saberes de las mayoras del Chocó como patrimonio vivo y memoria afrodescendiente del Atrato.",
+    territory: "Chocó",
+    council: "Organizaciones comunitarias del Atrato",
+    department: "Chocó",
+    municipality: "Quibdó",
+    year: 2022,
+    validity: "Vigente",
+    visibility: "public",
+    keywords: ["cantos", "mayoras", "Atrato", "tradición oral"],
+    genderFocus: true,
+    mjnTags: ["Mujeres"],
+    action: "file",
+    fileLabel: "Descargar PDF",
+    fileSize: "3.1 MB",
+    url: "#",
   },
 ];
 
@@ -843,9 +1012,11 @@ export const recentActivity: ActivityRecord[] = [
 ];
 
 export const homeIntro = [
-  "La Plataforma Palenke organiza, custodia y comunica el trabajo político, técnico y comunitario del Palenke de Pensamiento y Cuidadores del Territorio / Proceso de Comunidades Negras (PCN).",
-  "Este MVP prioriza una Biblioteca Base, una agenda de Mujeres, Juventudes y Niñez, el acceso a tableros de estadísticas y un punto de entrada al geoportal del equipo SIG de Hileros/PCN.",
-  "El sistema de visibilidad es estructural: lo público se comparte, lo interno requiere autenticación y lo sensible nunca circula en la web.",
+  "El Palenke de Pensamiento y Cuidadores del Territorio es un espacio político, organizativo y de producción de conocimiento impulsado por el Proceso de Comunidades Negras (PCN) y articulado operativamente a través de la Corporación Agencia Afrocolombiana Hileros.",
+  "Su propósito es fortalecer la autonomía territorial, el gobierno propio y la defensa integral de la vida en los territorios del Pueblo Negro, afrocolombiano, raizal y palenquero en Colombia.",
+  "El Palenke surge como una apuesta colectiva para articular pensamiento, cuidado territorial y acción política, combinando saberes ancestrales, conocimiento comunitario y herramientas técnicas para proteger los territorios y garantizar la continuidad histórica de los pueblos afrodescendientes.",
+  "Este espacio se construye desde la experiencia organizativa del PCN, movimiento social que desde 1993 articula organizaciones, consejos comunitarios y procesos territoriales en defensa de los derechos colectivos, la dignidad y la autonomía del Pueblo Negro.",
+  "El Palenke no sustituye las estructuras organizativas del PCN ni de los Consejos Comunitarios. Por el contrario, funciona como un espacio de articulación estratégica que fortalece los procesos de gobierno propio y autonomía territorial del Pueblo Negro.",
 ];
 
 export const mjnContext = [

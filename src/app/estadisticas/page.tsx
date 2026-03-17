@@ -51,7 +51,7 @@ export default async function EstadisticasPage({
             Mirador de datos del territorio
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-white/65">
-            Catálogo de tableros del equipo SIG de Hileros/PCN. Explora indicadores territoriales,
+            Catálogo de tableros del equipo de la Corporación Agencia Afrocolombiana Hileros/PCN. Explora indicadores territoriales,
             sociales y ambientales con filtros por tema y territorio.
           </p>
 

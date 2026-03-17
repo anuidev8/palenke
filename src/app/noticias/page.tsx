@@ -2,92 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
-
-const noticias = [
-  {
-    slug: "comunidades-del-pacifico-defienden-sus-rios",
-    categoria: "Pronunciamiento",
-    categoriaColor: "#2e7d32",
-    categoriaBg: "#d8f3dc",
-    fecha: "12 mar 2026",
-    territorio: "Buenaventura, Valle del Cauca",
-    titulo: "Comunidades del Pacífico defienden sus ríos ante amenazas extractivas",
-    resumen:
-      "Más de 200 personas de 15 consejos comunitarios se reunieron para analizar las amenazas a sus ríos por proyectos extractivos y acordaron una ruta de acción conjunta.",
-  },
-  {
-    slug: "acuerdo-colectivo-guapi",
-    categoria: "Acuerdo colectivo",
-    categoriaColor: "#1565c0",
-    categoriaBg: "#e3f2fd",
-    fecha: "5 mar 2026",
-    territorio: "Guapi, Cauca",
-    titulo: "Consejo Comunitario de Guapi firma acuerdo de conservación de manglares",
-    resumen:
-      "El acuerdo protege 3.200 hectáreas de manglar en la desembocadura del río Guapi, asegurando los derechos colectivos y la soberanía ambiental del territorio.",
-  },
-  {
-    slug: "fallo-tutela-rio-anchicaya",
-    categoria: "Litigio estratégico",
-    categoriaColor: "#d32f2f",
-    categoriaBg: "#fddede",
-    fecha: "28 feb 2026",
-    territorio: "Valle del Cauca",
-    titulo: "Fallo favorable en tutela por contaminación del Río Anchicayá",
-    resumen:
-      "La Corte ordenó medidas cautelares para proteger el río Anchicayá después de que el equipo jurídico del PCN presentara evidencias de contaminación por actividades mineras.",
-  },
-  {
-    slug: "censo-comunitario-2025",
-    categoria: "Datos territoriales",
-    categoriaColor: "#f57f17",
-    categoriaBg: "#fff3cd",
-    fecha: "14 feb 2026",
-    territorio: "Pacífico colombiano",
-    titulo: "Publicación del Censo Comunitario del Pacífico 2025",
-    resumen:
-      "El SCITA publica los resultados del Censo Comunitario 2025, con datos demográficos actualizados de 48 Consejos Comunitarios del Pacífico Sur y Norte.",
-  },
-];
-
-const eventos = [
-  {
-    fecha: "20 mar 2026",
-    tipo: "Asamblea",
-    titulo: "Asamblea territorial de Consejos Comunitarios del Pacífico Sur",
-    lugar: "Tumaco, Nariño",
-  },
-  {
-    fecha: "18 mar 2026",
-    tipo: "Taller",
-    titulo: "Formación en herramientas SIG para equipos comunitarios",
-    lugar: "Quibdó, Chocó",
-  },
-  {
-    fecha: "15 mar 2026",
-    tipo: "Litigio",
-    titulo: "Audiencia pública — Ruta de litigio estratégico Río Anchicayá",
-    lugar: "Bogotá D.C.",
-  },
-  {
-    fecha: "10 mar 2026",
-    tipo: "Cultural",
-    titulo: "Lanzamiento del archivo audiovisual de memorias del Pacífico",
-    lugar: "Cali, Valle del Cauca",
-  },
-  {
-    fecha: "5 mar 2026",
-    tipo: "Taller",
-    titulo: "Taller de formación en derechos étnicos — Ley 70 de 1993",
-    lugar: "Buenaventura, Valle del Cauca",
-  },
-  {
-    fecha: "28 feb 2026",
-    tipo: "Reunión",
-    titulo: "Mesa de trabajo SCITA — actualización de capas SIG",
-    lugar: "Virtual",
-  },
-];
+import { pcnNewsArticles, territorialEvents } from "@/lib/newsroom";
 
 export default async function NoticiasPage({
   searchParams,
@@ -102,7 +17,7 @@ export default async function NoticiasPage({
       role={role}
       breadcrumbs={[
         { label: "Inicio", href: "/" },
-        { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
+        { label: "Memoria Afrodescendiente", href: "/memoria-afroterritorial" },
         { label: "Noticias y eventos" },
       ]}
     >
@@ -110,12 +25,12 @@ export default async function NoticiasPage({
       <section className="bg-[#2c3e2a] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[1.5px] text-[#fbc02d]">
-            Memoria Afroterritorial
+            Memoria Afrodescendiente
           </p>
           <h1 className="font-display text-4xl text-white sm:text-5xl">Noticias y eventos</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-white/70">
-            Actualizaciones recientes del Proceso de Comunidades Negras — pronunciamientos,
-            acuerdos, litigios y agenda territorial.
+            Noticias publicadas por PCN y agenda territorial del Palenke para seguimiento político,
+            organizativo y comunitario.
           </p>
         </div>
       </section>
@@ -126,11 +41,11 @@ export default async function NoticiasPage({
 
           {/* ── Entérate — news cards ── */}
           <div>
-            <p className="eyebrow mb-2">Pronunciamientos y noticias</p>
+            <p className="eyebrow mb-2">Noticias publicadas por PCN</p>
             <h2 className="mb-8 font-display text-3xl text-[#1a1a1a]">Entérate</h2>
 
             <div className="grid gap-6">
-              {noticias.map((n) => (
+              {pcnNewsArticles.map((n) => (
                 <article
                   key={n.slug}
                   className="surface-card flex flex-col gap-4 overflow-hidden"
@@ -152,6 +67,9 @@ export default async function NoticiasPage({
                   </div>
 
                   <div className="flex items-center gap-2 text-xs text-[#7a756e]">
+                    <span className="rounded-full bg-[#1a1a1a] px-2.5 py-1 font-semibold text-white">
+                      {n.publisher}
+                    </span>
                     <span
                       className="rounded-full px-2.5 py-1 text-xs font-semibold"
                       style={{ background: n.categoriaBg, color: n.categoriaColor }}
@@ -181,11 +99,11 @@ export default async function NoticiasPage({
 
           {/* ── Lo último — events list ── */}
           <div>
-            <p className="eyebrow mb-2">Agenda territorial</p>
+            <p className="eyebrow mb-2">Agenda territorial del proceso</p>
             <h2 className="mb-8 font-display text-3xl text-[#1a1a1a]">Lo último</h2>
 
             <div className="overflow-hidden rounded-[28px] border border-[#e8dfd3]">
-              {eventos.map((ev, i) => (
+              {territorialEvents.map((ev, i) => (
                 <div
                   key={i}
                   className="flex items-start gap-4 border-b border-[#e8dfd3] px-5 py-4 last:border-0 hover:bg-[#f8f5f2] transition-colors"
@@ -224,7 +142,7 @@ export default async function NoticiasPage({
             href={withRole("/memoria-afroterritorial", role)}
             className="inline-flex items-center gap-2 rounded-full border-2 border-[#2e7d32] px-5 py-2.5 text-sm font-semibold text-[#2e7d32] transition hover:bg-[#d8f3dc]"
           >
-            ← Memoria Afroterritorial
+            ← Memoria Afrodescendiente
           </Link>
         </div>
       </section>

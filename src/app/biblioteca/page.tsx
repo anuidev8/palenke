@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileText, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Lock } from "lucide-react";
 import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
 import {
@@ -54,7 +54,7 @@ export default async function BibliotecaPage({
       role={role}
       breadcrumbs={[
         { label: "Inicio", href: "/" },
-        { label: "Memoria Afroterritorial", href: "/biblioteca" },
+        { label: "Memoria Afrodescendiente", href: "/biblioteca" },
         ...(sectionActive ? [{ label: sectionActive }] : []),
       ]}
       floatingPanel={
@@ -76,7 +76,7 @@ export default async function BibliotecaPage({
             <div className="mt-1 h-12 w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
             <div>
               <h1 className="font-display text-4xl text-[#1a1a1a]">
-                {sectionActive || "Memoria Afroterritorial"}
+                {sectionActive || "Memoria Afrodescendiente"}
               </h1>
               <p className="mt-2 max-w-2xl text-base text-[#4a4540]">
                 Corpus documental del Palenke — resoluciones, planes de manejo, acuerdos y
@@ -236,20 +236,49 @@ export default async function BibliotecaPage({
                         </td>
 
                         {/* Acción */}
-                        <td className="whitespace-nowrap px-5 py-4">
+                        <td className="px-5 py-4">
                           {doc.visibility === "sensitive" ? (
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fddede] px-3 py-1.5 text-xs font-semibold text-[#d32f2f]">
                               <Lock className="h-3 w-3" aria-hidden="true" />
                               Restringido
                             </span>
                           ) : (
-                            <Link
-                              href={withRole(`/biblioteca/${doc.slug}`, role)}
-                              className="inline-flex items-center gap-1.5 rounded-full bg-[#2e7d32] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1b5e20]"
-                            >
-                              <FileText className="h-3 w-3" aria-hidden="true" />
-                              Ver PDF
-                            </Link>
+                            <div className="flex flex-col gap-1.5">
+                              {/* PDF / archivo adjunto */}
+                              {doc.action === "file" ? (
+                                <a
+                                  href={doc.url}
+                                  download
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-[#2e7d32] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1b5e20]"
+                                >
+                                  <Download className="h-3 w-3" aria-hidden="true" />
+                                  Descargar PDF
+                                </a>
+                              ) : null}
+
+                              {/* Fuente oficial / enlace externo */}
+                              {doc.sourceUrl ? (
+                                <a
+                                  href={doc.sourceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 rounded-full border border-[#e8dfd3] bg-white px-3 py-1.5 text-xs font-semibold text-[#1a1a1a] transition hover:bg-[#f0eae0]"
+                                >
+                                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                                  Fuente oficial
+                                </a>
+                              ) : doc.action === "external" ? (
+                                <a
+                                  href={doc.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 rounded-full border border-[#e8dfd3] bg-white px-3 py-1.5 text-xs font-semibold text-[#1a1a1a] transition hover:bg-[#f0eae0]"
+                                >
+                                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                                  {doc.fileLabel}
+                                </a>
+                              ) : null}
+                            </div>
                           )}
                         </td>
                       </tr>

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   ArrowRight,
@@ -26,6 +27,8 @@ type Crumb = {
   href?: string;
 };
 
+import { SiteHeader } from "./SiteHeader";
+
 type SiteLayoutProps = {
   role: ViewerRole;
   children: ReactNode;
@@ -34,112 +37,8 @@ type SiteLayoutProps = {
   footerMinimal?: boolean;
   banner?: ReactNode;
   floatingPanel?: ReactNode;
+  transparentHeaderAtTop?: boolean;
 };
-
-function SiteHeader({
-  role,
-  simplified = false,
-}: {
-  role: ViewerRole;
-  simplified?: boolean;
-}) {
-  const navItems: Array<{ label: string; href: string }> = [
-    { label: "Inicio", href: "/" },
-    { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
-    { label: "Gobierno Propio", href: "/gobierno-propio" },
-    { label: "SCITA", href: "/scita" },
-  ];
-
-  if (isInternal(role)) {
-    navItems.push({ label: "Geoportal", href: "/geoportal" });
-  }
-
-  return (
-    <header className="sticky top-0 z-40 border-b border-[#e8dfd3] bg-[#f8f5f2]">
-      <div className="mx-auto flex h-[73px] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        {/* PCN Logo */}
-        <Link href={withRole("/", role)} className="flex shrink-0 items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="flex w-7 flex-col overflow-hidden rounded-[5px]"
-            style={{ height: 28 }}
-          >
-            <span className="block h-[7px] bg-[#1a1a1a]" />
-            <span className="block h-[7px] bg-[#2e7d32]" />
-            <span className="block h-[7px] bg-[#d32f2f]" />
-            <span className="block h-[7px] bg-[#fbc02d]" />
-          </span>
-          <span>
-            <span className="block font-display text-[20px] leading-none text-[#1a1a1a]">Palenke</span>
-            <span className="mt-0.5 block text-[11px] font-medium uppercase tracking-[2px] text-[#7a756e]">
-              Pensamiento
-            </span>
-          </span>
-        </Link>
-
-        {simplified ? null : (
-          <>
-            {/* Desktop navigation */}
-            <nav
-              aria-label="Navegación principal"
-              className="hidden items-center gap-5 lg:flex"
-            >
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={withRole(item.href, role)}
-                  className="text-sm font-medium text-[#4a4540] transition-colors hover:text-[#1a1a1a]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            {/* Search pill + role badge */}
-            <div className="hidden items-center gap-3 lg:flex">
-              <div className="flex h-[37px] w-[200px] items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-3 text-sm text-[#7a756e]">
-                <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>Buscar…</span>
-              </div>
-              {isInternal(role) ? (
-                <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
-                  Rol: {role === "admin" ? "Admin" : "Interno"}
-                </span>
-              ) : null}
-            </div>
-
-            {/* Mobile menu */}
-            <details className="group lg:hidden">
-              <summary className="list-none rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-medium text-[#1a1a1a]">
-                Menú
-              </summary>
-              <div className="absolute left-4 right-4 top-[79px] z-50 rounded-3xl border border-[#e8dfd3] bg-white p-4 shadow-[var(--shadow-card)]">
-                <div className="grid gap-1">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={withRole(item.href, role)}
-                      className="rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-                {isInternal(role) ? (
-                  <div className="mt-4 border-t border-[#e8dfd3] pt-4">
-                    <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
-                      Rol: {role === "admin" ? "Admin" : "Interno"}
-                    </span>
-                  </div>
-                ) : null}
-              </div>
-            </details>
-          </>
-        )}
-      </div>
-    </header>
-  );
-}
 
 function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boolean }) {
   return (
@@ -148,20 +47,17 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
         {/* Brand column */}
         <div className="space-y-4">
           <Link href={withRole("/", role)} className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="flex w-7 flex-col overflow-hidden rounded-[5px]"
-              style={{ height: 28 }}
-            >
-              <span className="block h-[7px] bg-white/50" />
-              <span className="block h-[7px] bg-[#2e7d32]" />
-              <span className="block h-[7px] bg-[#d32f2f]" />
-              <span className="block h-[7px] bg-[#fbc02d]" />
-            </span>
+            <Image
+              src="/assets/logo.svg"
+              alt="Logo Palenke / PCN"
+              width={40}
+              height={40}
+              className="h-10 w-10 shrink-0"
+            />
             <span className="font-display text-xl text-white">Palenke</span>
           </Link>
           <p className="max-w-sm text-sm leading-6 text-white/60">
-            Casa digital del Proceso de Comunidades Negras — política, comunitaria y territorial.
+            Casa digital del Proceso de Comunidades Negras — espacio político, organizativo y de producción de conocimiento articulado por la Corporación Agencia Afrocolombiana Hileros.
           </p>
         </div>
 
@@ -176,13 +72,16 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
                   Inicio
                 </Link>
                 <Link href={withRole("/memoria-afroterritorial", role)} className="text-white/70 transition hover:text-white">
-                  Memoria Afroterritorial
+                  Memoria Afrodescendiente
                 </Link>
                 <Link href={withRole("/gobierno-propio", role)} className="text-white/70 transition hover:text-white">
                   Gobierno Propio
                 </Link>
                 <Link href={withRole("/scita", role)} className="text-white/70 transition hover:text-white">
                   SCITA
+                </Link>
+                <Link href={withRole("/noticias", role)} className="text-white/70 transition hover:text-white">
+                  Noticias y eventos
                 </Link>
                 {isInternal(role) ? (
                   <Link href={withRole("/geoportal", role)} className="text-white/70 transition hover:text-white">
@@ -211,8 +110,7 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/40">Aliados</p>
               <div className="grid gap-2.5">
                 <span className="text-white/70">Proceso de Comunidades Negras</span>
-                <span className="text-white/70">Hileros / Equipo SIG</span>
-                <span className="text-white/70">SCITA</span>
+                <span className="text-white/70">Corporación Agencia Afrocolombiana Hileros</span>
               </div>
             </div>
           </>
@@ -242,6 +140,7 @@ export function SiteLayout({
   footerMinimal,
   banner,
   floatingPanel,
+  transparentHeaderAtTop,
 }: SiteLayoutProps) {
   return (
     <div className="min-h-screen bg-[color:var(--page)] text-[color:var(--forest)]">
@@ -251,7 +150,7 @@ export function SiteLayout({
       >
         Saltar al contenido principal
       </a>
-      <SiteHeader role={role} simplified={simplifiedHeader} />
+      <SiteHeader role={role} simplified={simplifiedHeader} transparentAtTop={transparentHeaderAtTop} />
       {/* PCN 4-colour brand stripe */}
       <div aria-hidden="true" className="flex h-1.5 w-full">
         <span className="flex-1 bg-[#1a1a1a]" />
