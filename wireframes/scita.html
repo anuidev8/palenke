@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke — SCITA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP: SCITA ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA 4: SCITA — Visor parcial del territorio + salida al SIG completo</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Flujos de navegación desde SCITA</div>
+      <table class="flow-table">
+        <tr><th>Elemento</th><th>Acción (clic)</th><th>Destino</th></tr>
+        <tr><td>Menú "Inicio"</td><td>Clic</td><td>→ Pantalla Inicio (Home)</td></tr>
+        <tr><td>Menú "Memoria Afroterritorial"</td><td>Clic</td><td>→ Pantalla Memoria Afroterritorial</td></tr>
+        <tr><td>Menú "Gobierno propio"</td><td>Clic</td><td>→ Pantalla Gobierno propio</td></tr>
+        <tr><td>Clic sobre un ACC en el mapa</td><td>Clic en polígono/pin</td><td>→ Ficha de ACC o documento en Memoria Afroterritorial</td></tr>
+        <tr><td>Botones de "Capas" (vista parcial)</td><td>Clic (toggle)</td><td>⟳ NO cambia de pantalla — activa/desactiva capa visual en el mapa</td></tr>
+        <tr><td>Botón "Ir al geoportal SIG"</td><td>Clic</td><td>→ Geoportal externo (nueva pestaña) — solo internos, o todos según config</td></tr>
+        <tr><td>Botón "Enviar información ambiental"</td><td>Clic</td><td>→ Formulario (modal/panel)</td></tr>
+        <tr><td>Tras enviar formulario</td><td>Envío exitoso</td><td>→ "Gracias" + volver al mapa o → Memoria Afroterritorial</td></tr>
+        <tr><td>"Ver tableros territoriales"</td><td>Clic</td><td>→ Mirador de datos del territorio</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="logo-bar logo-bar--black"></span>
+        <span class="logo-bar logo-bar--green"></span>
+        <span class="logo-bar logo-bar--red"></span>
+        <span class="logo-bar logo-bar--yellow"></span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Palenke</span>
+        <span class="logo-subtitle">Pensamiento</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Inicio</a>
+      <a href="memoria.html" class="nav-link">Memoria Afroterritorial</a>
+      <a href="gobierno.html" class="nav-link">Gobierno propio</a>
+      <a href="scita.html" class="nav-link active">SCITA</a>
+    </nav>
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-accent">
+      <span style="background:var(--green)"></span>
+      <span style="background:var(--red)"></span>
+      <span style="background:var(--yellow)"></span>
+    </div>
+    <h1 class="section-title" style="font-size:2.2rem;">SCITA</h1>
+    <p class="page-hero-subtitle">Sistema Comunitario de Información Territorial Afrodescendiente — aquí ves las Áreas de Conservación Comunitaria y algunas capas clave del territorio, sin reemplazar el sistema SIG completo.</p>
+  </div>
+</section>
+
+<!-- MAPA / GEOVISOR -->
+<section class="section section--light" style="padding-top:var(--space-lg);">
+  <div class="container">
+    <div class="map-container">
+      <!-- Simulated map elements -->
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg, #C5E1A5 0%, #A5D6A7 25%, #81C784 50%, #66BB6A 75%, #4CAF50 100%);opacity:0.3;"></div>
+
+      <!-- Grid lines -->
+      <div style="position:absolute;inset:0;background:
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(0,0,0,0.04) 59px, rgba(0,0,0,0.04) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,0,0,0.04) 59px, rgba(0,0,0,0.04) 60px);
+      "></div>
+
+      <!-- ACC Polygons -->
+      <div class="map-polygon" style="top:15%;left:20%;width:120px;height:80px;background:var(--green);border-color:var(--green);"></div>
+      <div class="map-polygon" style="top:35%;left:50%;width:100px;height:70px;background:var(--green);border-color:var(--green);"></div>
+      <div class="map-polygon" style="top:55%;left:30%;width:140px;height:90px;background:var(--green);border-color:var(--green);"></div>
+      <div class="map-polygon" style="top:25%;left:70%;width:90px;height:60px;background:var(--green);border-color:var(--green);"></div>
+      <div class="map-polygon" style="top:65%;left:65%;width:110px;height:75px;background:var(--green);border-color:var(--green);"></div>
+
+      <!-- Pins -->
+      <div class="map-pin" style="top:20%;left:25%;background:var(--red);"></div>
+      <div class="map-pin" style="top:40%;left:55%;background:var(--red);"></div>
+      <div class="map-pin" style="top:60%;left:35%;background:var(--red);"></div>
+      <div class="map-pin" style="top:30%;left:73%;background:var(--yellow);"></div>
+      <div class="map-pin" style="top:70%;left:70%;background:var(--yellow);"></div>
+
+      <!-- River lines -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 460" fill="none">
+        <path d="M0 200 Q200 180 300 220 Q400 260 500 230 Q600 200 800 240" stroke="#1565C0" stroke-width="3" opacity="0.25" fill="none"/>
+        <path d="M100 350 Q250 330 400 370 Q550 410 700 380" stroke="#1565C0" stroke-width="2" opacity="0.2" fill="none"/>
+      </svg>
+
+      <!-- Map label -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2;">
+        <p style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:rgba(0,0,0,0.25);letter-spacing:4px;text-transform:uppercase;">Pacífico Colombiano</p>
+      </div>
+
+      <!-- UI Controls -->
+      <div class="map-overlay-ui">
+        <button class="map-btn">+</button>
+        <button class="map-btn">&minus;</button>
+      </div>
+
+      <!-- Click annotation on map -->
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;">
+        <div class="annotation annotation--click" style="background:rgba(227,242,253,0.95);max-width:280px;text-align:center;">CLIC sobre un ACC (polígono/pin) → Ficha de ACC o documento en Memoria Afroterritorial</div>
+      </div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <div class="map-legend-item">
+          <span class="map-legend-dot" style="background:var(--green);opacity:0.5;"></span>
+          <span>Área de Conservación Comunitaria</span>
+        </div>
+        <div class="map-legend-item">
+          <span class="map-legend-dot" style="background:var(--red);"></span>
+          <span>Punto de interés</span>
+        </div>
+        <div class="map-legend-item">
+          <span class="map-legend-dot" style="background:var(--yellow);"></span>
+          <span>Infraestructura comunitaria</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ¿QUÉ ES Y QUÉ HACE? -->
+<section class="section section--warm">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="video-placeholder" style="aspect-ratio:16/10;">
+        <div class="video-play-btn">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="video-label">Video — ¿Qué es SCITA?</span>
+      </div>
+    </div>
+    <div class="col col--right">
+      <div class="section-accent-line accent--green"></div>
+      <h2 class="section-title">¿Qué es el Sistema Comunitario de Información Territorial?</h2>
+      <p class="body-text">
+        SCITA organiza y articula la información territorial de las comunidades negras. El mapa de arriba muestra <strong>solo algunas capas clave</strong> — las Áreas de Conservación Comunitaria, recursos hídricos, cobertura boscosa y más — como una vista curada para entender el territorio.
+      </p>
+      <p class="body-text">
+        El sistema completo de información geográfica (SIG) vive en el geoportal del equipo. Desde aquí puedes explorar lo esencial, enviar información ambiental desde el territorio, o <strong>abrir el geoportal para interactuar con todas las capas y herramientas</strong>.
+      </p>
+      <p style="font-size:0.85rem;color:var(--green);font-weight:500;margin-top:var(--space-sm);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        Este sistema se ve parcialmente en el mapa superior
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CAPAS DE INFORMACIÓN -->
+<section class="section section--light">
+  <div class="container">
+    <div class="section-header-center">
+      <h2 class="section-title">Capas de información <span style="font-size:0.6em;font-weight:400;color:var(--text-muted);">(vista parcial)</span></h2>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-top:0.25rem;">Solo las capas prioritarias definidas por el equipo. Para todas las capas y herramientas, usa el geoportal SIG.</p>
+      <div class="title-underline"></div>
+    </div>
+    <div style="margin-bottom:var(--space-md);">
+      <div class="annotation annotation--info" style="max-width:100%;">CAPAS (vista parcial): Solo capas seleccionadas, NO el catálogo completo del SIG. Clic activa/desactiva en el mapa. NO cambia de pantalla. Se pueden seleccionar múltiples capas.</div>
+    </div>
+
+    <div class="cards-grid--6" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-sm);">
+
+      <div class="layer-card active" style="border:2px solid var(--green);position:relative;">
+        <div style="position:absolute;top:-8px;right:12px;background:var(--green);color:#fff;font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;">Capa base</div>
+        <div class="layer-card-icon" style="background:var(--green-pale);color:var(--green);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Áreas de conservación comunitaria</h4>
+          <p>ACC definidas por los consejos</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card active">
+        <div class="layer-card-icon" style="background:var(--green-pale);color:var(--green);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Información hídrica</h4>
+          <p>Ríos, quebradas y fuentes de agua</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card active">
+        <div class="layer-card-icon" style="background:var(--green-pale);color:var(--green);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Fauna y flora</h4>
+          <p>Biodiversidad del territorio</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card">
+        <div class="layer-card-icon" style="background:var(--green-pale);color:var(--green);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Cobertura boscosa</h4>
+          <p>Estado de los bosques</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card">
+        <div class="layer-card-icon" style="background:var(--yellow-pale);color:#B8860B;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Infraestructura comunitaria</h4>
+          <p>Escuelas, centros, caminos</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card">
+        <div class="layer-card-icon" style="background:#FDDEDE;color:var(--red);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Alertas ambientales</h4>
+          <p>Puntos críticos y denuncias</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+      <div class="layer-card">
+        <div class="layer-card-icon" style="background:var(--green-pale);color:var(--green);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="layer-card-text">
+          <h4>Límites territoriales</h4>
+          <p>Consejos comunitarios y ACC</p>
+        </div>
+        <div class="layer-toggle"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABRIR SISTEMA SIG COMPLETO -->
+<section class="section section--warm" style="padding:var(--space-lg) 0;">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg);align-items:center;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:var(--space-sm);">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h2 class="section-title" style="margin:0;">Abrir sistema de información geográfica completo</h2>
+        </div>
+        <p class="body-text">Si quieres interactuar con <strong>todas las capas y herramientas</strong> del sistema de información geográfica, entra al geoportal del equipo SIG. El login se maneja desde el propio geoportal.</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:var(--space-xs);">Lo que ves en esta página es solo una vista parcial. El geoportal tiene el sistema completo.</p>
+        <div style="margin-top:var(--space-md);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <a href="geoportal.html" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--green);color:#fff;border-radius:100px;font-weight:700;font-size:1rem;text-decoration:none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Ir al geoportal SIG
+          </a>
+          <span style="font-size:0.75rem;color:var(--text-muted);">Abre nueva pestaña</span>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="annotation annotation--click" style="max-width:360px;">"Ir al geoportal SIG" → URL externa en nueva pestaña. Internos: acceso directo. Público: según config.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
+        <div style="background:#fff;padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-light);">
+          <div style="display:flex;gap:12px;align-items:start;">
+            <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--yellow-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;">Ver tableros territoriales</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Dashboards Power BI sobre datos del territorio</div>
+            </div>
+          </div>
+          <a href="mirador.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 20px;border:1.5px solid var(--border-soft);border-radius:100px;font-size:0.85rem;font-weight:600;color:var(--text-primary);text-decoration:none;">
+            Ir al Mirador de datos →
+          </a>
+          <div style="margin-top:8px;">
+            <div class="annotation annotation--nav" style="font-size:0.7rem;">"Ver tableros" → Mirador de datos del territorio (pantalla 8)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENVIAR INFORMACIÓN AMBIENTAL -->
+<section class="section" style="background:var(--bg-warm);">
+  <div class="container">
+    <div class="cta-environmental">
+      <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-md);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <h3>Envía información ambiental</h3>
+      <p>Las comunidades pueden corregir, actualizar y aportar información desde el territorio. Por ejemplo: "aquí no hay tanta agua", "esta quebrada está seca", "encontramos nuevas especies".</p>
+      <a href="formulario-ambiental.html" class="btn btn--white">Aportar información desde el territorio</a>
+      <div style="margin-top:16px;">
+        <div class="annotation annotation--flow" style="background:rgba(252,228,236,0.9);max-width:400px;margin:0 auto;text-align:center;color:#B71C1C;">CLIC → Abre formulario de envío → Tras enviar: "Gracias por tu aporte" → Opción: volver al mapa o ir a Memoria Afroterritorial</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo logo--footer">
+          <div class="logo-mark">
+            <span class="logo-bar logo-bar--black-f"></span>
+            <span class="logo-bar logo-bar--green"></span>
+            <span class="logo-bar logo-bar--red"></span>
+            <span class="logo-bar logo-bar--yellow"></span>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title" style="color:#fff">Palenke</span>
+            <span class="logo-subtitle" style="color:rgba(255,255,255,0.6)">Pensamiento</span>
+          </div>
+        </div>
+        <p class="footer-desc">Casa digital del Proceso de Comunidades Negras — política, comunitaria, territorial.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Navegación</h4>
+        <a href="index.html" class="footer-link">Inicio</a>
+        <a href="memoria.html" class="footer-link">Memoria Afroterritorial</a>
+        <a href="gobierno.html" class="footer-link">Gobierno propio</a>
+        <a href="scita.html" class="footer-link">SCITA</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Legal</h4>
+        <a href="#" class="footer-link">Aviso legal</a>
+        <a href="#" class="footer-link">Política de datos</a>
+        <a href="#" class="footer-link">Contacto</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Aliados</h4>
+        <div class="allies-placeholder">
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-color-band">
+        <span class="band band--black"></span>
+        <span class="band band--green"></span>
+        <span class="band band--red"></span>
+        <span class="band band--yellow"></span>
+      </div>
+      <p class="footer-copy">&copy; 2026 Palenke Pensamiento — Proceso de Comunidades Negras (PCN)</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

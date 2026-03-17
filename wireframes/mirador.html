@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke — Mirador de Datos del Territorio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA 8: MIRADOR DE DATOS DEL TERRITORIO — Tableros Power BI</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Orígenes y destinos</div>
+      <table class="flow-table">
+        <tr><th>Origen</th><th>Acción</th><th>Destino desde aquí</th></tr>
+        <tr><td>SCITA → "Ver tableros territoriales"</td><td>Clic</td><td>← Llega aquí (listado)</td></tr>
+        <tr><td>Home → Accesos rápidos (si se incluye)</td><td>Clic</td><td>← Llega aquí</td></tr>
+        <tr><td>Detalle noticia → enlace relacionado</td><td>Clic</td><td>← Llega aquí</td></tr>
+        <tr><td>"Ver tablero" en card</td><td>Clic</td><td>→ Detalle de tablero (iframe)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="logo-bar logo-bar--black"></span>
+        <span class="logo-bar logo-bar--green"></span>
+        <span class="logo-bar logo-bar--red"></span>
+        <span class="logo-bar logo-bar--yellow"></span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Palenke</span>
+        <span class="logo-subtitle">Pensamiento</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Inicio</a>
+      <a href="memoria.html" class="nav-link">Memoria Afroterritorial</a>
+      <a href="gobierno.html" class="nav-link">Gobierno propio</a>
+      <a href="scita.html" class="nav-link">SCITA</a>
+    </nav>
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ PAGE HEADER ═══════════════ -->
+<section style="padding:var(--space-xl) 0 var(--space-md);background:linear-gradient(135deg,var(--black) 0%,#2C3E2A 100%);color:#fff;">
+  <div class="container">
+    <p style="font-size:0.8rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:var(--space-sm);">Datos del territorio</p>
+    <h1 style="font-family:var(--font-display);font-size:2.5rem;line-height:1.1;margin-bottom:var(--space-sm);">Mirador de datos del territorio</h1>
+    <p style="font-size:1.1rem;color:rgba(255,255,255,0.7);max-width:600px;">Tableros de datos sobre nuestros territorios, comunidades y procesos organizativos.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ FILTERS ═══════════════ -->
+<section style="padding:var(--space-md) 0;">
+  <div class="container">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;position:relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar tablero..." style="width:100%;padding:10px 10px 10px 36px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;">
+      </div>
+      <select style="padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;color:var(--text-secondary);">
+        <option>Tema (todos)</option>
+        <option>Agua</option>
+        <option>Territorio</option>
+        <option>Demografía</option>
+      </select>
+      <select style="padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;color:var(--text-secondary);">
+        <option>Territorio (todos)</option>
+        <option>Pacífico</option>
+        <option>Caribe</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DASHBOARD GRID ═══════════════ -->
+<section style="padding:0 0 var(--space-xl);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;">
+
+      <!-- Card 1 -->
+      <div style="background:var(--bg-white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;transition:all 0.2s;">
+        <div style="height:180px;background:linear-gradient(135deg,#E3F2FD,#BBDEFB);display:flex;align-items:center;justify-content:center;color:#1565C0;font-size:0.8rem;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div style="padding:20px;">
+          <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:#E3F2FD;color:#1565C0;margin-bottom:8px;">Agua</span>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px;">Calidad hídrica por región</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Indicadores de calidad de agua en cuencas del Pacífico.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text-muted);">Pacífico · 2025</span>
+            <a href="#" style="padding:8px 18px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver tablero</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div style="background:var(--bg-white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;">
+        <div style="height:180px;background:linear-gradient(135deg,var(--green-pale),#A5D6A7);display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div style="padding:20px;">
+          <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:var(--green-pale);color:var(--green);margin-bottom:8px;">Territorio</span>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px;">Cobertura boscosa ACC</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Análisis de cobertura en áreas de conservación comunitaria.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text-muted);">Nacional · 2024</span>
+            <a href="#" style="padding:8px 18px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver tablero</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div style="background:var(--bg-white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;">
+        <div style="height:180px;background:linear-gradient(135deg,var(--yellow-pale),#FFE082);display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F57F17" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:var(--yellow-pale);color:#F57F17;">Demografía</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>
+          </div>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px;">Censo comunitario Pacífico</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Datos demográficos de consejos comunitarios.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text-muted);">Pacífico · 2023</span>
+            <a href="#" style="padding:8px 18px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver tablero</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding-bottom:var(--space-md);">
+  <div style="display:flex;gap:12px;">
+    <a href="scita.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border:2px solid var(--border-soft);border-radius:100px;font-weight:600;font-size:0.9rem;color:var(--text-primary);text-decoration:none;">← Volver a SCITA</a>
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border:2px solid var(--border-soft);border-radius:100px;font-weight:600;font-size:0.9rem;color:var(--text-primary);text-decoration:none;">← Volver al Inicio</a>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Palenke Pensamiento</div>
+        <p class="footer-text">Proceso de Comunidades Negras</p>
+      </div>
+      <div>
+        <div class="footer-heading">Módulos</div>
+        <a href="index.html" class="footer-link">Inicio</a>
+        <a href="memoria.html" class="footer-link">Memoria Afroterritorial</a>
+        <a href="gobierno.html" class="footer-link">Gobierno propio</a>
+        <a href="scita.html" class="footer-link">SCITA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Palenke Pensamiento / PCN</span>
+      <span>Política de datos · Aviso legal</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Ban,
   CheckCircle2,
-  ChevronDown,
   CloudUpload,
   Globe,
   Lock,
@@ -20,7 +19,7 @@ import type {
   ViewerRole,
   Visibility,
 } from "@/lib/mock-data";
-import { formatDateRange, formatVisibility, getViewerName, isAdmin, isInternal, withRole } from "@/lib/viewer";
+import { formatDateRange, formatVisibility, getViewerName, isInternal, withRole } from "@/lib/viewer";
 
 type Crumb = {
   label: string;
@@ -44,103 +43,95 @@ function SiteHeader({
   role: ViewerRole;
   simplified?: boolean;
 }) {
-  const navItems = [
+  const navItems: Array<{ label: string; href: string }> = [
     { label: "Inicio", href: "/" },
-    { label: "Biblioteca", href: "/biblioteca" },
-    { label: "MJN", href: "/mujeres-juventudes-ninez" },
-    { label: "Estadísticas", href: "/estadisticas" },
+    { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
+    { label: "Gobierno Propio", href: "/gobierno-propio" },
+    { label: "SCITA", href: "/scita" },
   ];
 
   if (isInternal(role)) {
     navItems.push({ label: "Geoportal", href: "/geoportal" });
   }
 
-  const userName = getViewerName(role);
-
   return (
-    <header className="sticky top-0 z-40 border-b border-[color:var(--border-soft)] bg-[color:rgb(250_244_228_/_0.94)] backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <Link href={withRole("/", role)} className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border-strong)] bg-[color:var(--forest)] text-sm font-semibold text-[color:var(--sand)]">
-            PK
+    <header className="sticky top-0 z-40 border-b border-[#e8dfd3] bg-[#f8f5f2]">
+      <div className="mx-auto flex h-[73px] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        {/* PCN Logo */}
+        <Link href={withRole("/", role)} className="flex shrink-0 items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="flex w-7 flex-col overflow-hidden rounded-[5px]"
+            style={{ height: 28 }}
+          >
+            <span className="block h-[7px] bg-[#1a1a1a]" />
+            <span className="block h-[7px] bg-[#2e7d32]" />
+            <span className="block h-[7px] bg-[#d32f2f]" />
+            <span className="block h-[7px] bg-[#fbc02d]" />
           </span>
           <span>
-            <span className="block font-display text-xl text-[color:var(--forest)]">Palenke</span>
-            <span className="block text-xs uppercase tracking-[0.2em] text-[color:var(--muted-strong)]">
-              MVP mockup
+            <span className="block font-display text-[20px] leading-none text-[#1a1a1a]">Palenke</span>
+            <span className="mt-0.5 block text-[11px] font-medium uppercase tracking-[2px] text-[#7a756e]">
+              Pensamiento
             </span>
           </span>
         </Link>
 
         {simplified ? null : (
           <>
-            <nav aria-label="Navegación principal" className="hidden items-center gap-6 text-sm font-medium text-[color:var(--forest)] lg:flex">
+            {/* Desktop navigation */}
+            <nav
+              aria-label="Navegación principal"
+              className="hidden items-center gap-5 lg:flex"
+            >
               {navItems.map((item) => (
-                <Link key={item.href} href={withRole(item.href, role)} className="transition hover:text-[color:var(--gold-700)]">
+                <Link
+                  key={item.href}
+                  href={withRole(item.href, role)}
+                  className="text-sm font-medium text-[#4a4540] transition-colors hover:text-[#1a1a1a]"
+                >
                   {item.label}
                 </Link>
               ))}
             </nav>
 
+            {/* Search pill + role badge */}
             <div className="hidden items-center gap-3 lg:flex">
-              {role === "public" ? (
-                <Link href={withRole("/login", role)} className="button-primary">
-                  Iniciar sesión
-                </Link>
-              ) : (
-                <>
-                  {isAdmin(role) ? (
-                    <Link href={withRole("/admin", role)} className="button-secondary">
-                      Ir al panel
-                    </Link>
-                  ) : null}
-                  <div className="rounded-full border border-[color:var(--border-strong)] px-4 py-2 text-sm font-medium text-[color:var(--forest)]">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span>{userName}</span>
-                      <ChevronDown className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <Link href="/" className="button-ghost">
-                    Cerrar sesión
-                  </Link>
-                </>
-              )}
+              <div className="flex h-[37px] w-[200px] items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-3 text-sm text-[#7a756e]">
+                <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>Buscar…</span>
+              </div>
+              {isInternal(role) ? (
+                <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
+                  Rol: {role === "admin" ? "Admin" : "Interno"}
+                </span>
+              ) : null}
             </div>
 
+            {/* Mobile menu */}
             <details className="group lg:hidden">
-              <summary className="list-none rounded-full border border-[color:var(--border-strong)] px-4 py-2 text-sm font-medium text-[color:var(--forest)]">
+              <summary className="list-none rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-medium text-[#1a1a1a]">
                 Menú
               </summary>
-              <div className="absolute left-4 right-4 top-[74px] rounded-3xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] p-4 shadow-[var(--shadow-card)]">
-                <div className="grid gap-2">
+              <div className="absolute left-4 right-4 top-[79px] z-50 rounded-3xl border border-[#e8dfd3] bg-white p-4 shadow-[var(--shadow-card)]">
+                <div className="grid gap-1">
                   {navItems.map((item) => (
                     <Link
                       key={item.href}
                       href={withRole(item.href, role)}
-                      className="rounded-2xl px-4 py-3 text-sm font-medium text-[color:var(--forest)] hover:bg-[color:var(--sand-strong)]"
+                      className="rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
                     >
                       {item.label}
                     </Link>
                   ))}
                 </div>
-                <div className="mt-4 grid gap-2 border-t border-[color:var(--border-soft)] pt-4">
-                  {role === "public" ? (
-                    <Link href={withRole("/login", role)} className="button-primary text-center">
-                      Iniciar sesión
-                    </Link>
-                  ) : (
-                    <>
-                      {isAdmin(role) ? (
-                        <Link href={withRole("/admin", role)} className="button-secondary text-center">
-                          Ir al panel
-                        </Link>
-                      ) : null}
-                      <span className="rounded-2xl bg-[color:var(--sand-strong)] px-4 py-3 text-sm font-medium text-[color:var(--forest)]">
-                        {userName}
-                      </span>
-                    </>
-                  )}
-                </div>
+                {isInternal(role) ? (
+                  <div className="mt-4 border-t border-[#e8dfd3] pt-4">
+                    <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
+                      Rol: {role === "admin" ? "Admin" : "Interno"}
+                    </span>
+                  </div>
+                ) : null}
               </div>
             </details>
           </>
@@ -152,61 +143,91 @@ function SiteHeader({
 
 function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boolean }) {
   return (
-    <footer className="border-t border-[color:var(--border-soft)] bg-[color:var(--forest)] text-[color:var(--sand)]">
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-semibold">
-              PK
+    <footer className="bg-[#1a1a1a] text-white">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 pb-16 pt-24 sm:px-6 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] lg:px-8">
+        {/* Brand column */}
+        <div className="space-y-4">
+          <Link href={withRole("/", role)} className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="flex w-7 flex-col overflow-hidden rounded-[5px]"
+              style={{ height: 28 }}
+            >
+              <span className="block h-[7px] bg-white/50" />
+              <span className="block h-[7px] bg-[#2e7d32]" />
+              <span className="block h-[7px] bg-[#d32f2f]" />
+              <span className="block h-[7px] bg-[#fbc02d]" />
             </span>
-            <span className="font-display text-2xl">Plataforma Palenke</span>
-          </div>
-          <p className="max-w-lg text-sm leading-6 text-[color:rgb(245_237_214_/_0.74)]">
-            Portal web del Palenke de Pensamiento y Cuidadores del Territorio / PCN para organizar,
-            custodiar y comunicar trabajo político, técnico y comunitario.
+            <span className="font-display text-xl text-white">Palenke</span>
+          </Link>
+          <p className="max-w-sm text-sm leading-6 text-white/60">
+            Casa digital del Proceso de Comunidades Negras — política, comunitaria y territorial.
           </p>
         </div>
 
         {minimal ? null : (
           <>
-            <div className="space-y-3 text-sm">
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:rgb(245_237_214_/_0.52)]">
+            <div className="space-y-4 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/40">
                 Navegación
               </p>
-              <div className="grid gap-2">
-                <Link href={withRole("/", role)} className="transition hover:text-white">
+              <div className="grid gap-2.5">
+                <Link href={withRole("/", role)} className="text-white/70 transition hover:text-white">
                   Inicio
                 </Link>
-                <Link href={withRole("/biblioteca", role)} className="transition hover:text-white">
-                  Biblioteca
+                <Link href={withRole("/memoria-afroterritorial", role)} className="text-white/70 transition hover:text-white">
+                  Memoria Afroterritorial
                 </Link>
-                <Link href={withRole("/mujeres-juventudes-ninez", role)} className="transition hover:text-white">
-                  MJN
+                <Link href={withRole("/gobierno-propio", role)} className="text-white/70 transition hover:text-white">
+                  Gobierno Propio
                 </Link>
-                <Link href={withRole("/estadisticas", role)} className="transition hover:text-white">
-                  Estadísticas
+                <Link href={withRole("/scita", role)} className="text-white/70 transition hover:text-white">
+                  SCITA
                 </Link>
+                {isInternal(role) ? (
+                  <Link href={withRole("/geoportal", role)} className="text-white/70 transition hover:text-white">
+                    Geoportal
+                  </Link>
+                ) : null}
               </div>
             </div>
 
-            <div className="space-y-3 text-sm">
-              <p className="text-xs uppercase tracking-[0.22em] text-[color:rgb(245_237_214_/_0.52)]">Legal</p>
-              <div className="grid gap-2">
-                <Link href={withRole("/politica-de-datos", role)} className="transition hover:text-white">
-                  Política de tratamiento de datos
+            <div className="space-y-4 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/40">Legal</p>
+              <div className="grid gap-2.5">
+                <Link href={withRole("/politica-de-datos", role)} className="text-white/70 transition hover:text-white">
+                  Política de datos
                 </Link>
-                <Link href={withRole("/accesibilidad", role)} className="transition hover:text-white">
-                  Declaración de accesibilidad
+                <Link href={withRole("/accesibilidad", role)} className="text-white/70 transition hover:text-white">
+                  Accesibilidad
                 </Link>
-                <a href="mailto:datos@palenke.org" className="transition hover:text-white">
+                <a href="mailto:datos@palenke.org" className="text-white/70 transition hover:text-white">
                   Contacto
                 </a>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/40">Aliados</p>
+              <div className="grid gap-2.5">
+                <span className="text-white/70">Proceso de Comunidades Negras</span>
+                <span className="text-white/70">Hileros / Equipo SIG</span>
+                <span className="text-white/70">SCITA</span>
               </div>
             </div>
           </>
         )}
       </div>
-      <div className="border-t border-white/10 px-4 py-4 text-center text-xs text-[color:rgb(245_237_214_/_0.52)] sm:px-6 lg:px-8">
+
+      {/* PCN 4-stripe identity bar */}
+      <div aria-hidden="true" className="flex h-1.5 w-full">
+        <span className="flex-1 bg-white/30" />
+        <span className="flex-1 bg-[#2e7d32]" />
+        <span className="flex-1 bg-[#d32f2f]" />
+        <span className="flex-1 bg-[#fbc02d]" />
+      </div>
+
+      <div className="px-4 py-4 text-center text-xs text-white/40 sm:px-6 lg:px-8">
         © 2026 Palenke de Pensamiento y Cuidadores del Territorio / PCN. Todos los derechos reservados.
       </div>
     </footer>
@@ -231,6 +252,13 @@ export function SiteLayout({
         Saltar al contenido principal
       </a>
       <SiteHeader role={role} simplified={simplifiedHeader} />
+      {/* PCN 4-colour brand stripe */}
+      <div aria-hidden="true" className="flex h-1.5 w-full">
+        <span className="flex-1 bg-[#1a1a1a]" />
+        <span className="flex-1 bg-[#2e7d32]" />
+        <span className="flex-1 bg-[#d32f2f]" />
+        <span className="flex-1 bg-[#fbc02d]" />
+      </div>
       {banner ? <div className="border-b border-[color:var(--border-soft)] bg-[color:var(--sand-strong)]">{banner}</div> : null}
       {breadcrumbs?.length ? (
         <div className="border-b border-[color:var(--border-soft)] bg-[color:rgb(255_250_240_/_0.7)]">
@@ -903,8 +931,8 @@ export function Toolbar({
   actions?: ReactNode;
 }) {
   return (
-    <div className="surface-card flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">{children}</div>
+    <div className="surface-card flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">{children}</div>
       {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
     </div>
   );
@@ -914,19 +942,30 @@ export function TableCard({
   headers,
   rows,
   footer,
+  columnWidths,
 }: {
   headers: string[];
   rows: ReactNode[][];
   footer?: ReactNode;
+  /** Optional min-width classes per column for better layout on different devices (e.g. ["w-10", "min-w-[220px]"]). */
+  columnWidths?: string[];
 }) {
+  const hasColWidths = columnWidths && columnWidths.length === headers.length;
   return (
     <div className="surface-card overflow-hidden p-0">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-[color:var(--border-soft)] text-left text-sm">
+        <table className="min-w-[880px] w-full divide-y divide-[color:var(--border-soft)] text-left text-sm">
+          {hasColWidths ? (
+            <colgroup>
+              {columnWidths!.map((w, i) => (
+                <col key={i} className={w} />
+              ))}
+            </colgroup>
+          ) : null}
           <thead className="bg-[color:var(--sand-strong)]">
             <tr>
               {headers.map((header) => (
-                <th key={header} className="px-5 py-4 font-semibold text-[color:var(--forest)]">
+                <th key={header} className="px-5 py-4 font-semibold text-[color:var(--forest)] sm:px-6 sm:py-5">
                   {header}
                 </th>
               ))}
@@ -936,7 +975,7 @@ export function TableCard({
             {rows.map((row, index) => (
               <tr key={index}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="px-5 py-4 align-top text-[color:var(--muted-strong)]">
+                  <td key={cellIndex} className="px-5 py-4 align-top text-[color:var(--muted-strong)] sm:px-6 sm:py-5">
                     {cell}
                   </td>
                 ))}
@@ -945,7 +984,7 @@ export function TableCard({
           </tbody>
         </table>
       </div>
-      {footer ? <div className="border-t border-[color:var(--border-soft)] px-5 py-4">{footer}</div> : null}
+      {footer ? <div className="border-t border-[color:var(--border-soft)] px-5 py-4 sm:px-6 sm:py-5">{footer}</div> : null}
     </div>
   );
 }

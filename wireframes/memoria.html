@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke — Memoria Afroterritorial</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP: MEMORIA AFROTERRITORIAL ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA: MEMORIA AFROTERRITORIAL — Mapa de flujos y acciones del usuario</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Flujos de navegación desde Memoria Afroterritorial</div>
+      <table class="flow-table">
+        <tr><th>Elemento</th><th>Acción (clic)</th><th>Destino</th></tr>
+        <tr><td>Menú "Inicio"</td><td>Clic</td><td>→ Pantalla Inicio (Home)</td></tr>
+        <tr><td>Menú "Gobierno propio"</td><td>Clic</td><td>→ Pantalla Gobierno propio</td></tr>
+        <tr><td>Menú "SCITA"</td><td>Clic</td><td>→ Pantalla SCITA (mapa y capas)</td></tr>
+        <tr><td>Video "Ver más documentos"</td><td>Clic (opcional)</td><td>→ Listados internos de biblioteca</td></tr>
+        <tr><td>Card "Normativa vigente"</td><td>Clic</td><td>→ Listado de documentos normativos (leyes, reglamentos, acuerdos)</td></tr>
+        <tr><td>Card "Memoria viva del territorio"</td><td>Clic</td><td>→ Listado de artículos, relatos, materiales culturales</td></tr>
+        <tr><td>Evento en "Vení te contamos"</td><td>Clic</td><td>→ Ficha del evento o noticia relacionada (también en "Lo último" de Home)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="logo-bar logo-bar--black"></span>
+        <span class="logo-bar logo-bar--green"></span>
+        <span class="logo-bar logo-bar--red"></span>
+        <span class="logo-bar logo-bar--yellow"></span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Palenke</span>
+        <span class="logo-subtitle">Pensamiento</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Inicio</a>
+      <a href="memoria.html" class="nav-link active">Memoria Afroterritorial</a>
+      <a href="gobierno.html" class="nav-link">Gobierno propio</a>
+      <a href="scita.html" class="nav-link">SCITA</a>
+    </nav>
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-accent">
+      <span style="background:var(--green)"></span>
+      <span style="background:var(--red)"></span>
+      <span style="background:var(--yellow)"></span>
+    </div>
+    <h1 class="section-title" style="font-size:2.5rem;">Memoria Afroterritorial</h1>
+    <p class="page-hero-subtitle">Biblioteca y memoria documental y viva del territorio — relatos, normativa, cultura y procesos organizativos.</p>
+  </div>
+</section>
+
+<!-- VIDEO DE PRESENTACIÓN -->
+<section class="section section--light">
+  <div class="container">
+    <div class="video-placeholder" style="aspect-ratio:21/9; max-height: 400px;">
+      <div class="video-play-btn">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <span class="video-label">Video de presentación — Memoria Afroterritorial</span>
+    </div>
+    <div class="annotation-inline">
+      <div class="annotation annotation--click">VIDEO: El usuario puede ver el video. Opcionalmente un botón "Ver más documentos" → lleva a listados internos de la biblioteca.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ¿QUÉ ES? -->
+<div class="container" style="padding-top:4px;padding-bottom:4px;">
+  <div class="annotation">SECCIÓN "¿Qué es?": Solo informativa. El usuario lee y baja al siguiente bloque.</div>
+</div>
+<section class="section section--warm">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="section-accent-line accent--green"></div>
+      <h2 class="section-title">¿Qué es?</h2>
+      <p class="body-text">
+        La Memoria Afroterritorial es el archivo vivo de las comunidades negras del Pacífico colombiano. Aquí se reúnen documentos normativos, relatos, crónicas, materiales culturales y registros históricos que dan cuenta de la lucha, la resistencia y la riqueza de los territorios ancestrales.
+      </p>
+      <p class="body-text">
+        Es un espacio de consulta, aprendizaje y fortalecimiento de la identidad colectiva — un puente entre el pasado y el futuro de los pueblos afrodescendientes.
+      </p>
+    </div>
+    <div class="col col--right">
+      <div class="img-placeholder" style="aspect-ratio:4/3;">
+        <span>Imagen representativa del territorio</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NORMATIVA VIGENTE + QUÉ SE VA A ENCONTRAR -->
+<section class="section section--light">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="cta-card">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-md);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3 class="cta-card-title">Normativa vigente</h3>
+        <p class="cta-card-desc">Leyes, reglamentos, acuerdos y marcos normativos que protegen los derechos territoriales y colectivos.</p>
+        <a href="listado-documentos.html" class="btn btn--green">Explorar documentos &rarr;</a>
+        <div class="annotation-inline">
+          <span class="flow-arrow flow-arrow--green">CLIC → Listado de documentos normativos (leyes, reglamentos, acuerdos)</span>
+        </div>
+      </div>
+    </div>
+    <div class="col col--right">
+      <div class="section-accent-line accent--yellow"></div>
+      <h2 class="section-title">Qué vas a encontrar</h2>
+      <p class="body-text">Dentro de la Memoria Afroterritorial podrás consultar:</p>
+      <ul style="list-style:none; padding:0; margin-top: var(--space-sm);">
+        <li style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+          <span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:8px;"></span>
+          <span class="body-text" style="margin:0;">Documentos normativos y legislación vigente</span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+          <span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:8px;"></span>
+          <span class="body-text" style="margin:0;">Relatos y crónicas del territorio</span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+          <span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--yellow);margin-top:8px;"></span>
+          <span class="body-text" style="margin:0;">Materiales culturales, académicos y audiovisuales</span>
+        </li>
+        <li style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+          <span style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:8px;"></span>
+          <span class="body-text" style="margin:0;">Registros de procesos organizativos y memoria histórica</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MEMORIA VIVA DEL TERRITORIO -->
+<section class="section section--warm">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="section-accent-line accent--red"></div>
+      <h2 class="section-title">¿Qué es la memoria viva?</h2>
+      <p class="body-text">
+        La memoria viva es la producción constante de conocimiento desde el territorio. Son los relatos de los mayores, las crónicas de las luchas recientes, los cantos, las tradiciones y las formas de habitar que hacen del territorio un espacio de vida y resistencia.
+      </p>
+      <p class="body-text">
+        Este espacio reúne artículos, crónicas, materiales culturales y contenidos producidos por y para las comunidades.
+      </p>
+    </div>
+    <div class="col col--right">
+      <a href="listado-documentos.html" class="memoria-viva-card" style="text-decoration:none;color:inherit;display:block;">
+        <div class="memoria-viva-card-overlay">
+          <span style="display:inline-block;padding:4px 12px;background:var(--yellow);color:var(--black);border-radius:4px;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Colección</span>
+          <h3>Memoria viva del territorio</h3>
+          <p>Artículos, relatos, crónicas y materiales culturales — la voz viva de las comunidades.</p>
+          <span style="display:inline-block;margin-top:12px;color:var(--yellow);font-weight:600;font-size:0.9rem;">Explorar &rarr;</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- VENÍ TE CONTAMOS -->
+<section class="section section--light">
+  <div class="container">
+    <div class="section-header-center">
+      <h2 class="section-title">Vení te contamos</h2>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-top:0.25rem;">Eventos, actividades y contenidos académicos y normativos relacionados con la memoria.</p>
+      <div class="title-underline"></div>
+    </div>
+    <div class="events-carousel">
+      <a href="detalle-noticia.html" class="evento-card" style="text-decoration:none;color:inherit;display:block;">
+        <div class="evento-card-img"></div>
+        <div class="evento-card-body">
+          <p class="evento-card-date">20 de marzo, 2026</p>
+          <h4 class="evento-card-title">Conversatorio: Territorio y memoria</h4>
+          <p class="evento-card-location">Buenaventura, Valle del Cauca</p>
+        </div>
+      </a>
+      <a href="detalle-noticia.html" class="evento-card" style="text-decoration:none;color:inherit;display:block;">
+        <div class="evento-card-img" style="background:linear-gradient(135deg, #FDDEDE, var(--bg-warm));"></div>
+        <div class="evento-card-body">
+          <p class="evento-card-date">2 de abril, 2026</p>
+          <h4 class="evento-card-title">Taller de cartografía social</h4>
+          <p class="evento-card-location">Tumaco, Nariño</p>
+        </div>
+      </a>
+      <a href="detalle-noticia.html" class="evento-card" style="text-decoration:none;color:inherit;display:block;">
+        <div class="evento-card-img" style="background:linear-gradient(135deg, var(--yellow-pale), var(--bg-warm));"></div>
+        <div class="evento-card-body">
+          <p class="evento-card-date">15 de abril, 2026</p>
+          <h4 class="evento-card-title">Lanzamiento: Archivo de la resistencia</h4>
+          <p class="evento-card-location">Quibdó, Chocó</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo logo--footer">
+          <div class="logo-mark">
+            <span class="logo-bar logo-bar--black-f"></span>
+            <span class="logo-bar logo-bar--green"></span>
+            <span class="logo-bar logo-bar--red"></span>
+            <span class="logo-bar logo-bar--yellow"></span>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title" style="color:#fff">Palenke</span>
+            <span class="logo-subtitle" style="color:rgba(255,255,255,0.6)">Pensamiento</span>
+          </div>
+        </div>
+        <p class="footer-desc">Casa digital del Proceso de Comunidades Negras — política, comunitaria, territorial.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Navegación</h4>
+        <a href="index.html" class="footer-link">Inicio</a>
+        <a href="memoria.html" class="footer-link">Memoria Afroterritorial</a>
+        <a href="gobierno.html" class="footer-link">Gobierno propio</a>
+        <a href="scita.html" class="footer-link">SCITA</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Legal</h4>
+        <a href="#" class="footer-link">Aviso legal</a>
+        <a href="#" class="footer-link">Política de datos</a>
+        <a href="#" class="footer-link">Contacto</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Aliados</h4>
+        <div class="allies-placeholder">
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-color-band">
+        <span class="band band--black"></span>
+        <span class="band band--green"></span>
+        <span class="band band--red"></span>
+        <span class="band band--yellow"></span>
+      </div>
+      <p class="footer-copy">&copy; 2026 Palenke Pensamiento — Proceso de Comunidades Negras (PCN)</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

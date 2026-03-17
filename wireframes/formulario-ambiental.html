@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke — Formulario Información Ambiental</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA 7: FORMULARIO "ENVIAR INFORMACIÓN AMBIENTAL" — Modal/panel desde SCITA</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Flujo</div>
+      <table class="flow-table">
+        <tr><th>Paso</th><th>Acción</th><th>Resultado</th></tr>
+        <tr><td>SCITA → CTA verde</td><td>Clic "Enviar información ambiental"</td><td>Abre este formulario (modal/panel)</td></tr>
+        <tr><td>Formulario → Cancelar</td><td>Clic X o Cancelar</td><td>Cierra → vuelve a SCITA</td></tr>
+        <tr><td>Formulario → Enviar</td><td>Clic "Enviar información"</td><td>Muestra mensaje de éxito</td></tr>
+        <tr><td>Éxito → "Volver al mapa"</td><td>Clic</td><td>→ SCITA (mapa)</td></tr>
+        <tr><td>Éxito → "Ver Memoria"</td><td>Clic</td><td>→ Memoria Afroterritorial</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCITA BACKGROUND (context) ═══════════════ -->
+<div style="position:relative;min-height:100vh;background:#E8F5E9;">
+  <!-- Fake map background -->
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,#C8E6C9 0%,#A5D6A7 50%,#81C784 100%);opacity:0.4;"></div>
+  <div style="position:absolute;top:20px;left:20px;padding:8px 16px;background:rgba(0,0,0,0.6);color:#fff;border-radius:var(--radius-sm);font-size:0.75rem;">SCITA — Mapa de fondo (contexto)</div>
+
+  <!-- ═══════════════ MODAL FORM ═══════════════ -->
+  <div style="position:relative;z-index:10;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px;">
+    <div style="width:100%;max-width:520px;background:var(--bg-white);border-radius:var(--radius-lg);box-shadow:0 24px 64px rgba(0,0,0,0.2);overflow:hidden;">
+
+      <!-- Modal header -->
+      <div style="background:var(--green);padding:24px 32px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:1.4rem;color:#fff;margin-bottom:4px;">Envía información ambiental</h2>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.8);">Tu aporte desde el territorio es valioso</p>
+        </div>
+        <button style="width:36px;height:36px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+
+      <!-- Form body -->
+      <div style="padding:32px;">
+        <!-- Tipo de observación -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-weight:600;font-size:0.85rem;color:var(--text-primary);margin-bottom:6px;">Tipo de observación *</label>
+          <select style="width:100%;padding:12px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--text-secondary);background:var(--bg-white);">
+            <option>Selecciona una opción...</option>
+            <option>Agua / fuentes hídricas</option>
+            <option>Bosques / cobertura</option>
+            <option>Fauna y flora</option>
+            <option>Infraestructura</option>
+            <option>Otro</option>
+          </select>
+        </div>
+
+        <!-- Descripción -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-weight:600;font-size:0.85rem;color:var(--text-primary);margin-bottom:6px;">Descripción *</label>
+          <textarea rows="4" placeholder="Cuéntanos qué está pasando (ej. 'La quebrada que aquí aparece con agua está seca desde hace meses')" style="width:100%;padding:12px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Referencia al lugar -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-weight:600;font-size:0.85rem;color:var(--text-primary);margin-bottom:6px;">Referencia al lugar *</label>
+          <input type="text" placeholder="Ej. Quebrada La Honda, vereda El Firme" style="width:100%;padding:12px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;">
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">En fases futuras se podrá marcar directamente en el mapa</p>
+        </div>
+
+        <!-- Divider -->
+        <div style="border-top:1px dashed var(--border-light);margin:24px 0;"></div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;">Opcional — para que podamos contactarte</p>
+
+        <!-- Nombre -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-weight:600;font-size:0.85rem;color:var(--text-primary);margin-bottom:6px;">Nombre <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+          <input type="text" placeholder="Tu nombre" style="width:100%;padding:12px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;">
+        </div>
+
+        <!-- Contacto -->
+        <div style="margin-bottom:28px;">
+          <label style="display:block;font-weight:600;font-size:0.85rem;color:var(--text-primary);margin-bottom:6px;">Medio de contacto <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+          <input type="text" placeholder="Teléfono, WhatsApp o correo" style="width:100%;padding:12px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;">
+        </div>
+
+        <!-- Buttons -->
+        <div style="display:flex;gap:12px;">
+          <button style="flex:1;padding:14px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:1rem;font-weight:700;cursor:pointer;">Enviar información</button>
+          <button style="padding:14px 24px;background:none;border:1px solid var(--border-soft);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--text-muted);cursor:pointer;">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SUCCESS STATE ═══════════════ -->
+  <div style="position:relative;z-index:10;display:flex;align-items:center;justify-content:center;padding:40px;">
+    <div style="width:100%;max-width:520px;background:var(--bg-white);border-radius:var(--radius-lg);box-shadow:0 24px 64px rgba(0,0,0,0.2);overflow:hidden;text-align:center;padding:48px 32px;">
+      <div style="width:72px;height:72px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-md);">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:1.5rem;color:var(--black);margin-bottom:12px;">Gracias por tu aporte desde el territorio</h3>
+      <p style="font-size:1rem;color:var(--text-secondary);margin-bottom:var(--space-lg);">Tu información será revisada por el equipo del Palenke/PCN.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <a href="scita.html" style="padding:12px 28px;background:var(--green);color:#fff;border-radius:100px;font-weight:600;text-decoration:none;">Volver al mapa</a>
+        <a href="memoria.html" style="padding:12px 28px;border:2px solid var(--green);color:var(--green);border-radius:100px;font-weight:600;text-decoration:none;">Ver Memoria Afroterritorial</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

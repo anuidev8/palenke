@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke Pensamiento — Inicio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP: INICIO ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA: INICIO (HOME) — Mapa de flujos y acciones del usuario</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Flujos de navegación desde Inicio</div>
+      <table class="flow-table">
+        <tr><th>Elemento</th><th>Acción (clic)</th><th>Destino</th></tr>
+        <tr><td>Menú "Memoria Afroterritorial"</td><td>Clic</td><td>→ Pantalla Memoria Afroterritorial</td></tr>
+        <tr><td>Menú "Gobierno propio"</td><td>Clic</td><td>→ Pantalla Gobierno propio</td></tr>
+        <tr><td>Menú "SCITA"</td><td>Clic</td><td>→ Pantalla SCITA (mapa y capas)</td></tr>
+        <tr><td>Card "Área de conservación"</td><td>Clic</td><td>→ SCITA (mapa + ACC)</td></tr>
+        <tr><td>Card "Protección hídrica"</td><td>Clic</td><td>→ Gobierno propio o SCITA</td></tr>
+        <tr><td>Card "SIG Afro"</td><td>Clic</td><td>→ SCITA o geoportal directo</td></tr>
+        <tr><td>Noticia en "Entérate"</td><td>Clic</td><td>→ Memoria, Gobierno propio o SCITA (según contenido)</td></tr>
+        <tr><td>Evento en "Lo último"</td><td>Clic</td><td>→ Ficha de evento o noticia relacionada</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ HEADER ═══════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="logo-bar logo-bar--black"></span>
+        <span class="logo-bar logo-bar--green"></span>
+        <span class="logo-bar logo-bar--red"></span>
+        <span class="logo-bar logo-bar--yellow"></span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Palenke</span>
+        <span class="logo-subtitle">Pensamiento</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link active">Inicio</a>
+      <a href="memoria.html" class="nav-link">Memoria Afroterritorial <span class="flow-arrow flow-arrow--green">→ Pantalla 2</span></a>
+      <a href="gobierno.html" class="nav-link">Gobierno propio <span class="flow-arrow flow-arrow--red">→ Pantalla 3</span></a>
+      <a href="scita.html" class="nav-link">SCITA <span class="flow-arrow">→ Pantalla 4</span></a>
+    </nav>
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════ HERO ═══════════════════════════════════════════ -->
+<div class="container" style="padding-top:8px;padding-bottom:8px;">
+  <div class="annotation annotation--nav">HEADER: Menú principal visible en TODAS las pantallas. Cada ítem lleva a su pantalla correspondiente. El ítem activo se subraya en verde o rojo.</div>
+</div>
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Proceso de Comunidades Negras</p>
+    <h1 class="hero-title">Nuestras Raíces,<br>Nuestro Territorio</h1>
+    <p class="hero-desc">Defendiendo la vida, la alegría y la libertad desde nuestros territorios ancestrales. Un palenke de pensamiento político y comunitario para el mundo.</p>
+    <div class="hero-cta-row">
+      <a href="memoria.html" class="btn--hero-green">Conoce Nuestra Lucha</a>
+      <a href="#" class="btn--hero-outline">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Ver video presentación
+      </a>
+    </div>
+  </div>
+</section>
+<div class="hero-flag"><span></span><span></span><span></span><span></span></div>
+<div class="container" style="padding-top:8px;padding-bottom:8px;">
+  <div class="annotation annotation--info">HERO: Imagen con movimiento (video de fondo, slider o animación). Dos CTAs: "Conoce Nuestra Lucha" (verde) y "Ver video presentación" (outline). Banda de colores PCN debajo.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIÉNES SOMOS ═══════════════════════════════════════════ -->
+<div class="container" style="padding-top:4px;padding-bottom:4px;">
+  <div class="annotation">SECCIÓN INFORMATIVA: No tiene clic/acción. El usuario lee y sigue bajando.</div>
+</div>
+<section class="section section--light" id="quienes">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="section-accent-line accent--green"></div>
+      <h2 class="section-title">¿Quiénes somos?</h2>
+      <div class="decorative-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="col col--right">
+      <p class="body-text">
+        El Proceso de Comunidades Negras (PCN) es una expresión organizativa de las comunidades negras/afrocolombianas que trabaja por la defensa del territorio, la identidad cultural y los derechos colectivos de los pueblos afrodescendientes en Colombia.
+      </p>
+      <p class="body-text">
+        Desde los territorios ancestrales del Pacífico colombiano, articulamos procesos políticos, ambientales y culturales que fortalecen el gobierno propio y la autonomía comunitaria.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ VIDEO + QUEHACER POLÍTICO ═══════════════════════════════════════════ -->
+<section class="section section--warm" id="quehacer">
+  <div class="container two-col">
+    <div class="col col--left">
+      <div class="video-placeholder">
+        <div class="video-play-btn">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="video-label">Video de presentación</span>
+      </div>
+    </div>
+    <div class="col col--right">
+      <div class="quehacer-card">
+        <div class="quehacer-accent"></div>
+        <h2 class="section-title">Nuestro quehacer político</h2>
+        <p class="body-text">
+          Defendemos el territorio ancestral, fortalecemos el gobierno propio y construimos autonomía comunitaria desde los principios de identidad, territorio y participación.
+        </p>
+        <a href="gobierno.html" class="btn btn--green">Ver más</a>
+        <div class="annotation-inline">
+          <div class="annotation annotation--click">"Ver más" → Puede enlazar a una subsección con más información sobre el quehacer político del PCN.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ACCESOS RÁPIDOS ═══════════════════════════════════════════ -->
+<section class="section section--light" id="accesos">
+  <div class="container">
+    <div class="section-header-center">
+      <h2 class="section-title">Accesos rápidos</h2>
+      <div class="title-underline"></div>
+    </div>
+    <div class="cards-grid cards-grid--3">
+      <a href="scita.html" class="access-card">
+        <div class="access-card-icon access-card-icon--green">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="access-card-stripe access-card-stripe--green"></div>
+        <h3 class="access-card-title">Área de conservación comunitaria</h3>
+        <p class="access-card-desc">Territorios protegidos por las comunidades afrodescendientes.</p>
+        <span class="flow-arrow flow-arrow--green">CLIC → SCITA (mapa + ACC)</span>
+      </a>
+      <a href="gobierno.html" class="access-card">
+        <div class="access-card-icon access-card-icon--blue">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div class="access-card-stripe access-card-stripe--blue"></div>
+        <h3 class="access-card-title">Protección hídrica</h3>
+        <p class="access-card-desc">Cuidado y defensa de ríos, quebradas y fuentes de agua ancestrales.</p>
+        <span class="flow-arrow">CLIC → Gobierno propio</span>
+      </a>
+      <a href="scita.html" class="access-card">
+        <div class="access-card-icon access-card-icon--red">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div class="access-card-stripe access-card-stripe--red"></div>
+        <h3 class="access-card-title">SIG Afrodescendiente</h3>
+        <p class="access-card-desc">Sistema de información geográfica de los territorios colectivos.</p>
+        <span class="flow-arrow flow-arrow--red">CLIC → SCITA / Geoportal</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ENTÉRATE + LO ÚLTIMO ═══════════════════════════════════════════ -->
+<section class="section section--warm" id="noticias">
+  <div class="container two-col two-col--news">
+    <!-- ENTÉRATE -->
+    <div class="col col--left">
+      <div class="news-header">
+        <h2 class="section-title">Entérate</h2>
+        <p class="section-subtitle">Noticias publicadas por PCN</p>
+      </div>
+      <div class="news-list">
+        <article class="news-card">
+          <div class="news-card-img"></div>
+          <div class="news-card-body">
+            <span class="news-tag news-tag--green">Territorio</span>
+            <h3 class="news-card-title">Comunidades del Pacífico fortalecen su gobierno propio</h3>
+            <p class="news-card-excerpt">Líderes de tres consejos comunitarios se reunieron para articular estrategias de defensa territorial...</p>
+            <a href="detalle-noticia.html" class="news-link">Leer más &rarr;</a>
+            <span class="flow-arrow flow-arrow--green" style="margin-top:6px;">CLIC → Detalle de noticia</span>
+          </div>
+        </article>
+        <article class="news-card">
+          <div class="news-card-img"></div>
+          <div class="news-card-body">
+            <span class="news-tag news-tag--red">Resistencia</span>
+            <h3 class="news-card-title">Avances en la protección de áreas de conservación comunitaria</h3>
+            <p class="news-card-excerpt">Nuevos acuerdos con entidades ambientales permiten mayor autonomía en la gestión territorial...</p>
+            <a href="detalle-noticia.html" class="news-link">Leer más &rarr;</a>
+            <span class="flow-arrow flow-arrow--red" style="margin-top:6px;">CLIC → Detalle de noticia</span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <!-- LO ÚLTIMO -->
+    <div class="col col--right">
+      <div class="news-header">
+        <h2 class="section-title">Lo último</h2>
+        <p class="section-subtitle">Talleres, actividades y eventos recientes</p>
+      </div>
+      <div class="events-list">
+        <a href="detalle-noticia.html" class="event-item" style="text-decoration:none;color:inherit;">
+          <div class="event-date">
+            <span class="event-day">15</span>
+            <span class="event-month">Mar</span>
+          </div>
+          <div class="event-body">
+            <span class="event-tag">Taller</span>
+            <h4 class="event-title">Cartografía social del territorio</h4>
+            <p class="event-location">Buenaventura, Valle del Cauca</p>
+          </div>
+        </a>
+        <a href="detalle-noticia.html" class="event-item" style="text-decoration:none;color:inherit;">
+          <div class="event-date">
+            <span class="event-day">22</span>
+            <span class="event-month">Mar</span>
+          </div>
+          <div class="event-body">
+            <span class="event-tag">Evento</span>
+            <h4 class="event-title">Encuentro de jóvenes del Pacífico</h4>
+            <p class="event-location">Tumaco, Nariño</p>
+          </div>
+        </a>
+        <a href="detalle-noticia.html" class="event-item" style="text-decoration:none;color:inherit;">
+          <div class="event-date">
+            <span class="event-day">05</span>
+            <span class="event-month">Abr</span>
+          </div>
+          <div class="event-body">
+            <span class="event-tag">Reunión</span>
+            <h4 class="event-title">Mesa de diálogo con autoridades ambientales</h4>
+            <p class="event-location">Guapi, Cauca</p>
+          </div>
+        </a>
+        <a href="detalle-noticia.html" class="event-item" style="text-decoration:none;color:inherit;">
+          <div class="event-date">
+            <span class="event-day">12</span>
+            <span class="event-month">Abr</span>
+          </div>
+          <div class="event-body">
+            <span class="event-tag">Taller</span>
+            <h4 class="event-title">Formación en derechos territoriales</h4>
+            <p class="event-location">Quibdó, Chocó</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FRASE ICÓNICA ═══════════════════════════════════════════ -->
+<section class="section section--dark" id="frase">
+  <div class="container">
+    <div class="iconic-phrase">
+      <div class="phrase-accent-top"></div>
+      <blockquote>
+        "El territorio no es solo tierra,<br>es memoria, identidad y futuro."
+      </blockquote>
+      <div class="phrase-accent-bottom"></div>
+      <p class="phrase-attribution">— Proceso de Comunidades Negras</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ NAV SECUNDARIA ═══════════════════════════════════════════ -->
+<section class="secondary-nav">
+  <div class="container">
+    <div class="secondary-nav-links">
+      <a href="memoria.html">Memoria Afroterritorial</a>
+      <a href="gobierno.html">Gobierno propio</a>
+      <a href="scita.html">SCITA</a>
+      <a href="#">Contacto</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FOOTER ═══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo logo--footer">
+          <div class="logo-mark">
+            <span class="logo-bar logo-bar--black-f"></span>
+            <span class="logo-bar logo-bar--green"></span>
+            <span class="logo-bar logo-bar--red"></span>
+            <span class="logo-bar logo-bar--yellow"></span>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title" style="color:#fff">Palenke</span>
+            <span class="logo-subtitle" style="color:rgba(255,255,255,0.6)">Pensamiento</span>
+          </div>
+        </div>
+        <p class="footer-desc">Casa digital del Proceso de Comunidades Negras — política, comunitaria, territorial.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Navegación</h4>
+        <a href="index.html" class="footer-link">Inicio</a>
+        <a href="memoria.html" class="footer-link">Memoria Afroterritorial</a>
+        <a href="gobierno.html" class="footer-link">Gobierno propio</a>
+        <a href="scita.html" class="footer-link">SCITA</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Legal</h4>
+        <a href="#" class="footer-link">Aviso legal</a>
+        <a href="#" class="footer-link">Política de datos</a>
+        <a href="#" class="footer-link">Contacto</a>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Aliados</h4>
+        <div class="allies-placeholder">
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+          <div class="ally-logo"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-color-band">
+        <span class="band band--black"></span>
+        <span class="band band--green"></span>
+        <span class="band band--red"></span>
+        <span class="band band--yellow"></span>
+      </div>
+      <p class="footer-copy">&copy; 2026 Palenke Pensamiento — Proceso de Comunidades Negras (PCN)</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

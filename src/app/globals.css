@@ -1,47 +1,78 @@
 @import "tailwindcss";
 
 :root {
-  --page: #f5edd6;
-  --surface: #fff9ec;
-  --surface-muted: #efe4c5;
-  --sand: #f5edd6;
-  --sand-strong: #eadcb6;
-  --forest: #0d1f0a;
-  --forest-soft: #173114;
-  --gold-100: #f1e0b6;
-  --gold-300: #ddb66d;
-  --gold-500: #c8943a;
-  --gold-700: #9f6f24;
-  --muted: #697560;
-  --muted-strong: #465244;
-  --info: #d7e5f2;
-  --warning: #f2e0b4;
-  --danger: #a54a46;
-  --danger-soft: #f8d5d5;
-  --success: #d8ead2;
-  --success-strong: #21542c;
-  --search-surface: #ecf5f8;
-  --search-surface-strong: #e1eff4;
-  --search-accent: #1f556e;
-  --search-accent-strong: #2f6179;
-  --search-border: rgba(47, 97, 121, 0.24);
-  --search-border-strong: rgba(47, 97, 121, 0.34);
-  --search-ring: rgba(47, 97, 121, 0.12);
-  --border-soft: rgba(13, 31, 10, 0.1);
-  --border-strong: rgba(13, 31, 10, 0.22);
-  --shadow-card: 0 20px 60px rgba(13, 31, 10, 0.08);
+  /* ── Figma v2 palette ── */
+  --page: #f8f5f2;
+  --page-alt: #f0eae0;
+  --surface: #ffffff;
+  --surface-muted: #fafaf8;
+
+  /* PCN brand colours */
+  --pcn-black: #1a1a1a;
+  --pcn-green: #2e7d32;
+  --pcn-green-light: #d8f3dc;
+  --pcn-red: #d32f2f;
+  --pcn-red-light: #fddede;
+  --pcn-yellow: #fbc02d;
+  --pcn-yellow-light: #fff3cd;
+
+  /* Typography */
+  --text-primary: #1a1a1a;
+  --text-body: #4a4540;
+  --text-muted: #7a756e;
+
+  /* Borders */
+  --border-base: #e8dfd3;
+  --border-light: #f0ece6;
+  --border-soft: rgba(26, 26, 26, 0.08);
+  --border-strong: rgba(26, 26, 26, 0.18);
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(255, 152, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+
+  /* Legacy aliases kept for backwards compat */
+  --forest: #1a1a1a;
+  --forest-soft: #2c2c2c;
+  --sand: #f8f5f2;
+  --sand-strong: #f0eae0;
+  --gold-100: #fff3cd;
+  --gold-300: #fbc02d;
+  --gold-500: #f57f17;
+  --gold-700: #e65100;
+  --muted: #7a756e;
+  --muted-strong: #4a4540;
+  --info: #e3f2fd;
+  --warning: #fff3cd;
+  --danger: #d32f2f;
+  --danger-soft: #fddede;
+  --success: #d8f3dc;
+  --success-strong: #2e7d32;
+  --search-surface: #e3f2fd;
+  --search-surface-strong: #bbdefb;
+  --search-accent: #1565c0;
+  --search-accent-strong: #0d47a1;
+  --search-border: rgba(21, 101, 192, 0.24);
+  --search-border-strong: rgba(21, 101, 192, 0.34);
+  --search-ring: rgba(21, 101, 192, 0.12);
 }
 
 @theme {
-  --color-palenke-sand: #F7F4EB;
-  --color-palenke-cream: #EFEADB;
-  --color-palenke-forest: #1A3629;
-  --color-palenke-gold: #D4AF37;
-  --color-palenke-public: #2F855A;
-  --color-palenke-internal: #D69E2E;
-  --color-palenke-sensitive: #C53030;
-  --font-sans: var(--font-public-sans), ui-sans-serif, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --color-pcn-black: #1a1a1a;
+  --color-pcn-green: #2e7d32;
+  --color-pcn-green-light: #d8f3dc;
+  --color-pcn-red: #d32f2f;
+  --color-pcn-red-light: #fddede;
+  --color-pcn-yellow: #fbc02d;
+  --color-pcn-yellow-light: #fff3cd;
+  --color-palenke-sand: #f8f5f2;
+  --color-palenke-cream: #f0eae0;
+  --color-palenke-forest: #1a1a1a;
+  --color-palenke-gold: #fbc02d;
+  --color-palenke-public: #2e7d32;
+  --color-palenke-internal: #f57f17;
+  --color-palenke-sensitive: #d32f2f;
+  --font-sans: var(--font-source-sans-3), ui-sans-serif, sans-serif;
+  --font-display: var(--font-dm-serif-display), ui-serif, Georgia, serif;
 }
 
 * {

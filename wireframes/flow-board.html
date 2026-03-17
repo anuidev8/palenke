@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke v2 — Mapa de Flujos Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  :root {
+    --black: #1A1A1A;
+    --green: #2E7D32;
+    --red: #D32F2F;
+    --yellow: #FBC02D;
+    --bg: #F5F0EB;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'Source Sans 3', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--black); }
+
+  .board { width: 1800px; padding: 40px; }
+
+  .board-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 3px solid var(--black);
+  }
+  .board-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+  }
+  .board-header p {
+    font-size: 1rem;
+    color: #666;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+  }
+
+  .flow-canvas {
+    position: relative;
+    width: 1720px;
+    height: 1350px;
+    margin: 0 auto;
+  }
+
+  .screen-card {
+    position: absolute;
+    width: 260px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border: 2px solid #E0D8CE;
+  }
+  .screen-card-header {
+    padding: 14px 16px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .screen-card-body {
+    padding: 16px;
+  }
+  .screen-card-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .screen-card-desc {
+    font-size: 0.78rem;
+    color: #777;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .screen-card-actions {
+    border-top: 1px solid #EEE;
+    padding-top: 10px;
+  }
+  .screen-card-action {
+    font-size: 0.72rem;
+    padding: 3px 0;
+    color: #555;
+    display: flex;
+    gap: 6px;
+  }
+  .screen-card-action strong {
+    color: var(--black);
+    min-width: 100px;
+  }
+
+  .module-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .arrows-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .arrows-layer svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .screen-card { z-index: 1; }
+
+  .note {
+    position: absolute;
+    width: 220px;
+    padding: 14px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .note-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+  }
+  .note--yellow { background: #FFF8E1; border-left: 4px solid var(--yellow); }
+  .note--green { background: #E8F5E9; border-left: 4px solid var(--green); }
+  .note--red { background: #FFEBEE; border-left: 4px solid var(--red); }
+  .note--blue { background: #E3F2FD; border-left: 4px solid #1565C0; }
+
+  .arrow-label {
+    position: absolute;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #666;
+    background: rgba(255,255,255,0.9);
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 2;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="board">
+
+  <div class="board-header">
+    <h1>Palenke Pensamiento v2 — Mapa de Flujos Completo</h1>
+    <p>10 pantallas conectadas por acciones de usuario. Cada card muestra el módulo al que pertenece y las acciones principales.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--black);"></div> Inicio (Home)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div> Memoria Afroterritorial</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div> Gobierno propio</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow);"></div> SCITA / Territorio</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565C0;"></div> Pantallas compartidas</div>
+    <div class="legend-item"><svg width="30" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#999" stroke-width="2" stroke-dasharray="4,3"/></svg> Flujo de usuario</div>
+  </div>
+
+  <div class="flow-canvas">
+
+    <!-- ═══ ARROWS SVG ═══ -->
+    <div class="arrows-layer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 1350">
+        <defs>
+          <marker id="ah-black" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#333"/></marker>
+          <marker id="ah-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#2E7D32"/></marker>
+          <marker id="ah-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#D32F2F"/></marker>
+          <marker id="ah-yellow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#FBC02D"/></marker>
+          <marker id="ah-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1565C0"/></marker>
+        </defs>
+
+        <!-- INICIO (730,30) center ~860,160 → MEMORIA (120,330) center ~250,460 -->
+        <path d="M 730,160 Q 480,160 380,330" stroke="#2E7D32" stroke-width="2.5" fill="none" stroke-dasharray="6,4" marker-end="url(#ah-green)"/>
+
+        <!-- INICIO → GOBIERNO (1340,330) center ~1470,460 -->
+        <path d="M 990,160 Q 1200,160 1340,330" stroke="#D32F2F" stroke-width="2.5" fill="none" stroke-dasharray="6,4" marker-end="url(#ah-red)"/>
+
+        <!-- INICIO → SCITA (730,330) center ~860,460 -->
+        <line x1="860" y1="270" x2="860" y2="330" stroke="#FBC02D" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#ah-yellow)"/>
+
+        <!-- INICIO → DETALLE NOTICIA (120,700) -->
+        <path d="M 750,270 Q 400,500 300,700" stroke="#333" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-black)"/>
+
+        <!-- MEMORIA → DETALLE NOTICIA -->
+        <path d="M 250,580 L 250,700" stroke="#2E7D32" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-green)"/>
+
+        <!-- MEMORIA → LISTADO DOCS (500,700) -->
+        <path d="M 370,580 Q 440,640 500,700" stroke="#2E7D32" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-green)"/>
+
+        <!-- GOBIERNO → LISTADO DOCS -->
+        <path d="M 1380,580 Q 900,640 760,700" stroke="#D32F2F" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-red)"/>
+
+        <!-- SCITA → FORMULARIO (900,700) -->
+        <path d="M 920,580 L 960,700" stroke="#FBC02D" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-yellow)"/>
+
+        <!-- SCITA → MIRADOR (1180,700) -->
+        <path d="M 980,580 Q 1100,640 1180,700" stroke="#FBC02D" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-yellow)"/>
+
+        <!-- SCITA → GEOPORTAL (1450,700) -->
+        <path d="M 1000,560 Q 1250,620 1450,700" stroke="#FBC02D" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-yellow)"/>
+
+        <!-- MIRADOR → DETALLE TABLERO (1180,1020) -->
+        <line x1="1310" y1="950" x2="1310" y2="1020" stroke="#1565C0" stroke-width="2" fill="none" stroke-dasharray="5,4" marker-end="url(#ah-blue)"/>
+
+        <!-- DETALLE NOTICIA → LISTADO (cross) -->
+        <path d="M 370,830 L 500,830" stroke="#999" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#ah-black)"/>
+
+        <!-- DETALLE NOTICIA → MIRADOR -->
+        <path d="M 330,950 Q 700,1050 1180,850" stroke="#999" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#ah-black)"/>
+
+        <!-- FORMULARIO success → SCITA back -->
+        <path d="M 950,950 Q 890,680 880,580" stroke="#2E7D32" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#ah-green)"/>
+
+        <!-- FORMULARIO success → MEMORIA -->
+        <path d="M 900,950 Q 500,750 300,580" stroke="#2E7D32" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#ah-green)"/>
+
+        <!-- HOME → MIRADOR (optional) -->
+        <path d="M 990,250 Q 1350,500 1340,700" stroke="#999" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#ah-black)"/>
+      </svg>
+    </div>
+
+    <!-- ═══ SCREEN CARDS ═══ -->
+
+    <!-- 1. INICIO -->
+    <div class="screen-card" style="left:730px;top:30px;width:260px;">
+      <div class="screen-card-header" style="background:var(--black);">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 1</span> Inicio (Home)
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Palenke Pensamiento — Inicio</div>
+        <div class="screen-card-desc">Hero, accesos rápidos, Entérate, Lo último. Punto de entrada principal.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Menú →</strong> Memoria, Gobierno, SCITA</div>
+          <div class="screen-card-action"><strong>Cards ACC →</strong> SCITA</div>
+          <div class="screen-card-action"><strong>Entérate →</strong> Detalle noticia</div>
+          <div class="screen-card-action"><strong>Lo último →</strong> Detalle noticia</div>
+          <div class="screen-card-action"><strong>Mirador →</strong> Mirador datos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MEMORIA -->
+    <div class="screen-card" style="left:120px;top:330px;width:260px;">
+      <div class="screen-card-header" style="background:var(--green);">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 2</span> Memoria Afroterritorial
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Memoria Afroterritorial</div>
+        <div class="screen-card-desc">Video, normativa vigente, memoria viva, eventos "Vení te contamos".</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Normativa →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Memoria viva →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Eventos →</strong> Detalle noticia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SCITA -->
+    <div class="screen-card" style="left:730px;top:330px;width:260px;">
+      <div class="screen-card-header" style="background:var(--yellow);color:var(--black);">
+        <span class="module-tag" style="background:rgba(0,0,0,0.15);color:var(--black);">Pantalla 4</span> SCITA
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">SCITA — Mapa territorial</div>
+        <div class="screen-card-desc">Mapa de ACC, capas ambientales, envío de información, tableros.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Enviar info →</strong> Formulario ambiental</div>
+          <div class="screen-card-action"><strong>Tableros →</strong> Mirador datos</div>
+          <div class="screen-card-action"><strong>Geoportal →</strong> Geoportal interno</div>
+          <div class="screen-card-action"><strong>Clic ACC →</strong> Ficha ACC / Memoria</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. GOBIERNO -->
+    <div class="screen-card" style="left:1340px;top:330px;width:260px;">
+      <div class="screen-card-header" style="background:var(--red);">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 3</span> Gobierno propio
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Gobierno propio</div>
+        <div class="screen-card-desc">Reglamentos, planes, litigio, ACC, etnodesarrollo, protección hídrica.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Reglamentos →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Planes →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Litigio →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Conservación →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Etnodesarrollo →</strong> Listado docs</div>
+          <div class="screen-card-action"><strong>Hídrica →</strong> Listado docs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. DETALLE NOTICIA -->
+    <div class="screen-card" style="left:120px;top:700px;width:260px;">
+      <div class="screen-card-header" style="background:linear-gradient(90deg,var(--black),var(--green));">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 5</span> Detalle noticia
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Detalle de noticia / evento</div>
+        <div class="screen-card-desc">Artículo completo con imagen, citas, galería y enlaces relacionados.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Enlace doc →</strong> Listado docs (Memoria)</div>
+          <div class="screen-card-action"><strong>Enlace gob →</strong> Listado docs (Gobierno)</div>
+          <div class="screen-card-action"><strong>Enlace datos →</strong> Mirador</div>
+          <div class="screen-card-action"><strong>Volver →</strong> Home o Memoria</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. LISTADO DOCS -->
+    <div class="screen-card" style="left:500px;top:700px;width:260px;">
+      <div class="screen-card-header" style="background:linear-gradient(90deg,var(--green),var(--red));">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 6</span> Listado documentos
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Listado de documentos</div>
+        <div class="screen-card-desc">Plantilla reutilizable: búsqueda, filtros, tabla/cards, paginación. Usado por Memoria y Gobierno.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Ver PDF →</strong> Nueva pestaña</div>
+          <div class="screen-card-action"><strong>Breadcrumb →</strong> Módulo origen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. FORMULARIO -->
+    <div class="screen-card" style="left:860px;top:700px;width:260px;">
+      <div class="screen-card-header" style="background:var(--yellow);color:var(--black);">
+        <span class="module-tag" style="background:rgba(0,0,0,0.15);color:var(--black);">Pantalla 7</span> Formulario ambiental
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Enviar información ambiental</div>
+        <div class="screen-card-desc">Modal/panel sobre SCITA. Tipo, descripción, lugar, contacto opcional.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Enviar →</strong> Éxito → Volver mapa</div>
+          <div class="screen-card-action"><strong>Éxito →</strong> Ver Memoria</div>
+          <div class="screen-card-action"><strong>Cancelar →</strong> SCITA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. MIRADOR -->
+    <div class="screen-card" style="left:1180px;top:700px;width:260px;">
+      <div class="screen-card-header" style="background:#1565C0;">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 8</span> Mirador datos
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Mirador de datos del territorio</div>
+        <div class="screen-card-desc">Grid de tableros Power BI. Filtros por tema y territorio.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Ver tablero →</strong> Detalle tablero</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. GEOPORTAL -->
+    <div class="screen-card" style="left:1450px;top:700px;width:260px;">
+      <div class="screen-card-header" style="background:linear-gradient(90deg,var(--yellow),#FF9800);color:var(--black);">
+        <span class="module-tag" style="background:rgba(0,0,0,0.15);color:var(--black);">Pantalla 10</span> Geoportal interno
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Geoportal interno</div>
+        <div class="screen-card-desc">Página intermedia antes de salir al SIG externo (Hileros/PCN). Solo internos.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Ir geoportal →</strong> URL externa (nueva tab)</div>
+          <div class="screen-card-action"><strong>Volver →</strong> SCITA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. DETALLE TABLERO -->
+    <div class="screen-card" style="left:1180px;top:1020px;width:260px;">
+      <div class="screen-card-header" style="background:#1565C0;">
+        <span class="module-tag" style="background:rgba(255,255,255,0.2);color:#fff;">Pantalla 9</span> Detalle tablero
+      </div>
+      <div class="screen-card-body">
+        <div class="screen-card-title">Detalle de tablero</div>
+        <div class="screen-card-desc">Iframe Power BI embebido con descripción y metadatos.</div>
+        <div class="screen-card-actions">
+          <div class="screen-card-action"><strong>Volver →</strong> Mirador (listado)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ARROW LABELS ═══ -->
+    <div class="arrow-label" style="top:180px;left:460px;">Menú → Memoria</div>
+    <div class="arrow-label" style="top:180px;left:1140px;">Menú → Gobierno</div>
+    <div class="arrow-label" style="top:290px;left:870px;">Menú → SCITA</div>
+    <div class="arrow-label" style="top:470px;left:420px;">Entérate / Lo último</div>
+    <div class="arrow-label" style="top:630px;left:200px;">Vení te contamos</div>
+    <div class="arrow-label" style="top:630px;left:430px;">Normativa / Memoria viva</div>
+    <div class="arrow-label" style="top:640px;left:1020px;">Reglamentos, Planes...</div>
+    <div class="arrow-label" style="top:630px;left:870px;">Enviar info ambiental</div>
+    <div class="arrow-label" style="top:640px;left:1100px;">Ver tableros</div>
+    <div class="arrow-label" style="top:640px;left:1300px;">Geoportal SIG</div>
+    <div class="arrow-label" style="top:980px;left:1310px;">Ver tablero</div>
+
+    <!-- ═══ STICKY NOTES ═══ -->
+    <div class="note note--yellow" style="left:20px;top:1050px;">
+      <div class="note-title">Tipo de persona: Pública</div>
+      Ve todo lo público: Home, Memoria, Gobierno, SCITA. No ve Geoportal interno ni documentos con candado.
+    </div>
+
+    <div class="note note--green" style="left:260px;top:1050px;">
+      <div class="note-title">Tipo de persona: Interna</div>
+      Ve todo lo público + Geoportal interno + documentos sensibles (candado). Acceso completo a listados y tableros.
+    </div>
+
+    <div class="note note--red" style="left:500px;top:1050px;">
+      <div class="note-title">Tipo de persona: Admin</div>
+      Todo lo de interno + panel de administración para subir documentos, gestionar tableros y crear noticias/eventos.
+    </div>
+
+    <div class="note note--blue" style="left:740px;top:1050px;">
+      <div class="note-title">Pantallas compartidas</div>
+      "Listado documentos" y "Detalle noticia" son plantillas que se reciclan entre Memoria y Gobierno. El título cambia dinámicamente según el origen.
+    </div>
+
+    <div class="note note--yellow" style="left:980px;top:1100px;">
+      <div class="note-title">Flujos circulares</div>
+      El formulario ambiental puede volver a SCITA o ir a Memoria. Los enlaces relacionados de noticias conectan con Gobierno y Mirador. Todo regresa al módulo de origen.
+    </div>
+
+    <div class="note note--green" style="left:1220px;top:1200px;">
+      <div class="note-title">Mirador + Geoportal</div>
+      Mirador muestra dashboards embebidos (Power BI). Geoportal sale a un SIG externo (nueva pestaña). Ambos accesibles desde SCITA.
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

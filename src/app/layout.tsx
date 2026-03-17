@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
-import { Fraunces, Public_Sans } from "next/font/google";
+import { DM_Serif_Display, Source_Sans_3 } from "next/font/google";
 import { Suspense } from "react";
 import GlobalBibliotecaSearchDock from "@/components/palenke/GlobalBibliotecaSearchDock";
 import { getVisibleDocuments } from "@/lib/mock-data";
 import "./globals.css";
 
-const publicSans = Public_Sans({
+const sourceSans3 = Source_Sans_3({
   subsets: ["latin"],
-  variable: "--font-public-sans",
+  variable: "--font-source-sans-3",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const fraunces = Fraunces({
+const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-dm-serif-display",
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
-  title: "Plataforma Palenke | MVP mockup blueprint",
+  title: "Palenke Pensamiento | Proceso de Comunidades Negras",
   description:
-    "Mock interactivo del MVP Palenke con flujo público, interno y panel administrativo basado en el blueprint de diseño.",
+    "Casa digital del Proceso de Comunidades Negras — política, comunitaria, territorial.",
 };
 
 const globalSearchDocuments = getVisibleDocuments("public").toSorted((a, b) => b.year - a.year);
@@ -30,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${publicSans.variable} ${fraunces.variable} antialiased`}>
+      <body className={`${sourceSans3.variable} ${dmSerifDisplay.variable} antialiased`}>
         {children}
         <Suspense fallback={null}>
           <GlobalBibliotecaSearchDock documents={globalSearchDocuments} />

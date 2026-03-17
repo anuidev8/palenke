@@ -77,6 +77,7 @@ export default async function AdminDocumentosPage({
 
       <TableCard
         headers={["□", "Título", "Sección", "Territorio", "Año", "Visibilidad", "Última edición", "⋮"]}
+        columnWidths={["w-10", "min-w-[220px]", "min-w-[120px]", "min-w-[100px]", "w-16", "min-w-[110px]", "min-w-[130px]", "w-20"]}
         rows={filtered.map((document) => [
           <input key="checkbox" type="checkbox" />,
           <Link key="title" href={withRole(`/admin/documentos/${document.id}/editar`, role)} className="font-medium text-[color:var(--forest)] underline">

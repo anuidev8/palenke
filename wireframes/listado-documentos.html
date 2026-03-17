@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palenke — Listado de Documentos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ═══════════════ FLOW MAP ═══════════════ -->
+<div style="background:linear-gradient(135deg,#FFF3E0,#FFE0B2);padding:24px 0;border-bottom:3px solid #FF9800;">
+  <div class="container">
+    <div class="annotation-bar">PANTALLA 6: LISTADO DE DOCUMENTOS — Plantilla reutilizable (Normativa, Reglamentos, Planes, etc.)</div>
+    <div class="annotation-section">
+      <div class="annotation-section-title">Orígenes (se llega desde)</div>
+      <table class="flow-table">
+        <tr><th>Módulo origen</th><th>Elemento clic</th><th>Título que muestra</th></tr>
+        <tr><td>Memoria Afroterritorial</td><td>Card "Normativa vigente"</td><td>"Normativa vigente"</td></tr>
+        <tr><td>Memoria Afroterritorial</td><td>Card "Memoria viva"</td><td>"Memoria viva del territorio"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Reglamentos"</td><td>"Reglamentos"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Planes de uso"</td><td>"Planes de uso y manejo"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Litigio estratégico"</td><td>"Litigio estratégico"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Conservación"</td><td>"Conservación comunitaria"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Etnodesarrollo"</td><td>"Planes de etnodesarrollo"</td></tr>
+        <tr><td>Gobierno propio</td><td>Tarjeta "Protección hídrica"</td><td>"Protección hídrica"</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <span class="logo-bar logo-bar--black"></span>
+        <span class="logo-bar logo-bar--green"></span>
+        <span class="logo-bar logo-bar--red"></span>
+        <span class="logo-bar logo-bar--yellow"></span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Palenke</span>
+        <span class="logo-subtitle">Pensamiento</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Inicio</a>
+      <a href="memoria.html" class="nav-link">Memoria Afroterritorial</a>
+      <a href="gobierno.html" class="nav-link active">Gobierno propio</a>
+      <a href="scita.html" class="nav-link">SCITA</a>
+    </nav>
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ BREADCRUMB ═══════════════ -->
+<div class="container" style="padding-top:var(--space-md);">
+  <div style="font-size:0.85rem;color:var(--text-muted);">
+    <a href="index.html" style="color:var(--green);text-decoration:underline;">Inicio</a> &gt;
+    <a href="gobierno.html" style="color:var(--red);text-decoration:underline;">Gobierno propio</a> &gt;
+    <span style="color:var(--text-primary);font-weight:600;">Reglamentos</span>
+  </div>
+  <div class="annotation annotation--nav" style="margin-top:8px;">BREADCRUMB: Clic en "Gobierno propio" → vuelve a la pantalla Gobierno propio. Título dinámico según categoría.</div>
+</div>
+
+<!-- ═══════════════ PAGE HEADER ═══════════════ -->
+<section style="padding:var(--space-lg) 0 var(--space-md);">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div style="width:8px;height:40px;background:var(--red);border-radius:4px;"></div>
+      <h1 style="font-family:var(--font-display);font-size:2.2rem;color:var(--black);">Reglamentos</h1>
+    </div>
+    <p style="font-size:1.05rem;color:var(--text-secondary);max-width:600px;">Reglamentos internos de los consejos comunitarios y procesos organizativos del PCN.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ FILTER BAR ═══════════════ -->
+<section style="padding:0 0 var(--space-md);">
+  <div class="container">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;padding:20px;background:var(--bg-white);border-radius:var(--radius-md);border:1px solid var(--border-light);">
+      <div style="flex:1;min-width:200px;position:relative;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Buscar por título o palabra clave..." style="width:100%;padding:10px 10px 10px 36px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;">
+      </div>
+      <select style="padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;color:var(--text-secondary);background:var(--bg-white);">
+        <option>Territorio (todos)</option>
+        <option>Buenaventura</option>
+        <option>Tumaco</option>
+        <option>Guapi</option>
+        <option>Quibdó</option>
+      </select>
+      <select style="padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;color:var(--text-secondary);background:var(--bg-white);">
+        <option>Tipo (todos)</option>
+        <option>Reglamento</option>
+        <option>Acuerdo</option>
+        <option>Resolución</option>
+      </select>
+      <select style="padding:10px 14px;border:1px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.9rem;color:var(--text-secondary);background:var(--bg-white);">
+        <option>Año (todos)</option>
+        <option>2026</option>
+        <option>2025</option>
+        <option>2024</option>
+      </select>
+      <button style="padding:10px 20px;background:none;border:1px solid var(--border-soft);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.85rem;color:var(--text-muted);cursor:pointer;">Limpiar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ RESULTS COUNT ═══════════════ -->
+<div class="container" style="padding-bottom:var(--space-sm);">
+  <p style="font-size:0.85rem;color:var(--text-muted);">Mostrando 1–10 de 23 documentos</p>
+</div>
+
+<!-- ═══════════════ DOCUMENT TABLE ═══════════════ -->
+<section style="padding:0 0 var(--space-xl);">
+  <div class="container">
+    <div style="background:var(--bg-white);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;">
+      <!-- Table header -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.7fr 1.2fr 0.8fr;gap:0;padding:14px 20px;background:var(--black);color:#fff;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">
+        <div>Título</div>
+        <div>Tipo</div>
+        <div>Territorio</div>
+        <div>Año</div>
+        <div>Etiquetas</div>
+        <div>Acción</div>
+      </div>
+      <!-- Row 1 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.7fr 1.2fr 0.8fr;gap:0;padding:16px 20px;border-bottom:1px solid var(--border-light);align-items:center;">
+        <div style="font-weight:600;font-size:0.9rem;">Reglamento interno CC Río Anchicayá</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Reglamento</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Buenaventura</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">2024</div>
+        <div><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:var(--green-pale);color:var(--green);">ACC</span> <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:#FCE4EC;color:var(--red);">Género</span></div>
+        <div><a href="#" style="padding:6px 16px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver PDF</a></div>
+      </div>
+      <!-- Row 2 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.7fr 1.2fr 0.8fr;gap:0;padding:16px 20px;border-bottom:1px solid var(--border-light);align-items:center;background:#FAFAF8;">
+        <div style="font-weight:600;font-size:0.9rem;">Reglamento CC Alto Mira y Frontera</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Reglamento</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Tumaco</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">2023</div>
+        <div><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:var(--yellow-pale);color:#F57F17;">Etnodesarrollo</span></div>
+        <div><a href="#" style="padding:6px 16px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver PDF</a></div>
+      </div>
+      <!-- Row 3 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.7fr 1.2fr 0.8fr;gap:0;padding:16px 20px;border-bottom:1px solid var(--border-light);align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.9rem;">Acuerdo de uso territorio colectivo Guapi <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg></div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Acuerdo</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Guapi</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">2025</div>
+        <div><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:var(--green-pale);color:var(--green);">Territorio</span></div>
+        <div><a href="#" style="padding:6px 16px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver PDF</a></div>
+      </div>
+      <!-- Row 4 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.7fr 1.2fr 0.8fr;gap:0;padding:16px 20px;align-items:center;background:#FAFAF8;">
+        <div style="font-weight:600;font-size:0.9rem;">Reglamento interno CC Yurumanguí</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Reglamento</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">Buenaventura</div>
+        <div style="font-size:0.85rem;color:var(--text-secondary);">2022</div>
+        <div><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.7rem;font-weight:600;background:#E3F2FD;color:#1565C0;">Hídrica</span></div>
+        <div><a href="#" style="padding:6px 16px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:600;text-decoration:none;">Ver PDF</a></div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:var(--space-md);">
+      <span style="padding:8px 14px;background:var(--green);color:#fff;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;">1</span>
+      <a href="#" style="padding:8px 14px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--text-secondary);text-decoration:none;">2</a>
+      <a href="#" style="padding:8px 14px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--text-secondary);text-decoration:none;">3</a>
+      <a href="#" style="padding:8px 14px;background:var(--bg-white);border:1px solid var(--border-light);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--text-secondary);text-decoration:none;">→</a>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding-bottom:var(--space-lg);">
+  <div class="annotation annotation--click">"Ver PDF" → abre documento en nueva pestaña. Icono candado = solo visible para internos. Breadcrumb vuelve al módulo de origen.</div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Palenke Pensamiento</div>
+        <p class="footer-text">Proceso de Comunidades Negras</p>
+      </div>
+      <div>
+        <div class="footer-heading">Módulos</div>
+        <a href="index.html" class="footer-link">Inicio</a>
+        <a href="memoria.html" class="footer-link">Memoria Afroterritorial</a>
+        <a href="gobierno.html" class="footer-link">Gobierno propio</a>
+        <a href="scita.html" class="footer-link">SCITA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Palenke Pensamiento / PCN</span>
+      <span>Política de datos · Aviso legal</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
