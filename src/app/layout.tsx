@@ -36,7 +36,7 @@ export default function RootLayout({
       <body className={`${sourceSans3.variable} ${dmSerifDisplay.variable} antialiased`}>
         {children}
         <Suspense fallback={null}>
-          <GlobalBibliotecaSearchDock documents={globalSearchDocuments} />
+         
         </Suspense>
       </body>
     </html>
