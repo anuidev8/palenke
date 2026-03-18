@@ -284,80 +284,98 @@ export default async function ScitaPage({
         </div>
       </section>
 
-      {/* ── Abrir SIG + Ver tableros ── */}
+      {/* ── Acceso al Sistema de Información Geográfica ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className={`grid gap-6 ${isInternal(role) ? "md:grid-cols-2" : ""}`}>
-          {/* SIG-A card (internal only) */}
-          {isInternal(role) ? (
-            <div className="rounded-[28px] border border-[#e8dfd3] bg-[#f0eae0] p-8">
-              <p className="eyebrow mb-3">SIG Afrodescendiente · SIG-A</p>
-              <h2 className="font-display text-2xl text-[#1a1a1a]">Enlace al SIG Afrodescendiente</h2>
-              <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-                Accede al visor geográfico comunitario del equipo Corporación Agencia Afrocolombiana
-                Hileros/PCN — consulta mapas, capas territoriales y análisis espacial con soberanía
-                de información afrodescendiente.
-              </p>
+        <div className="relative overflow-hidden rounded-[32px] border border-[#e8dfd3] bg-white shadow-sm lg:flex">
+          {/* Content side */}
+          <div className="relative z-10 flex flex-col justify-center p-8 sm:p-12 lg:w-1/2">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="rounded-full bg-[#e3f2fd] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#1565c0]">
+                Nuevo
+              </span>
+              <p className="eyebrow text-[#2e7d32]">Sistema de Información Geográfica</p>
+            </div>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">
+              Interactúa con el territorio
+            </h2>
+            <p className="mt-4 text-base leading-7 text-[#4a4540]">
+              Si ya quieres interactuar con el sistema de información geográfica y explorar
+              nuestros datos espaciales, hemos dispuesto este acceso directo para llevarte
+              a la plataforma principal.
+            </p>
+            <div className="mt-8">
               <Link
                 href={withRole("/geoportal", role)}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#333] shadow-sm"
               >
-                Abrir SIG-A
+                Abrir Sistema de Información Geográfica
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-          ) : null}
+          </div>
 
-          {/* Ver tableros card */}
-          <div className="rounded-[28px] border border-[#e8dfd3] bg-white p-8">
-            <div className="mb-3 flex items-center gap-2">
-              <p className="eyebrow">Mirador de datos · Power BI</p>
-              {/* Read-only badge for public */}
-              {!isInternal(role) ? (
-                <span className="rounded-full bg-[#f0eae0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#7a756e]">
-                  Solo lectura
-                </span>
-              ) : null}
-            </div>
-            <h2 className="font-display text-2xl text-[#1a1a1a]">Tableros territoriales</h2>
-            <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-              Indicadores sobre agua, territorio, cobertura boscosa y demografía de los Consejos
-              Comunitarios del Pacífico colombiano.
-            </p>
-            {!isInternal(role) ? (
-              <p className="mt-2 text-xs leading-5 text-[#7a756e]">
-                Vista pública — solo métricas. Los botones de filtro y descarga están disponibles
-                para el equipo interno.
-              </p>
-            ) : null}
-            {/* Mock Power BI preview tiles */}
-            <div className="mt-5 grid grid-cols-2 gap-2">
-              {[
-                { label: "Cobertura boscosa", val: "68%", color: "#2e7d32", bg: "#d8f3dc" },
-                { label: "Alertas activas", val: "12", color: "#d32f2f", bg: "#fddede" },
-                { label: "ACCs declaradas", val: "7", color: "#1565c0", bg: "#e3f2fd" },
-                { label: "Cuencas monitoreadas", val: "23", color: "#f57f17", bg: "#fff3cd" },
-              ].map((m) => (
-                <div
-                  key={m.label}
-                  className="rounded-[16px] p-3"
-                  style={{ background: m.bg }}
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: m.color }}>
-                    {m.label}
-                  </p>
-                  <p className="mt-1 font-display text-2xl" style={{ color: m.color }}>
-                    {m.val}
-                  </p>
-                </div>
+          {/* Visual side */}
+          <div className="relative hidden min-h-[360px] bg-[#1a2a1a] lg:block lg:w-1/2">
+            {/* Map texture background */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 50% 50%, rgba(46,125,50,0.5), transparent 70%), linear-gradient(135deg, #0d1f0d 0%, #152a15 100%)",
+              }}
+            />
+            
+            {/* Grid overlay */}
+            <div className="absolute inset-0 opacity-[0.08]" aria-hidden="true">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <span
+                  key={`v-${i}`}
+                  className="absolute top-0 h-full w-px bg-white"
+                  style={{ left: `${i * 8.33}%` }}
+                />
+              ))}
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span
+                  key={`h-${i}`}
+                  className="absolute left-0 h-px w-full bg-white"
+                  style={{ top: `${i * 12.5}%` }}
+                />
               ))}
             </div>
-            <Link
-              href={withRole("/estadisticas", role)}
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333]"
+
+            {/* Simulated map polygons */}
+            <svg
+              className="absolute inset-0 h-full w-full opacity-60"
+              viewBox="0 0 500 400"
+              preserveAspectRatio="xMidYMid slice"
+              aria-hidden="true"
             >
-              Ver todos los tableros
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+              <polygon points="100,80 250,60 300,160 200,220 120,180" fill="#2e7d32" opacity="0.7" />
+              <polygon points="280,120 420,90 460,190 350,240 290,200" fill="#1565c0" opacity="0.6" />
+              <polygon points="150,240 280,220 320,320 220,360 140,320" fill="#f57f17" opacity="0.5" />
+              <polygon points="340,260 450,230 480,330 380,370 320,330" fill="#2e7d32" opacity="0.6" />
+              
+              {/* Nodes/Pins */}
+              <circle cx="200" cy="140" r="6" fill="white" opacity="0.9" />
+              <circle cx="370" cy="150" r="6" fill="white" opacity="0.9" />
+              <circle cx="230" cy="290" r="6" fill="white" opacity="0.9" />
+              <circle cx="400" cy="300" r="6" fill="white" opacity="0.9" />
+            </svg>
+
+            {/* Floating UI element */}
+            <div className="absolute bottom-6 left-6 rounded-2xl bg-black/40 p-4 backdrop-blur-md border border-white/10 shadow-lg">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2e7d32]/80">
+                  <Layers className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
+                    Módulo Activo
+                  </p>
+                  <p className="font-display text-lg text-white">Geoportal SIG-A</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
