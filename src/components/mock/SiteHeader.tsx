@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
 import type { ViewerRole } from "@/lib/mock-data";
 import { isInternal, withRole } from "@/lib/viewer";
 
@@ -33,7 +32,7 @@ export function SiteHeader({
 
   const navItems: Array<{ label: string; href: string }> = [
     { label: "Inicio", href: "/" },
-    { label: "Memoria Afrodescendiente", href: "/memoria-afroterritorial" },
+    { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
     { label: "Gobierno Propio", href: "/gobierno-propio" },
     { label: "SCITA", href: "/scita" },
   ];
@@ -90,17 +89,8 @@ export function SiteHeader({
               ))}
             </nav>
 
-            {/* Search pill + role badge */}
+            {/* Role badge (no global search) */}
             <div className="hidden items-center gap-3 lg:flex">
-              <form action={withRole("/buscar", role)} className="relative flex h-[37px] w-[200px] items-center">
-                <Search className="absolute left-3 h-4 w-4 shrink-0 text-[#7a756e]" aria-hidden="true" />
-                <input
-                  type="search"
-                  name="q"
-                  placeholder="Buscar…"
-                  className="h-full w-full rounded-full border border-[#e8dfd3] bg-white pl-9 pr-4 text-sm text-[#1a1a1a] placeholder:text-[#7a756e] focus:border-[#2e7d32] focus:outline-none focus:ring-1 focus:ring-[#2e7d32]"
-                />
-              </form>
               {isInternal(role) ? (
                 <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
                   Rol: {role === "admin" ? "Admin" : "Interno"}

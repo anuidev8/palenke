@@ -29,7 +29,7 @@ export function HeroCards({
 }) {
   const cards = [
     {
-      title: "Memoria Afrodescendiente",
+      title: "Memoria Afroterritorial",
       desc: "Archivo histórico y cultural comunitario.",
       href: "/memoria-afroterritorial",
       video: "https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4",
@@ -59,8 +59,8 @@ export function HeroCards({
   ];
 
   return (
-    <motion.div 
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5"
+    <motion.div
+      className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5"
       variants={containerVariants}
       initial="hidden"
       animate="show"
@@ -69,7 +69,7 @@ export function HeroCards({
         <motion.div key={card.title} variants={itemVariants} className="h-full">
           <Link
             href={withRole(card.href, role)}
-            className="group relative flex h-48 flex-col justify-end overflow-hidden rounded-[24px] border border-white/10 bg-[#1a1a1a] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl hover:shadow-black/50 sm:h-56 xl:h-60"
+            className="group relative flex h-40 flex-col justify-end overflow-hidden rounded-[24px] border border-white/10 bg-[#1a1a1a] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl hover:shadow-black/50 sm:h-56 sm:p-5 xl:h-60"
           >
             <video
               autoPlay
@@ -82,10 +82,10 @@ export function HeroCards({
               <source src={card.video} type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-60" />
-            
-            <div className="relative z-10 translate-y-4 transition-transform duration-300 group-hover:translate-y-0">
-              <h3 className="font-display text-xl text-white sm:text-2xl">{card.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+
+            <div className="relative z-10 translate-y-2 transition-transform duration-300 group-hover:translate-y-0 sm:translate-y-4">
+              <h3 className="font-display text-base text-white sm:text-2xl">{card.title}</h3>
+              <p className="mt-1 hidden text-sm leading-relaxed text-white/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:mt-2 sm:block">
                 {card.desc}
               </p>
             </div>

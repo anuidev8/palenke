@@ -1,11 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar, Search } from "lucide-react";
+import { ArrowRight, Calendar, ChevronDown, Search } from "lucide-react";
 import { Callout, PageBanner, SiteLayout } from "@/components/mock/ui";
-import { homeIntro } from "@/lib/mock-data";
+import {
+  homeIntro,
+  homePoliticalOrientationIntro,
+  homePoliticalOrientationLead,
+  homePoliticalOrientationPillars,
+  homeStrategicFunctions,
+  homeStrategicFunctionsClosing,
+  homeStrategicFunctionsIntro,
+} from "@/lib/mock-data";
 import { getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
 import { HeroCards } from "@/components/home/HeroCards";
+import {
+  HomePoliticalOrientationAccordion,
+  HomeWhoWeAreAccordion,
+} from "@/components/home/HomeInfoAccordions";
 import { getHomePcnNews, getLatestTerritorialEvents } from "@/lib/newsroom";
+import { ExpandableVideo } from "@/components/home/ExpandableVideo";
+import { HomeVideoGallery } from "@/components/home/HomeVideoGallery";
 
 export default async function HomePage({
   searchParams,
@@ -54,7 +68,7 @@ export default async function HomePage({
           />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col px-4 pb-6 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8 lg:pb-10 lg:pt-8">
+        <div className="relative z-10 mx-auto flex min-h-[90vh] w-full max-w-7xl flex-col px-4 pb-6 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8 lg:pb-10 lg:pt-8">
           {/* Masthead row */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <Link href={withRole("/", role)} className="flex items-center gap-3">
@@ -132,24 +146,35 @@ export default async function HomePage({
 
               {/* Right: Presentation Video Container */}
               <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
-                  {/* Simulated Presentation Video Background */}
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity duration-300 group-hover:opacity-100"
-                  >
-                    <source src="https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4" type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/10" />
+                <ExpandableVideo videoId="hero" fullSrc="/hero-bg.mp4">
+                  <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
+                    {/* Simulated Presentation Video Background */}
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+                    >
+                      <source src="https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4" type="video/mp4" />
+                    </video>
+                    <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/10" />
 
-                  {/* Video Tag Label */}
-                  <div className="absolute bottom-5 left-5 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md">
-                    Video de presentación
+                    {/* Play Icon Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2e7d32] shadow-[0_0_0_8px_rgba(46,125,50,0.25)] transition-transform duration-300 group-hover:scale-110 group-hover:bg-[#1b5e20]">
+                        <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7 translate-x-0.5" aria-hidden="true">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Video Tag Label */}
+                    <div className="absolute bottom-5 left-5 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md z-10">
+                      Video de presentación
+                    </div>
                   </div>
-                </div>
+                </ExpandableVideo>
               </div>
             </div>
           </div>
@@ -159,16 +184,27 @@ export default async function HomePage({
             <HeroCards role={role} />
           </div>
         </div>
+
+        <a
+          href="#quienes-somos"
+          aria-label="Hay más contenido. Desplazarse a la siguiente sección"
+          className="absolute bottom-3 right-1 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/65 motion-reduce:transition-none sm:bottom-4 sm:right-2 lg:bottom-5 lg:right-3"
+        >
+          <ChevronDown className="h-5 w-5 animate-bounce motion-reduce:animate-none" aria-hidden="true" />
+        </a>
       </section>
 
       {/* ── ¿Quiénes somos? ── */}
-      <section className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-20">
+      <section
+        id="quienes-somos"
+        className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-20"
+      >
         {/* Left: accent bar + heading + PCN dots */}
         <div className="flex gap-5">
           <div className="w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
           <div>
             <h2 className="font-display text-4xl leading-tight text-[#1a1a1a] sm:text-5xl">
-              ¿Quiénes somos?
+              QUIÉNES SOMOS
             </h2>
             <div className="mt-4 flex items-center gap-2" aria-hidden="true">
               <span className="h-3 w-3 rounded-full bg-[#2e7d32]" />
@@ -178,107 +214,21 @@ export default async function HomePage({
           </div>
         </div>
         {/* Right: paragraphs */}
-        <div className="space-y-5">
-          {homeIntro.map((paragraph) => (
-            <p key={paragraph} className="text-base leading-8 text-[#4a4540]">
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        <HomeWhoWeAreAccordion
+          introParagraphs={homeIntro}
+          strategicFunctionsIntro={homeStrategicFunctionsIntro}
+          strategicFunctions={homeStrategicFunctions}
+          strategicFunctionsClosing={homeStrategicFunctionsClosing}
+        />
       </section>
 
-      {/* ── Tres funciones estratégicas ── */}
-      <section className="bg-[#1a1a1a] px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#fbc02d]">
-              Marco de acción
-            </p>
-            <h2 className="font-display text-3xl text-white sm:text-4xl">
-              Tres funciones estratégicas
-            </h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white/65">
-              El Palenke cumple tres roles complementarios para fortalecer la autonomía y la
-              defensa integral del Pueblo Negro.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                num: "01",
-                title: "Producción de conocimiento propio",
-                body: "Sistematiza saberes ancestrales, experiencias comunitarias e información territorial para fortalecer la toma de decisiones desde el gobierno propio.",
-                accent: "#2e7d32",
-                bg: "#d8f3dc",
-              },
-              {
-                num: "02",
-                title: "Cuidado territorial comunitario",
-                body: "Acompaña procesos de monitoreo ambiental y territorial mediante el Sistema Comunitario de Información Territorial y Ambiental (SCITA), que incluye el SIG-A, fortaleciendo el gobierno comunitario sobre los territorios.",
-                accent: "#fbc02d",
-                bg: "#fff3cd",
-              },
-              {
-                num: "03",
-                title: "Incidencia política",
-                body: "Promueve el reconocimiento de las comunidades negras como autoridades territoriales y ambientales legítimas, participando en agendas nacionales e internacionales relacionadas con derechos territoriales, biodiversidad y justicia climática.",
-                accent: "#d32f2f",
-                bg: "#fddede",
-              },
-            ].map((fn) => (
-              <article
-                key={fn.num}
-                className="flex flex-col gap-5 rounded-[24px] border border-white/10 bg-white/5 p-7 backdrop-blur-sm"
-              >
-                <div
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl text-lg font-bold"
-                  style={{ background: fn.bg, color: fn.accent }}
-                >
-                  {fn.num}
-                </div>
-                <div>
-                  <h3 className="font-display text-xl text-white">{fn.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-white/65">{fn.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Video + Nuestro quehacer político ── */}
+      {/* ── Video + Nuestra orientación política ── */}
       <section className="bg-[#f0eae0] px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto grid w-full max-w-7xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* Video placeholder */}
-          <div className="relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-[28px] bg-[#1a2a1a]">
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(26,26,26,0.92) 0%, rgba(44,62,42,0.85) 100%)",
-              }}
-            />
-            <button
-              type="button"
-              aria-label="Reproducir video de presentación"
-              className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[#2e7d32] shadow-[0_0_0_8px_rgba(46,125,50,0.25)] transition hover:bg-[#1b5e20]"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="white"
-                className="h-7 w-7 translate-x-0.5"
-                aria-hidden="true"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </button>
-            <div className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
-              Video de presentación
-            </div>
-          </div>
+        <div className="mx-auto grid w-full max-w-7xl items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          {/* Video Gallery */}
+          <HomeVideoGallery />
 
-          {/* Quehacer político card */}
+          {/* Orientación política card */}
           <div className="flex flex-col gap-5 rounded-[28px] border border-[#e8dfd3] bg-white p-8">
             {/* multi-stripe top accent */}
             <div className="flex h-1 overflow-hidden rounded-full" aria-hidden="true">
@@ -286,17 +236,12 @@ export default async function HomePage({
               <span className="flex-1 bg-[#d32f2f]" />
               <span className="flex-1 bg-[#fbc02d]" />
             </div>
-            <h2 className="font-display text-3xl text-[#1a1a1a]">Nuestro quehacer político</h2>
-            <p className="text-base leading-7 text-[#4a4540]">
-              Defendemos el territorio ancestral, fortalecemos el gobierno propio y construimos
-              autonomía comunitaria desde los principios de identidad, territorio y participación.
-            </p>
-            <Link
-              href={withRole("/gobierno-propio", role)}
-              className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-[#2e7d32] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
-            >
-              Ver más
-            </Link>
+            <h2 className="font-display text-3xl text-[#1a1a1a]">NUESTRA ORIENTACIÓN POLÍTICA</h2>
+            <HomePoliticalOrientationAccordion
+              intro={homePoliticalOrientationIntro}
+              lead={homePoliticalOrientationLead}
+              pillars={homePoliticalOrientationPillars}
+            />
           </div>
         </div>
       </section>
@@ -315,12 +260,12 @@ export default async function HomePage({
               {
                 color: "#2e7d32",
                 lightBg: "#d8f3dc",
-                tag: "SCITA",
-                title: "Área de conservación comunitaria",
+                tag: "Memoria Afroterritorial",
+                title: "Memoria viva del territorio",
                 description:
-                  "Capas de datos sobre las ACC, cobertura boscosa y alertas territoriales del equipo SIG.",
-                href: "/scita",
-                cta: "Ver en SCITA",
+                  "Explora relatos, archivos y contenidos culturales que preservan la historia comunitaria.",
+                href: "/biblioteca?section=Memoria+viva+del+territorio",
+                cta: "Ver memoria",
               },
               {
                 color: "#1565c0",
@@ -335,12 +280,15 @@ export default async function HomePage({
               {
                 color: "#d32f2f",
                 lightBg: "#fddede",
-                tag: "SCITA",
-                title: "SIG Afrodescendiente",
-                description:
-                  "Sistema de información geográfica territorial — geoportal y tableros de datos del Pacífico colombiano.",
-                href: isInternal(role) ? "/geoportal" : "/scita",
-                cta: "Abrir SIG",
+                tag: isInternal(role) ? "SCITA" : "Memoria Afroterritorial",
+                title: isInternal(role) ? "SIG Afrodescendiente" : "Archivo comunitario",
+                description: isInternal(role)
+                  ? "Sistema de información geográfica territorial — geoportal y tableros de datos del Pacífico colombiano."
+                  : "Documentos, voces y registros para fortalecer la memoria y el cuidado del territorio.",
+                href: isInternal(role)
+                  ? "/geoportal"
+                  : "/biblioteca?section=Memoria+viva+del+territorio",
+                cta: isInternal(role) ? "Abrir SIG" : "Explorar archivo",
               },
             ].map((item) => (
               <article
@@ -486,91 +434,6 @@ export default async function HomePage({
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Nuestra orientación política — 5 pilares ── */}
-      <section className="bg-[#f0eae0] px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="eyebrow mb-2">Principios organizativos del PCN</p>
-              <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">
-                Nuestra orientación política
-              </h2>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-[#4a4540]">
-                El Palenke se orienta por los principios políticos y organizativos del Proceso de
-                Comunidades Negras, construidos históricamente en la lucha del pueblo
-                afrodescendiente por la dignidad, el territorio y la autodeterminación.
-              </p>
-            </div>
-            <div className="flex h-1 w-48 shrink-0 overflow-hidden rounded-full lg:self-auto" aria-hidden="true">
-              <span className="flex-1 bg-[#1a1a1a]" />
-              <span className="flex-1 bg-[#2e7d32]" />
-              <span className="flex-1 bg-[#d32f2f]" />
-              <span className="flex-1 bg-[#fbc02d]" />
-            </div>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-            {[
-              {
-                num: "I",
-                title: "Autonomía del Pueblo Negro",
-                body: "Reconocemos el derecho de las comunidades negras a ejercer gobierno propio sobre sus territorios colectivos, de acuerdo con la Constitución Política, la Ley 70 de 1993 y los instrumentos internacionales de derechos de los pueblos afrodescendientes.",
-                color: "#1a1a1a",
-                bg: "#f0eae0",
-                border: "#1a1a1a",
-              },
-              {
-                num: "II",
-                title: "Defensa integral del territorio",
-                body: "Entendemos el territorio como un espacio de vida que integra tierra, agua, ecosistemas, biodiversidad, cultura, memoria y espiritualidad. La defensa territorial implica proteger estos elementos frente a amenazas extractivas, ambientales y sociales.",
-                color: "#2e7d32",
-                bg: "#d8f3dc",
-                border: "#2e7d32",
-              },
-              {
-                num: "III",
-                title: "Gobernanza comunitaria",
-                body: "Promovemos el fortalecimiento de los Consejos Comunitarios como autoridades legítimas de sus territorios, apoyando la construcción de instrumentos propios de gobierno y herramientas legislativas para la gestión territorial.",
-                color: "#1565c0",
-                bg: "#e3f2fd",
-                border: "#1565c0",
-              },
-              {
-                num: "IV",
-                title: "Justicia racial, ambiental y climática",
-                body: "Reconocemos que los territorios afrodescendientes son fundamentales para la conservación de ecosistemas bioculturales estratégicos. Impulsamos una agenda de justicia política, climática y sociocultural que reconozca el papel histórico de las comunidades negras.",
-                color: "#d32f2f",
-                bg: "#fddede",
-                border: "#d32f2f",
-              },
-              {
-                num: "V",
-                title: "Conocimiento ancestral y diálogo de saberes",
-                body: "Valoramos los saberes de mayoras y mayores como fundamento del pensamiento afrodescendiente, promoviendo su diálogo con herramientas técnicas, académicas y tecnológicas para fortalecer la autonomía territorial.",
-                color: "#f57f17",
-                bg: "#fff3cd",
-                border: "#f57f17",
-              },
-            ].map((pillar) => (
-              <article
-                key={pillar.num}
-                className="flex flex-col gap-4 rounded-[24px] border-t-4 bg-white p-6 shadow-sm"
-                style={{ borderTopColor: pillar.border }}
-              >
-                <div
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
-                  style={{ background: pillar.bg, color: pillar.color }}
-                >
-                  {pillar.num}
-                </div>
-                <h3 className="font-display text-lg leading-snug text-[#1a1a1a]">{pillar.title}</h3>
-                <p className="text-sm leading-6 text-[#4a4540]">{pillar.body}</p>
-              </article>
-            ))}
           </div>
         </div>
       </section>

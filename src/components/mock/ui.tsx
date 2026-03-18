@@ -72,7 +72,7 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
                   Inicio
                 </Link>
                 <Link href={withRole("/memoria-afroterritorial", role)} className="text-white/70 transition hover:text-white">
-                  Memoria Afrodescendiente
+                  Memoria Afroterritorial
                 </Link>
                 <Link href={withRole("/gobierno-propio", role)} className="text-white/70 transition hover:text-white">
                   Gobierno Propio

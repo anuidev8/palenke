@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ExternalLink, Layers } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
+import { ScitaLayerToggles } from "@/components/palenke/ScitaLayerToggles";
 import { getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
 
 const capas = [
@@ -78,14 +79,7 @@ export default async function ScitaPage({
       {/* ── Page header ── */}
       <section className="border-b border-[#e8dfd3] bg-[#1a1a1a] px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[1.5px] text-[#fbc02d]">
-            Sistema Comunitario de Información Territorial y Ambiental
-          </p>
           <h1 className="font-display text-4xl text-white sm:text-5xl">SCITA</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-white/70">
-            Plataforma de datos geoespaciales y territoriales del Proceso de Comunidades Negras.
-            Visualiza capas, consulta tableros y envía información ambiental desde el campo.
-          </p>
         </div>
       </section>
 
@@ -251,9 +245,6 @@ export default async function ScitaPage({
 
           {/* Text */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#fbc02d]">
-              Sistema Comunitario de Información Territorial y Ambiental
-            </p>
             <h2 className="font-display text-3xl text-white sm:text-4xl">
               ¿Qué hace el SCITA?
             </h2>
@@ -289,51 +280,14 @@ export default async function ScitaPage({
             <h2 className="font-display text-2xl text-[#1a1a1a]">Capas de información</h2>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {capas.map((capa) => (
-              <div
-                key={capa.id}
-                className="flex items-center gap-4 rounded-[20px] border bg-white px-4 py-4 transition hover:shadow-sm"
-                style={{
-                  borderColor: capa.active ? capa.color : "#e8dfd3",
-                  borderLeftWidth: capa.active ? "3px" : "1px",
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold"
-                  style={{ background: capa.lightBg, color: capa.color }}
-                >
-                  {capa.abbr.slice(0, 3)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-[#1a1a1a]">{capa.label}</p>
-                  <p className="mt-0.5 text-xs text-[#7a756e]">
-                    {capa.active ? "Activa" : "Disponible"}
-                  </p>
-                </div>
-                {/* toggle pill */}
-                <div
-                  className="h-5 w-9 rounded-full transition-colors"
-                  style={{ background: capa.active ? capa.color : "#e8dfd3" }}
-                  aria-hidden="true"
-                >
-                  <div
-                    className="mt-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
-                    style={{
-                      transform: capa.active ? "translateX(18px)" : "translateX(2px)",
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          <ScitaLayerToggles initialLayers={capas} />
         </div>
       </section>
 
       {/* ── Abrir SIG + Ver tableros ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* SIG-A card (internal) / Formulario ambiental card (public) */}
+        <div className={`grid gap-6 ${isInternal(role) ? "md:grid-cols-2" : ""}`}>
+          {/* SIG-A card (internal only) */}
           {isInternal(role) ? (
             <div className="rounded-[28px] border border-[#e8dfd3] bg-[#f0eae0] p-8">
               <p className="eyebrow mb-3">SIG Afrodescendiente · SIG-A</p>
@@ -351,24 +305,7 @@ export default async function ScitaPage({
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-          ) : (
-            <div className="rounded-[28px] border border-[#1b5e20] bg-[#d8f3dc] p-8">
-              <p className="eyebrow mb-3">Monitoreo comunitario</p>
-              <h2 className="font-display text-2xl text-[#1a1a1a]">Envía información ambiental</h2>
-              <p className="mt-3 text-sm leading-6 text-[#4a4540]">
-                ¿Detectaste una amenaza ambiental, minería ilegal o daño hídrico en tu territorio?
-                Usa el formulario comunitario para enviar un reporte al equipo del Palenke desde
-                el campo.
-              </p>
-              <Link
-                href="/scita/formulario"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#2e7d32] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
-              >
-                Abrir formulario
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-          )}
+          ) : null}
 
           {/* Ver tableros card */}
           <div className="rounded-[28px] border border-[#e8dfd3] bg-white p-8">

@@ -17,7 +17,7 @@ export default async function NoticiasPage({
       role={role}
       breadcrumbs={[
         { label: "Inicio", href: "/" },
-        { label: "Memoria Afrodescendiente", href: "/memoria-afroterritorial" },
+        { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
         { label: "Noticias y eventos" },
       ]}
     >
@@ -25,7 +25,7 @@ export default async function NoticiasPage({
       <section className="bg-[#2c3e2a] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[1.5px] text-[#fbc02d]">
-            Memoria Afrodescendiente
+            Memoria Afroterritorial
           </p>
           <h1 className="font-display text-4xl text-white sm:text-5xl">Noticias y eventos</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-white/70">
@@ -142,7 +142,7 @@ export default async function NoticiasPage({
             href={withRole("/memoria-afroterritorial", role)}
             className="inline-flex items-center gap-2 rounded-full border-2 border-[#2e7d32] px-5 py-2.5 text-sm font-semibold text-[#2e7d32] transition hover:bg-[#d8f3dc]"
           >
-            ← Memoria Afrodescendiente
+            ← Memoria Afroterritorial
           </Link>
         </div>
       </section>

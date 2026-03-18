@@ -180,7 +180,7 @@ export default async function DetalleNoticiaPage({
               href={withRole("/memoria-afroterritorial", role)}
               className="inline-flex items-center gap-2 rounded-full border-2 border-[#2e7d32] px-5 py-2.5 text-sm font-semibold text-[#2e7d32] transition hover:bg-[#d8f3dc]"
             >
-              ← Volver a Memoria Afrodescendiente
+              ← Volver a Memoria Afroterritorial
             </Link>
           </div>
         </div>

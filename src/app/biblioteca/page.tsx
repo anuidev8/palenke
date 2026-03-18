@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Download, ExternalLink, FileText, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
+import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
+import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
+import BibliotecaCategoryNav from "@/components/palenke/BibliotecaCategoryNav";
 import {
   getVisibleDocuments,
   librarySections,
@@ -11,11 +14,26 @@ import { filterDocuments, getDocumentYears, type LibraryFilters } from "@/lib/mo
 import { getFirstParam, getMultiParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
 const PAGE_SIZE = 10;
+const NORMATIVA_SECTION = "Normativa vigente";
+
+const normativaTypeLabels: Array<{ type: string; label: string }> = [
+  { type: "Constitución", label: "Base estructural · Constitución" },
+  { type: "Ley", label: "Derechos colectivos · Leyes" },
+  { type: "Decreto", label: "Desarrollo reglamentario · Decretos" },
+  { type: "Jurisprudencia", label: "Sentencias estructurales · Jurisprudencia" },
+  { type: "Instrumento internacional", label: "Marco global · Normativa internacional" },
+  { type: "Política pública", label: "Incidencia institucional · Políticas públicas" },
+  { type: "Instancia oficial", label: "Mecanismos oficiales · Instancias" },
+];
+
+function normalizeSectionLabel(section: string) {
+  return section === "Norma vigente" ? NORMATIVA_SECTION : section;
+}
 
 function parseFilters(params: SearchParams): LibraryFilters {
   return {
     query: getFirstParam(params.q) ?? "",
-    sections: getMultiParam(params.section),
+    sections: getMultiParam(params.section).map(normalizeSectionLabel),
     territory: getFirstParam(params.territory) ?? "",
     type: getFirstParam(params.type) ?? "",
     year: getFirstParam(params.year) ?? "",
@@ -37,6 +55,11 @@ export default async function BibliotecaPage({
   const visibleDocuments = getVisibleDocuments(role).toSorted((a, b) => b.year - a.year);
   const results = filterDocuments(visibleDocuments, filters);
   const years = getDocumentYears(visibleDocuments);
+  const docsForSectionContext =
+    filters.sections.length > 0
+      ? visibleDocuments.filter((document) => filters.sections.includes(document.section))
+      : visibleDocuments;
+  const types = Array.from(new Set(docsForSectionContext.map((document) => document.type))).toSorted();
 
   const totalCount = results.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -48,13 +71,17 @@ export default async function BibliotecaPage({
   const activeFilters = buildActiveFilters(filters, role);
 
   const sectionActive = filters.sections[0] ?? "";
+  const typeChips =
+    sectionActive === NORMATIVA_SECTION
+      ? normativaTypeLabels.filter(({ type }) => types.includes(type))
+      : types.map((type) => ({ type, label: type }));
 
   return (
     <SiteLayout
       role={role}
       breadcrumbs={[
         { label: "Inicio", href: "/" },
-        { label: "Memoria Afrodescendiente", href: "/biblioteca" },
+        { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
         ...(sectionActive ? [{ label: sectionActive }] : []),
       ]}
       floatingPanel={
@@ -76,11 +103,12 @@ export default async function BibliotecaPage({
             <div className="mt-1 h-12 w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
             <div>
               <h1 className="font-display text-4xl text-[#1a1a1a]">
-                {sectionActive || "Memoria Afrodescendiente"}
+                {sectionActive || "Memoria Afroterritorial"}
               </h1>
               <p className="mt-2 max-w-2xl text-base text-[#4a4540]">
-                Corpus documental del Palenke — resoluciones, planes de manejo, acuerdos y
-                materiales de base. Filtros por tipo, territorio y año.
+                {sectionActive === "Normativa vigente"
+                  ? "Módulo legislativo del Palenke — Constitución, leyes, decretos, jurisprudencia, normativa internacional y políticas públicas organizadas para navegación temática."
+                  : "Corpus documental del Palenke — resoluciones, planes de manejo, acuerdos y materiales de base. Filtros por tipo, territorio y año."}
               </p>
             </div>
           </div>
@@ -88,6 +116,39 @@ export default async function BibliotecaPage({
       </section>
 
       <div className="mx-auto w-full max-w-7xl px-4 pb-44 pt-8 sm:px-6 lg:px-8">
+        <BibliotecaCategoryNav
+          sections={[
+            {
+              label: "Toda la biblioteca",
+              href: withRole("/biblioteca", role, buildFilters({ ...filters, sections: [], type: "" })),
+              isActive: filters.sections.length === 0,
+            },
+            ...librarySections.map((section) => ({
+              label: section,
+              href: withRole("/biblioteca", role, buildFilters({ ...filters, sections: [section], type: "" })),
+              isActive: sectionActive === section,
+            })),
+          ]}
+          types={
+            typeChips.length > 1
+              ? [
+                  {
+                    type: "",
+                    label: sectionActive ? `Todas en ${sectionActive}` : "Todos los tipos",
+                    href: withRole("/biblioteca", role, buildFilters({ ...filters, type: "" })),
+                    isActive: !filters.type,
+                  },
+                  ...typeChips.map((chip) => ({
+                    type: chip.type,
+                    label: chip.label,
+                    href: withRole("/biblioteca", role, buildFilters({ ...filters, type: chip.type })),
+                    isActive: filters.type === chip.type,
+                  })),
+                ]
+              : []
+          }
+        />
+        
         {/* ── Filter bar ── */}
         <form
           action="/biblioteca"
@@ -109,17 +170,10 @@ export default async function BibliotecaPage({
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="f-section" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
-              Sección
-            </label>
-            <select id="f-section" name="section" defaultValue={filters.sections[0] ?? ""} className="input-shell">
-              <option value="">Todas</option>
-              {librarySections.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+          {filters.sections.map((section) => (
+            <input key={section} type="hidden" name="section" value={section} />
+          ))}
+          {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="f-territory" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
@@ -168,169 +222,58 @@ export default async function BibliotecaPage({
           </p>
         ) : null}
 
-        {/* ── Document table ── */}
+        {/* ── Document grid ── */}
         {pageResults.length > 0 ? (
           <>
-            <div className="overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-white">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] divide-y divide-[#e8dfd3] text-left text-sm">
-                  <thead>
-                    <tr className="bg-[#1a1a1a]">
-                      {["Título", "Tipo", "Territorio", "Año", "Etiquetas", "Acción"].map((h) => (
-                        <th
-                          key={h}
-                          className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e8dfd3]">
-                    {pageResults.map((doc, i) => (
-                      <tr
-                        key={doc.id}
-                        className={`align-top transition-colors hover:bg-[#f0eae0] ${
-                          i % 2 === 0 ? "bg-white" : "bg-[#fafaf8]"
-                        }`}
-                      >
-                        {/* Título */}
-                        <td className="max-w-[260px] px-5 py-4">
-                          <div className="flex items-start gap-2">
-                            {doc.visibility !== "public" ? (
-                              <Lock
-                                className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#7a756e]"
-                                aria-label="Acceso restringido"
-                              />
-                            ) : null}
-                            <span className="line-clamp-2 font-medium text-[#1a1a1a]">
-                              {doc.title}
-                            </span>
-                          </div>
-                          <p className="mt-1 text-xs text-[#7a756e]">{doc.section}</p>
-                        </td>
+            {sectionActive === "Memoria viva del territorio" ? (
+              <BibliotecaMemoriaGrid docs={pageResults} />
+            ) : (
+              <BibliotecaDocGrid docs={pageResults} />
+            )}
 
-                        {/* Tipo */}
-                        <td className="whitespace-nowrap px-5 py-4 text-[#4a4540]">{doc.type}</td>
-
-                        {/* Territorio */}
-                        <td className="whitespace-nowrap px-5 py-4 text-[#4a4540]">
-                          {doc.territory}
-                        </td>
-
-                        {/* Año */}
-                        <td className="whitespace-nowrap px-5 py-4 text-[#4a4540]">{doc.year}</td>
-
-                        {/* Etiquetas */}
-                        <td className="px-5 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {doc.keywords.slice(0, 2).map((kw) => (
-                              <span
-                                key={kw}
-                                className="inline-flex items-center rounded-full border border-[#e8dfd3] bg-white px-2 py-0.5 text-[10px] font-medium text-[#4a4540]"
-                              >
-                                {kw}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-
-                        {/* Acción */}
-                        <td className="px-5 py-4">
-                          {doc.visibility === "sensitive" ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fddede] px-3 py-1.5 text-xs font-semibold text-[#d32f2f]">
-                              <Lock className="h-3 w-3" aria-hidden="true" />
-                              Restringido
-                            </span>
-                          ) : (
-                            <div className="flex flex-col gap-1.5">
-                              {/* PDF / archivo adjunto */}
-                              {doc.action === "file" ? (
-                                <a
-                                  href={doc.url}
-                                  download
-                                  className="inline-flex items-center gap-1.5 rounded-full bg-[#2e7d32] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1b5e20]"
-                                >
-                                  <Download className="h-3 w-3" aria-hidden="true" />
-                                  Descargar PDF
-                                </a>
-                              ) : null}
-
-                              {/* Fuente oficial / enlace externo */}
-                              {doc.sourceUrl ? (
-                                <a
-                                  href={doc.sourceUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-full border border-[#e8dfd3] bg-white px-3 py-1.5 text-xs font-semibold text-[#1a1a1a] transition hover:bg-[#f0eae0]"
-                                >
-                                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                                  Fuente oficial
-                                </a>
-                              ) : doc.action === "external" ? (
-                                <a
-                                  href={doc.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-full border border-[#e8dfd3] bg-white px-3 py-1.5 text-xs font-semibold text-[#1a1a1a] transition hover:bg-[#f0eae0]"
-                                >
-                                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                                  {doc.fileLabel}
-                                </a>
-                              ) : null}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between border-t border-[#e8dfd3] px-5 py-4 text-sm text-[#7a756e]">
-                <span>
-                  Página {currentPage} de {totalPages}
-                </span>
-                <div className="flex items-center gap-2">
-                  {currentPage > 1 ? (
-                    <Link
-                      href={withRole("/biblioteca", role, {
-                        ...buildFilters(filters),
-                        page: String(currentPage - 1),
-                      })}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] transition hover:bg-[#f0eae0]"
-                      aria-label="Página anterior"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] opacity-30">
-                      <ArrowLeft className="h-4 w-4" />
-                    </span>
-                  )}
-
-                  <span className="inline-flex h-8 min-w-[32px] items-center justify-center rounded-full bg-[#1a1a1a] px-2 text-xs font-semibold text-white">
-                    {currentPage}
+            {/* Pagination */}
+            <div className="mt-4 flex items-center justify-between px-1 text-sm text-[#7a756e]">
+              <span>
+                Página {currentPage} de {totalPages}
+              </span>
+              <div className="flex items-center gap-2">
+                {currentPage > 1 ? (
+                  <Link
+                    href={withRole("/biblioteca", role, {
+                      ...buildFilters(filters),
+                      page: String(currentPage - 1),
+                    })}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] transition hover:bg-[#f0eae0]"
+                    aria-label="Página anterior"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] opacity-30">
+                    <ArrowLeft className="h-4 w-4" />
                   </span>
+                )}
 
-                  {currentPage < totalPages ? (
-                    <Link
-                      href={withRole("/biblioteca", role, {
-                        ...buildFilters(filters),
-                        page: String(currentPage + 1),
-                      })}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] transition hover:bg-[#f0eae0]"
-                      aria-label="Página siguiente"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] opacity-30">
-                      <ArrowRight className="h-4 w-4" />
-                    </span>
-                  )}
-                </div>
+                <span className="inline-flex h-8 min-w-[32px] items-center justify-center rounded-full bg-[#1a1a1a] px-2 text-xs font-semibold text-white">
+                  {currentPage}
+                </span>
+
+                {currentPage < totalPages ? (
+                  <Link
+                    href={withRole("/biblioteca", role, {
+                      ...buildFilters(filters),
+                      page: String(currentPage + 1),
+                    })}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] transition hover:bg-[#f0eae0]"
+                    aria-label="Página siguiente"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e8dfd3] opacity-30">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
               </div>
             </div>
           </>

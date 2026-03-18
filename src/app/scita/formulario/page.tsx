@@ -179,7 +179,7 @@ export default async function FormularioAmbientalPage({
                 </div>
                 {/* Progress steps */}
                 <div className="flex border-t border-white/15">
-                  {["Categoría", "Formato", "Ubicación", "Detalles"].map((step, i) => (
+                  {["Categoría", "Formato", "Detalles"].map((step, i) => (
                     <div
                       key={step}
                       className="flex flex-1 flex-col items-center gap-1 py-3 text-center"
@@ -332,94 +332,9 @@ export default async function FormularioAmbientalPage({
                 </div>
               </div>
 
-              {/* ── STEP 3 — Ubicación ── */}
+              {/* ── STEP 3 — Detalles de contacto ── */}
               <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">
-                <p className="eyebrow mb-1">Paso 3</p>
-                <h2 className="font-display text-xl text-[#1a1a1a]">
-                  ¿Dónde ocurrió?
-                </h2>
-                <p className="mt-1 text-sm text-[#7a756e]">Selecciona el territorio en el mapa o describe el lugar.</p>
-
-                {/* Mini map mockup */}
-                <div
-                  className="relative mt-5 overflow-hidden rounded-[20px]"
-                  style={{
-                    height: 240,
-                    background: "radial-gradient(ellipse at 40% 50%, rgba(46,125,50,0.4), transparent 60%), linear-gradient(160deg, #0d1f0d 0%, #1a2a1a 100%)",
-                  }}
-                >
-                  {/* grid lines */}
-                  <div className="absolute inset-0 opacity-[0.07]" aria-hidden="true">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <span key={`v${i}`} className="absolute top-0 h-full w-px bg-white" style={{ left: `${i * 14}%` }} />
-                    ))}
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={`h${i}`} className="absolute left-0 h-px w-full bg-white" style={{ top: `${i * 22}%` }} />
-                    ))}
-                  </div>
-                  {/* Territory shape */}
-                  <svg className="absolute inset-0 h-full w-full opacity-20" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                    <path d="M60,240 Q160,150 200,100 Q270,40 340,60 Q420,80 500,30" stroke="white" strokeWidth="2" fill="none" />
-                    <path d="M0,180 Q100,155 190,145 Q280,130 340,160 Q420,190 600,155" stroke="white" strokeWidth="1.2" fill="none" />
-                    <ellipse cx="200" cy="110" rx="55" ry="38" fill="#2e7d32" opacity="0.4" />
-                    <ellipse cx="400" cy="75" rx="70" ry="42" fill="#1565c0" opacity="0.3" />
-                  </svg>
-
-                  {/* Clickable territory pins */}
-                  {mapPins.map((pin) => {
-                    const isSelected = selectedPin === pin.id;
-                    return (
-                      <label
-                        key={pin.id}
-                        className="absolute cursor-pointer"
-                        style={{ left: pin.x, top: pin.y, transform: "translate(-50%, -50%)" }}
-                        title={pin.label}
-                      >
-                        <input
-                          type="radio"
-                          name="pin"
-                          value={pin.id}
-                          defaultChecked={isSelected}
-                          className="peer sr-only"
-                        />
-                        <div className="group relative flex items-center justify-center">
-                          <div
-                            className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white transition peer-checked:scale-125"
-                            style={{ background: isSelected ? "#2e7d32" : "rgba(255,255,255,0.25)" }}
-                          >
-                            <MapPin className="h-3 w-3 text-white" aria-hidden="true" />
-                          </div>
-                          <span className="pointer-events-none absolute bottom-full mb-1.5 hidden whitespace-nowrap rounded-md bg-[#1a1a1a] px-2 py-1 text-[10px] font-semibold text-white group-hover:block">
-                            {pin.label}
-                          </span>
-                        </div>
-                      </label>
-                    );
-                  })}
-
-                  <div className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/70 backdrop-blur-sm">
-                    Pacífico colombiano
-                  </div>
-                </div>
-
-                {/* Text fallback */}
-                <div className="mt-4">
-                  <label htmlFor="lugar" className="mb-2 block text-sm font-semibold text-[#1a1a1a]">
-                    O describe el lugar <span className="font-normal text-[#7a756e]">(quebrada, vereda, punto de referencia)</span>
-                  </label>
-                  <input
-                    id="lugar"
-                    name="lugar"
-                    type="text"
-                    placeholder="Ej: Quebrada La Honda, vereda El Firme, Naya"
-                    className="w-full rounded-[14px] border border-[#e8dfd3] px-4 py-3 text-sm text-[#1a1a1a] placeholder:text-[#bab4ac] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
-                  />
-                </div>
-              </div>
-
-              {/* ── STEP 4 — Detalles de contacto ── */}
-              <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">
-                <p className="eyebrow mb-1">Paso 4 · Opcional</p>
+                <p className="eyebrow mb-1">Paso 3 · Opcional</p>
                 <h2 className="font-display text-xl text-[#1a1a1a]">
                   ¿Cómo podemos contactarte?
                 </h2>
