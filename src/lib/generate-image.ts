@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
+import { getGeminiClient } from "@/lib/gemini-client";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDqsYOhiKjQ4qcEt3M0BHFscWjb3Lvxn40"});
+const ai = getGeminiClient();
+const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-image-preview";
 
 export async function getGeneratedImage(promptId: string, promptText: string, aspectRatio: string = '1:1'): Promise<string> {
   const filename = `${promptId}.png`;
@@ -20,18 +21,12 @@ export async function getGeneratedImage(promptId: string, promptText: string, as
 
   try {
     console.log(`Generating image for ${promptId}...`);
-    // imagen-4.0-generate-001 is the typical image generation model.
-    const response = await ai.models.generateImages({
-        model: 'imagen-4.0-generate-001',
-        prompt: promptText,
-        config: {
-            numberOfImages: 1,
-            outputMimeType: 'image/png',
-            aspectRatio: aspectRatio
-        }
+    const response = await ai.models.generateContent({
+        model: IMAGE_MODEL,
+        contents: `${promptText}\nAspect ratio: ${aspectRatio}.`,
     });
 
-    const base64Image = response.generatedImages?.[0]?.image?.imageBytes;
+    const base64Image = extractInlineImageBytes(response);
     if (!base64Image) {
       throw new Error("No image generated in response");
     }
@@ -41,4 +36,27 @@ export async function getGeneratedImage(promptId: string, promptText: string, as
     console.error('Error generating image:', error);
     return '';
   }
+}
+
+function extractInlineImageBytes(response: unknown) {
+  const candidates = (response as {
+    candidates?: Array<{
+      content?: {
+        parts?: Array<{
+          inlineData?: { data?: string };
+        }>;
+      };
+    }>;
+  }).candidates;
+
+  for (const candidate of candidates ?? []) {
+    for (const part of candidate.content?.parts ?? []) {
+      const data = part.inlineData?.data;
+      if (data) {
+        return data;
+      }
+    }
+  }
+
+  return null;
 }

@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
 import fs from 'fs';
 import path from 'path';
+import { getGeminiApiKey, getGeminiClient } from "@/lib/gemini-client";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyDqsYOhiKjQ4qcEt3M0BHFscWjb3Lvxn40"});
+const ai = getGeminiClient();
+const VIDEO_MODEL = process.env.GEMINI_VIDEO_MODEL ?? "veo-3.1-generate-preview";
 
 export async function getGeneratedVideo(promptId: string, promptText: string): Promise<string> {
   const filename = `${promptId}.mp4`;
@@ -21,7 +22,7 @@ export async function getGeneratedVideo(promptId: string, promptText: string): P
   try {
     console.log(`Generating video for ${promptId}... This might take a few minutes.`);
     const op = await ai.models.generateVideos({
-      model: 'veo-2.0-generate-001',
+      model: VIDEO_MODEL,
       prompt: promptText
     });
 
@@ -41,7 +42,7 @@ export async function getGeneratedVideo(promptId: string, promptText: string): P
     console.log(`Downloading video for ${promptId}...`);
     const res = await fetch(uri, { 
         headers: { 
-            'x-goog-api-key': "AIzaSyDqsYOhiKjQ4qcEt3M0BHFscWjb3Lvxn40" 
+            'x-goog-api-key': getGeminiApiKey()
         } 
     });
     

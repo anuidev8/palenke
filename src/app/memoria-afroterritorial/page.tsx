@@ -111,19 +111,16 @@ export default async function MemoriaAfroterritorialPage({
         </div>
       </section>
 
-      {/* ── Submódulo 1: Normativa vigente ── */}
+      {/* ── Normativa vigente ── */}
       <section className="bg-[#f8f5f2] px-4 py-14 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
 
-          {/* Left — Submódulo 1 card */}
+          {/* Left — Normativa vigente card */}
           <div className="flex flex-col gap-6 rounded-[28px] border-2 border-[#2e7d32] bg-white p-8 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2e7d32] text-sm font-bold text-white">
                 01
               </span>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#2e7d32]">
-                Submódulo 1
-              </p>
             </div>
             <h2 className="font-display text-3xl text-[#1a1a1a]">Normativa vigente</h2>
             <p className="text-base leading-7 text-[#4a4540]">
@@ -141,7 +138,7 @@ export default async function MemoriaAfroterritorialPage({
 
           {/* Right — Definición y Función */}
           <div>
-            <p className="eyebrow mb-2">Submódulo 1: Normativa vigente</p>
+            <p className="eyebrow mb-2">Normativa vigente</p>
             <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">Definición</h3>
             <p className="mt-4 text-base leading-7 text-[#4a4540]">
               Espacio que recopila y organiza el marco normativo nacional e internacional
@@ -165,13 +162,13 @@ export default async function MemoriaAfroterritorialPage({
         </div>
       </section>
 
-      {/* ── Submódulo 2: Memoria viva del territorio ── */}
+      {/* ── Memoria viva del territorio ── */}
       <section className="bg-white px-4 py-14 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-2 lg:gap-14">
 
           {/* Left — Definición y Función */}
           <div>
-            <p className="eyebrow mb-3">Submódulo 2: Memoria viva del territorio</p>
+            <p className="eyebrow mb-3">Memoria viva del territorio</p>
             <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Definición</h2>
             <p className="mt-5 text-base leading-8 text-[#4a4540]">
               Espacio de circulación de conocimiento afrodescendiente que recoge la producción
@@ -207,9 +204,6 @@ export default async function MemoriaAfroterritorialPage({
                 <span key={i} className="h-1.5 w-1.5 rounded-full bg-white" />
               ))}
             </div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#a5d6a7]">
-              Submódulo 2
-            </p>
             <h3 className="font-display text-2xl leading-tight text-white sm:text-3xl">
               Memoria viva<br />del territorio
             </h3>

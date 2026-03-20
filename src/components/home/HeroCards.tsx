@@ -50,9 +50,9 @@ export function HeroCards({
       poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=600",
     },
     {
-      title: "Noticias y eventos",
+      title: "Incidencia",
       desc: "Pronunciamientos, agenda y memoria viva del territorio.",
-      href: "/noticias",
+      href: "/incidencia",
       video: "https://cdn.pixabay.com/video/2023/10/22/185986-876934526_tiny.mp4",
       poster: "https://images.unsplash.com/photo-1505235687559-28b5f54645b7?auto=format&fit=crop&q=80&w=600",
     },

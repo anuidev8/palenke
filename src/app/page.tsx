@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar, ChevronDown, Search } from "lucide-react";
+import { ArrowRight, ChevronDown, Search } from "lucide-react";
 import { Callout, PageBanner, SiteLayout } from "@/components/mock/ui";
 import {
   homeIntro,
@@ -17,7 +17,7 @@ import {
   HomePoliticalOrientationAccordion,
   HomeWhoWeAreAccordion,
 } from "@/components/home/HomeInfoAccordions";
-import { getHomePcnNews, getLatestTerritorialEvents } from "@/lib/newsroom";
+import { getHomePcnNews } from "@/lib/newsroom";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 import { HomeVideoGallery } from "@/components/home/HomeVideoGallery";
 
@@ -30,7 +30,7 @@ export default async function HomePage({
   const role = getViewerRole(params);
   const notice = params.notice;
   const noticias = getHomePcnNews(2);
-  const ultimosEventos = getLatestTerritorialEvents(4);
+  const ultimasNoticias = getHomePcnNews(4);
 
   return (
     <SiteLayout
@@ -131,15 +131,22 @@ export default async function HomePage({
                   Nuestras Raíces,<br />Nuestro Territorio
                 </h1>
                 <p className="mt-6 max-w-xl text-base leading-7 text-white/75 sm:text-lg">
-                  Espacio digital para organizar, custodiar y comunicar el trabajo político,
-                  técnico y comunitario del Palenke y el PCN.
+                  Infraestructura digital para gestionar, proteger y comunicar información territorial, conocimiento propio y procesos de gobernanza del pueblo negro.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link
-                    href={withRole("/gobierno-propio", role)}
+                  <a
+                    href="https://renacientes.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-[#2e7d32] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/20 transition hover:bg-[#1b5e20]"
                   >
                     Conoce Nuestra Lucha
+                  </a>
+                  <Link
+                    href={withRole("/incidencia", role)}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    Incidencia
                   </Link>
                 </div>
               </div>
@@ -261,11 +268,11 @@ export default async function HomePage({
                 color: "#2e7d32",
                 lightBg: "#d8f3dc",
                 tag: "Memoria Afroterritorial",
-                title: "Memoria viva del territorio",
+                title: "Áreas de conservación bioculturales",
                 description:
-                  "Explora relatos, archivos y contenidos culturales que preservan la historia comunitaria.",
-                href: "/biblioteca?section=Memoria+viva+del+territorio",
-                cta: "Ver memoria",
+                  "Territorios colectivos con enfoque de pueblo negro: cartografía, acuerdos comunitarios y estrategias de conservación biocultural.",
+                href: "/memoria-afroterritorial",
+                cta: "Explorar áreas",
               },
               {
                 color: "#1565c0",
@@ -280,15 +287,12 @@ export default async function HomePage({
               {
                 color: "#d32f2f",
                 lightBg: "#fddede",
-                tag: isInternal(role) ? "SCITA" : "Memoria Afroterritorial",
-                title: isInternal(role) ? "SIG Afrodescendiente" : "Archivo comunitario",
-                description: isInternal(role)
-                  ? "Sistema de información geográfica territorial — geoportal y tableros de datos del Pacífico colombiano."
-                  : "Documentos, voces y registros para fortalecer la memoria y el cuidado del territorio.",
-                href: isInternal(role)
-                  ? "/geoportal"
-                  : "/biblioteca?section=Memoria+viva+del+territorio",
-                cta: isInternal(role) ? "Abrir SIG" : "Explorar archivo",
+                tag: "SCITA",
+                title: "SIG-A",
+                description:
+                  "Sistema de información geográfica afrodescendiente — geoportal y tableros de datos territoriales del Pacífico colombiano.",
+                href: "/geoportal",
+                cta: "Abrir SIG-A",
               },
             ].map((item) => (
               <article
@@ -392,15 +396,15 @@ export default async function HomePage({
             </div>
           </div>
 
-          {/* Lo último — events list */}
+          {/* Lo último — noticias de incidencia */}
           <div>
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <p className="eyebrow mb-2">Agenda territorial del proceso</p>
+                <p className="eyebrow mb-2">Incidencia política y territorial</p>
                 <h2 className="font-display text-3xl text-[#1a1a1a]">Lo último</h2>
               </div>
               <Link
-                href={withRole("/noticias", role)}
+                href={withRole("/incidencia", role)}
                 className="hidden items-center gap-2 text-sm font-semibold text-[#2e7d32] transition hover:text-[#1b5e20] sm:inline-flex"
               >
                 Ver todo
@@ -409,28 +413,37 @@ export default async function HomePage({
             </div>
 
             <div className="divide-y divide-[#e8dfd3] rounded-[28px] border border-[#e8dfd3] bg-white overflow-hidden">
-              {ultimosEventos.map((ev, i) => (
-                <div key={i} className="flex items-start gap-4 px-5 py-4 transition hover:bg-[#f8f5f2]">
-                  <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl bg-[#f0eae0]">
-                    <Calendar className="h-4 w-4 text-[#7a756e]" aria-hidden="true" />
+              {ultimasNoticias.map((n) => (
+                <Link
+                  key={n.slug}
+                  href={withRole(`/incidencia/${n.slug}`, role)}
+                  className="flex items-start gap-4 px-5 py-4 transition hover:bg-[#f8f5f2]"
+                >
+                  <div
+                    className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl text-xs font-bold text-white"
+                    style={{ background: n.categoriaColor }}
+                    aria-hidden="true"
+                  >
+                    {n.categoria.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-[#7a756e]">
-                      {ev.fecha} · <span className="font-semibold text-[#1a1a1a]">{ev.tipo}</span>
+                      {n.fecha} · <span className="font-semibold text-[#1a1a1a]">{n.categoria}</span>
                     </p>
-                    <p className="mt-1 text-sm font-medium leading-5 text-[#1a1a1a]">{ev.titulo}</p>
-                    <p className="mt-0.5 text-xs text-[#7a756e]">{ev.lugar}</p>
+                    <p className="mt-1 text-sm font-medium leading-5 text-[#1a1a1a]">{n.titulo}</p>
+                    <p className="mt-0.5 text-xs text-[#7a756e]">{n.territorio}</p>
                   </div>
-                </div>
+                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#7a756e]" aria-hidden="true" />
+                </Link>
               ))}
             </div>
 
             <div className="mt-4 sm:hidden">
               <Link
-                href={withRole("/noticias", role)}
+                href={withRole("/incidencia", role)}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-[#2e7d32] transition hover:text-[#1b5e20]"
               >
-                Ver toda la agenda
+                Ver toda la incidencia
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -448,9 +461,9 @@ export default async function HomePage({
         </div>
         <div className="mx-auto max-w-3xl pl-8">
           <p className="font-display text-2xl italic leading-relaxed text-white sm:text-3xl">
-            &ldquo;El territorio no es solo tierra, es memoria, identidad y futuro.&rdquo;
+            &ldquo;El territorio es la vida y la vida no se vende, se ama y se defiende.&rdquo;
           </p>
-          <p className="mt-4 text-sm text-white/50">— Proceso de Comunidades Negras, PCN</p>
+          <p className="mt-4 text-sm text-white/50">— Mayoras y jóvenes del Palenque Alto Cauca, PCN</p>
         </div>
       </section>
     </SiteLayout>

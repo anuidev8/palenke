@@ -738,7 +738,14 @@ export function AdminLayout({
   children,
 }: {
   role: ViewerRole;
-  active: "inicio" | "documentos" | "dashboards" | "accs" | "usuarios" | "campanas";
+  active:
+    | "inicio"
+    | "documentos"
+    | "dashboards"
+    | "accs"
+    | "usuarios"
+    | "campanas"
+    | "contenido-visual";
   title: string;
   intro?: string;
   children: ReactNode;
@@ -750,6 +757,7 @@ export function AdminLayout({
     { id: "accs", label: "ACCs", href: "/admin/accs" },
     { id: "usuarios", label: "Usuarios", href: "/admin/usuarios" },
     { id: "campanas", label: "Campañas", href: "/admin/campanas" },
+    { id: "contenido-visual", label: "Contenido visual IA", href: "/admin/contenido-visual" },
   ] as const;
 
   return (

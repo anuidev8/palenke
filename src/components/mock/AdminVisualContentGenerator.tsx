@@ -636,6 +636,7 @@ export function AdminVisualContentGenerator({
                     alt={result.brief.altText}
                     width={1600}
                     height={900}
+                    unoptimized
                     className="w-full rounded-[18px] border border-[color:var(--border-soft)] object-cover"
                   />
                 ) : null}

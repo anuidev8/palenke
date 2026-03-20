@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
 import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
 import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
-import BibliotecaCategoryNav from "@/components/palenke/BibliotecaCategoryNav";
 import {
   getVisibleDocuments,
-  librarySections,
   territories,
 } from "@/lib/mock-data";
 import { filterDocuments, getDocumentYears, type LibraryFilters } from "@/lib/mock-queries";
@@ -16,15 +14,60 @@ import { getFirstParam, getMultiParam, getViewerRole, type SearchParams, withRol
 const PAGE_SIZE = 10;
 const NORMATIVA_SECTION = "Normativa vigente";
 
-const normativaTypeLabels: Array<{ type: string; label: string }> = [
-  { type: "Constitución", label: "Base estructural · Constitución" },
-  { type: "Ley", label: "Derechos colectivos · Leyes" },
-  { type: "Decreto", label: "Desarrollo reglamentario · Decretos" },
-  { type: "Jurisprudencia", label: "Sentencias estructurales · Jurisprudencia" },
-  { type: "Instrumento internacional", label: "Marco global · Normativa internacional" },
-  { type: "Política pública", label: "Incidencia institucional · Políticas públicas" },
-  { type: "Instancia oficial", label: "Mecanismos oficiales · Instancias" },
-];
+const SECTION_META: Record<string, {
+  color: string;
+  lightBg: string;
+  darkBg: string;
+  tagLabel: string;
+  tagNum: string;
+  description: string;
+  whatYouFind: string;
+  categories: string[];
+  related: { label: string; href: string };
+}> = {
+  "Normativa vigente": {
+    color: "#2e7d32",
+    lightBg: "#d8f3dc",
+    darkBg: "#1a2a1a",
+    tagLabel: "Memoria Afroterritorial",
+    tagNum: "01",
+    description:
+      "Aquí encuentras el marco normativo nacional e internacional que protege los derechos del Pueblo Negro. Organizado por tipo de norma para facilitar la búsqueda y el litigio estratégico.",
+    whatYouFind: "¿Qué encuentras aquí?",
+    categories: [
+      "Constitución Política y bloque de constitucionalidad",
+      "Leyes nacionales — Ley 70, Ley 21 y afines",
+      "Decretos reglamentarios y resoluciones",
+      "Jurisprudencia étnica (Corte Constitucional, Consejo de Estado)",
+      "Normativa internacional y convenios OIT",
+    ],
+    related: {
+      label: "Memoria viva del territorio",
+      href: "/biblioteca?section=Memoria+viva+del+territorio",
+    },
+  },
+  "Memoria viva del territorio": {
+    color: "#1565c0",
+    lightBg: "#e3f2fd",
+    darkBg: "#0d1a2a",
+    tagLabel: "Memoria Afroterritorial",
+    tagNum: "02",
+    description:
+      "Corpus documental de producción propia: investigaciones académicas, sistematizaciones comunitarias y expresiones culturales del Pacífico colombiano.",
+    whatYouFind: "¿Qué encuentras aquí?",
+    categories: [
+      "Artículos y publicaciones académicas afrodescendientes",
+      "Sistematizaciones de experiencias comunitarias",
+      "Planes de manejo territorial y acuerdos colectivos",
+      "Prácticas culturales, saberes ancestrales y oralidad",
+      "Expresiones artísticas y patrimonio vivo del Pacífico",
+    ],
+    related: {
+      label: "Normativa vigente",
+      href: "/biblioteca?section=Normativa+vigente",
+    },
+  },
+};
 
 function normalizeSectionLabel(section: string) {
   return section === "Norma vigente" ? NORMATIVA_SECTION : section;
@@ -55,12 +98,6 @@ export default async function BibliotecaPage({
   const visibleDocuments = getVisibleDocuments(role).toSorted((a, b) => b.year - a.year);
   const results = filterDocuments(visibleDocuments, filters);
   const years = getDocumentYears(visibleDocuments);
-  const docsForSectionContext =
-    filters.sections.length > 0
-      ? visibleDocuments.filter((document) => filters.sections.includes(document.section))
-      : visibleDocuments;
-  const types = Array.from(new Set(docsForSectionContext.map((document) => document.type))).toSorted();
-
   const totalCount = results.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -71,10 +108,6 @@ export default async function BibliotecaPage({
   const activeFilters = buildActiveFilters(filters, role);
 
   const sectionActive = filters.sections[0] ?? "";
-  const typeChips =
-    sectionActive === NORMATIVA_SECTION
-      ? normativaTypeLabels.filter(({ type }) => types.includes(type))
-      : types.map((type) => ({ type, label: type }));
 
   return (
     <SiteLayout
@@ -96,59 +129,102 @@ export default async function BibliotecaPage({
       }
     >
       {/* ── Page header ── */}
-      <section className="border-b border-[#e8dfd3] bg-[#f8f5f2] px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="flex items-start gap-4">
-            {/* Green left-border accent */}
-            <div className="mt-1 h-12 w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
-            <div>
-              <h1 className="font-display text-4xl text-[#1a1a1a]">
-                {sectionActive || "Memoria Afroterritorial"}
-              </h1>
-              <p className="mt-2 max-w-2xl text-base text-[#4a4540]">
-                {sectionActive === "Normativa vigente"
-                  ? "Módulo legislativo del Palenke — Constitución, leyes, decretos, jurisprudencia, normativa internacional y políticas públicas organizadas para navegación temática."
-                  : "Corpus documental del Palenke — resoluciones, planes de manejo, acuerdos y materiales de base. Filtros por tipo, territorio y año."}
-              </p>
+      {sectionActive && SECTION_META[sectionActive] ? (() => {
+        const meta = SECTION_META[sectionActive];
+        return (
+          <>
+            {/* ── Context ribbon: "Estás en…" ── */}
+            <div style={{ background: meta.darkBg }} className="px-4 py-3 sm:px-6 lg:px-8">
+              <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
+                {/* Left: breadcrumb trail */}
+                <div className="flex items-center gap-2 text-sm">
+                  <Link
+                    href="/memoria-afroterritorial"
+                    className="flex items-center gap-1.5 text-white/60 transition hover:text-white"
+                  >
+                    <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Memoria Afroterritorial</span>
+                  </Link>
+                  <span className="text-white/30" aria-hidden="true">›</span>
+                  <span className="font-semibold text-white">{sectionActive}</span>
+                </div>
+                {/* Right: related section shortcut */}
+                <Link
+                  href={meta.related.href}
+                  className="hidden items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/20 sm:flex"
+                >
+                  <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                  {meta.related.label}
+                </Link>
+              </div>
+            </div>
+
+            {/* ── Rich section header ── */}
+            <section className="border-b border-[#e8dfd3] bg-[#f8f5f2] px-4 py-8 sm:px-6 lg:px-8">
+              <div className="mx-auto w-full max-w-7xl">
+                {/* Module tag */}
+                <div className="mb-4 flex items-center gap-3">
+                  <span
+                    className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.18em]"
+                    style={{ background: meta.lightBg, color: meta.color }}
+                  >
+                    <span
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                      style={{ background: meta.color }}
+                    >
+                      {meta.tagNum}
+                    </span>
+                    {meta.tagLabel}
+                  </span>
+                </div>
+
+                {/* H1 with accent bar + back button */}
+                <div className="flex items-start gap-4">
+                  <div
+                    className="mt-1 h-12 w-1 shrink-0 rounded-full"
+                    style={{ background: meta.color }}
+                    aria-hidden="true"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={withRole("/memoria-afroterritorial", role)}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e8dfd3] bg-white shadow-sm transition hover:bg-[#f0eae0] hover:shadow"
+                        aria-label="Volver a Memoria Afroterritorial"
+                      >
+                        <ArrowLeft className="h-4 w-4 text-[#1a1a1a]" aria-hidden="true" />
+                      </Link>
+                      <h1 className="font-display text-4xl text-[#1a1a1a] sm:text-5xl">
+                        {sectionActive}
+                      </h1>
+                    </div>
+                    <p className="mt-3 max-w-2xl text-base leading-7 text-[#4a4540]">
+                      {meta.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </>
+        );
+      })() : (
+        /* ── Default header (no section filter active) ── */
+        <section className="border-b border-[#e8dfd3] bg-[#f8f5f2] px-4 py-10 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="flex items-start gap-4">
+              <div className="mt-1 h-12 w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
+              <div>
+                <h1 className="font-display text-4xl text-[#1a1a1a]">Memoria Afroterritorial</h1>
+                <p className="mt-2 max-w-2xl text-base text-[#4a4540]">
+                  Corpus documental del Palenke — resoluciones, planes de manejo, acuerdos y materiales de base. Filtros por tipo, territorio y año.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <div className="mx-auto w-full max-w-7xl px-4 pb-44 pt-8 sm:px-6 lg:px-8">
-        <BibliotecaCategoryNav
-          sections={[
-            {
-              label: "Toda la biblioteca",
-              href: withRole("/biblioteca", role, buildFilters({ ...filters, sections: [], type: "" })),
-              isActive: filters.sections.length === 0,
-            },
-            ...librarySections.map((section) => ({
-              label: section,
-              href: withRole("/biblioteca", role, buildFilters({ ...filters, sections: [section], type: "" })),
-              isActive: sectionActive === section,
-            })),
-          ]}
-          types={
-            typeChips.length > 1
-              ? [
-                  {
-                    type: "",
-                    label: sectionActive ? `Todas en ${sectionActive}` : "Todos los tipos",
-                    href: withRole("/biblioteca", role, buildFilters({ ...filters, type: "" })),
-                    isActive: !filters.type,
-                  },
-                  ...typeChips.map((chip) => ({
-                    type: chip.type,
-                    label: chip.label,
-                    href: withRole("/biblioteca", role, buildFilters({ ...filters, type: chip.type })),
-                    isActive: filters.type === chip.type,
-                  })),
-                ]
-              : []
-          }
-        />
-        
         {/* ── Filter bar ── */}
         <form
           action="/biblioteca"

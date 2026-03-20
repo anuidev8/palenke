@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { SiteLayout } from "@/components/mock/ui";
-import { SubmoduleOptionsColumn } from "@/components/palenke/SubmoduleOptionsColumn";
+import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboardGrid";
+import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
 import { getViewerRole, type SearchParams } from "@/lib/viewer";
 
 const instruments = [
@@ -11,9 +12,11 @@ const instruments = [
       "Organización normativa de la vida comunitaria",
       "Reglas de uso del territorio y convivencia",
     ],
-    color: "#2e7d32",
-    lightBg: "#d8f3dc",
+    color: "#e65100", // Dark Orange (Action/Norms)
+    lightBg: "#fff3e0",
     href: "/gobierno-propio/reglamentos",
+    imageUrl: "/assets/placeholders/reglamentos.png",
+    fallbackImageUrl: "/assets/placeholders/reglamentos.svg",
   },
   {
     id: "planes-uso",
@@ -22,9 +25,11 @@ const instruments = [
       "Ordenamiento del territorio desde la visión comunitaria",
       "Definición de usos productivos, culturales y de conservación",
     ],
-    color: "#1565c0",
+    color: "#1565c0", // Deep Blue (Rivers/Management)
     lightBg: "#e3f2fd",
     href: "/gobierno-propio/planes-uso",
+    imageUrl: "/assets/placeholders/planes-uso.png",
+    fallbackImageUrl: "/assets/placeholders/planes-uso.svg",
   },
   {
     id: "etnodesarrollo",
@@ -33,48 +38,45 @@ const instruments = [
       "Planeación estratégica desde identidad y autonomía",
       "Proyección económica, social y cultural del territorio",
     ],
-    color: "#f57f17",
+    color: "#f57f17", // Yellow/Gold (Growth/Culture)
     lightBg: "#fff3cd",
     href: "/gobierno-propio/etnodesarrollo",
+    imageUrl: "/assets/placeholders/etnodesarrollo.png",
+    fallbackImageUrl: "/assets/placeholders/etnodesarrollo.svg",
   },
   {
     id: "conservacion",
-    title: "Áreas bioculturales de conservación comunitaria con enfoque de pueblo negro",
+    title: "Áreas bioculturales de conservación comunitaria",
     bullets: [
-      "Declaratoria y gestión de zonas conservadas por las comunidades",
+      "Declaratoria y gestión de zonas conservadas",
       "Integración de biodiversidad, cultura y espiritualidad",
     ],
-    color: "#2e7d32",
+    color: "#2e7d32", // Forest Green (Nature/Conservation)
     lightBg: "#d8f3dc",
     href: "/gobierno-propio/conservacion",
+    imageUrl: "/assets/placeholders/conservacion.png",
+    fallbackImageUrl: "/assets/placeholders/conservacion.svg",
   },
   {
     id: "proteccion-hidrica",
     title: "Protección hídrica",
     bullets: [
-      "Defensa de ecosistemas marinos y ecosistemas de agua dulce.",
-      "Gestión comunitaria del agua como parte integral del territorio.",
+      "Defensa de ecosistemas marinos y de agua dulce",
+      "Gestión comunitaria del agua como parte del territorio",
     ],
-    color: "#1565c0",
-    lightBg: "#e3f2fd",
+    color: "#00838f", // Cyan/Teal (Water/Ocean)
+    lightBg: "#e0f7fa",
     href: "/gobierno-propio/proteccion-hidrica",
+    imageUrl: "/assets/placeholders/proteccion-hidrica.png",
+    fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
   },
 ];
 
-const governmentFunctions = [
-  "Fortalecer la capacidad de decisión de los Consejos Comunitarios",
-  "Estructurar y difundir instrumentos de gobernanza territorial",
-  "Acompañar la planificación comunitaria del territorio",
-  "Consolidar la autoridad territorial afrodescendiente",
-];
-
-const alliedProcesses = [
-  { acronym: "PCN", name: "Proceso de Comunidades Negras", accent: "#1a1a1a", bg: "#f0eae0" },
-  { acronym: "HIL", name: "Corporación Agencia Afrocolombiana Hileros", accent: "#2e7d32", bg: "#d8f3dc" },
-  { acronym: "CC", name: "Consejos Comunitarios", accent: "#1565c0", bg: "#e3f2fd" },
-  { acronym: "PT", name: "Procesos territoriales articulados", accent: "#d32f2f", bg: "#fddede" },
-  { acronym: "ONG", name: "Organizaciones aliadas nacionales", accent: "#f57f17", bg: "#fff3cd" },
-  { acronym: "RED", name: "Redes internacionales de solidaridad", accent: "#1a1a1a", bg: "#f0eae0" },
+const EN_ALIANZA = [
+  { name: "RRI", src: "/brands/RRI.png" },
+  { name: "TTF", src: "/brands/TTF.png" },
+  { name: "ILC", src: "/brands/ILC.png" },
+  { name: "Hileros", src: "", pending: true },
 ];
 
 export default async function GobiernoPropioPage({
@@ -93,93 +95,123 @@ export default async function GobiernoPropioPage({
         { label: "Gobierno Propio" },
       ]}
     >
-      {/* ── Page title band ── */}
-      <section className="border-b border-[#e8dfd3] bg-[#f0eae0] px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="eyebrow mb-3">2. GOBIERNO PROPIO</p>
-          <h1 className="font-display text-5xl text-[#1a1a1a] sm:text-6xl">Gobierno propio</h1>
-        </div>
-      </section>
-
-      {/* ── Main: left vertical menu | right content ── */}
-      <section className="bg-white px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[400px_minmax(0,1fr)]">
-            <aside className="self-start lg:sticky lg:top-24">
-              <p className="eyebrow mb-5">Submódulos</p>
-              <SubmoduleOptionsColumn items={instruments} role={role} />
-            </aside>
-
-            <div className="rounded-[30px] border border-[#e8dfd3] bg-[#fcfaf7] p-6 sm:p-8 lg:p-10">
-              <div className="space-y-9">
-                <section>
-                  <h3 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Definición</h3>
-                  <p className="mt-4 text-base leading-8 text-[#4a4540]">
-                    El Gobierno Propio es el conjunto de normas, decisiones y prácticas mediante las
-                    cuales los Consejos Comunitarios ejercen autoridad sobre sus territorios colectivos.
-                    Este espacio del Palenke organiza los instrumentos que materializan la autonomía
-                    territorial.
-                  </p>
-                </section>
-
-                <section className="border-t border-[#e8dfd3] pt-8">
-                  <h3 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Función</h3>
-                  <ul className="mt-5 space-y-3">
-                    {governmentFunctions.map((item) => (
-                      <li key={item} className="flex items-start gap-3 text-base leading-7 text-[#4a4540]">
-                        <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Aliados — horizontal logo strip ── */}
-      <section className="border-t border-[#e8dfd3] bg-[#f8f5f2] px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="eyebrow mb-6 text-center">Aliados</p>
-
-          <div className="flex flex-wrap items-stretch justify-center gap-4">
-            {alliedProcesses.map((ally) => (
-              <div
-                key={ally.acronym}
-                className="flex min-w-[125px] flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-4 text-center"
-                style={{ borderColor: ally.accent, background: ally.bg, maxWidth: 180 }}
-              >
-                <span
-                  className="font-display text-xl font-bold"
-                  style={{ color: ally.accent }}
-                >
-                  {ally.acronym}
+      {/* ── Dashboard Top Section (Row 1) ── */}
+      <section className="bg-[#fcfaf7] px-4 py-16 sm:px-6 lg:px-8 border-b border-[#e8dfd3]">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start justify-between">
+            {/* Left Column: Title & Intro */}
+            <div className="flex-1 max-w-2xl space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#e8dfd3] shadow-sm">
+                <div className="h-2 w-2 rounded-full bg-[#2e7d32]" />
+                <span className="text-sm font-semibold tracking-wide text-[#2e7d32] uppercase">
+                  Módulo Palenke
                 </span>
-                <span className="text-[11px] leading-4 text-[#4a4540]">{ally.name}</span>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-8 flex justify-center">
-            <svg
-              viewBox="0 0 420 90"
-              aria-hidden="true"
-              className="h-16 w-full max-w-[520px]"
-              fill="none"
-            >
-              <path d="M12 12 L210 82 L408 12" stroke="#d9d0c3" strokeWidth="2" />
-            </svg>
-          </div>
-
-          <div className="-mt-2 flex justify-center">
-            <div className="rounded-full border border-[#d9d0c3] bg-white p-4">
-              <Image src="/assets/logo.svg" alt="Logo Palenke" width={46} height={46} className="h-11 w-11" />
+              
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#1a1a1a] tracking-tight leading-[1.1]">
+                Gobierno propio
+              </h1>
+              
+              <p className="text-xl sm:text-2xl leading-relaxed text-[#1a1a1a] font-display font-medium">
+                El <span className="text-[#2e7d32]">Gobierno Propio</span> es el conjunto de normas, decisiones y prácticas mediante las cuales los Consejos Comunitarios ejercen autoridad sobre sus territorios colectivos.
+              </p>
+              
+              <p className="text-lg text-[#4a4540] leading-relaxed">
+                Este espacio del Palenke organiza los instrumentos que materializan la autonomía territorial afrodescendiente.
+              </p>
+            </div>
+            
+            {/* Right Column: Key Highlights / Impact */}
+            <div className="w-full lg:w-[460px] shrink-0">
+              <div className="bg-white rounded-[32px] p-8 sm:p-10 border border-[#e8dfd3] shadow-sm relative overflow-hidden">
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d8f3dc]/20 blur-3xl pointer-events-none" />
+                <div className="relative z-10">
+                  <p className="eyebrow text-[#2e7d32] mb-6 tracking-widest text-sm">
+                    NUESTRO IMPACTO
+                  </p>
+                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-6 leading-snug">
+                    El poder de nuestro gobierno
+                  </h3>
+                  <GovernmentFunctionsList />
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
+      {/* ── Dashboard Grid Section (Row 2) ── */}
+      <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 text-center sm:text-left">
+            <h2 className="font-display text-3xl sm:text-4xl text-[#1a1a1a]">
+              Instrumentos de gobierno propio
+            </h2>
+            <p className="mt-4 text-[#4a4540] text-lg max-w-3xl">
+              Explora las herramientas que construimos para garantizar la vida, la cultura y la defensa de nuestra autonomía territorial.
+            </p>
+          </div>
+          
+          <InstrumentDashboardGrid instruments={instruments} role={role} />
+        </div>
+      </section>
+
+      {/* ── Aliados ── */}
+      <section className="border-t border-[#e8dfd3] bg-[#FDFBF7] px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+            {/* Card 1: Orientado por */}
+            <article className="flex flex-col overflow-hidden rounded-2xl border border-[#c8e6c9] bg-[#E8F5E9] p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+              <h3 className="mb-8 text-center text-sm font-bold uppercase tracking-[0.2em] text-[#2E7D32]">
+                Orientado por
+              </h3>
+              <div className="flex flex-1 flex-col items-center justify-center">
+                <div className="flex w-full max-w-[380px] items-center justify-center rounded-xl border border-[#e0e0e0] bg-white p-8 shadow-sm">
+                  <Image
+                    src="/brands/PALENKE.jpeg"
+                    alt="Proceso de Comunidades Negras (PCN)"
+                    width={360}
+                    height={180}
+                    className="max-h-36 w-auto object-contain"
+                  />
+                </div>
+              </div>
+            </article>
+
+            {/* Card 2: En alianza con */}
+            <article className="flex flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+              <h3 className="mb-8 text-center text-sm font-bold uppercase tracking-[0.2em] text-[#1565C0]">
+                En alianza con
+              </h3>
+              <div className="flex flex-1 flex-col items-center gap-6">
+                <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+                  {EN_ALIANZA.filter((b) => !b.pending).map((brand) => (
+                    <div
+                      key={brand.name}
+                      className="group flex h-16 w-28 items-center justify-center sm:h-20 sm:w-32"
+                    >
+                      <Image
+                        src={brand.src}
+                        alt={`Logo de ${brand.name}`}
+                        width={120}
+                        height={70}
+                        className="max-h-full w-auto object-contain grayscale transition-all duration-300 group-hover:grayscale-0 opacity-70 group-hover:opacity-100 mix-blend-multiply"
+                      />
+                    </div>
+                  ))}
+                </div>
+                {EN_ALIANZA.filter((b) => b.pending).length > 0 && (
+                  <div className="flex w-full max-w-xs justify-center">
+                    <div className="flex w-full items-center justify-center rounded-xl border-2 border-dashed border-[#E0E0E0] bg-[#fafafa] px-6 py-4">
+                      <span className="text-xs font-medium text-[#8d8276] uppercase tracking-wider">
+                        {EN_ALIANZA.filter((b) => b.pending).map((b) => `${b.name} (Pendiente)`).join(" · ")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </article>
+          </div>
         </div>
       </section>
     </SiteLayout>
