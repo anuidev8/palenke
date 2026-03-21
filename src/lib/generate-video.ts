@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { getGeminiApiKey, getGeminiClient } from "@/lib/gemini-client";
 
-const ai = getGeminiClient();
 const VIDEO_MODEL = process.env.GEMINI_VIDEO_MODEL ?? "veo-3.1-generate-preview";
 
 export async function getGeneratedVideo(promptId: string, promptText: string): Promise<string> {
@@ -14,13 +13,17 @@ export async function getGeneratedVideo(promptId: string, promptText: string): P
     fs.mkdirSync(publicPath, { recursive: true });
   }
 
-  // Check cache
   if (fs.existsSync(filePath)) {
     return `/generated/${filename}`;
   }
 
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    return '';
+  }
+
   try {
     console.log(`Generating video for ${promptId}... This might take a few minutes.`);
+    const ai = getGeminiClient();
     const op = await ai.models.generateVideos({
       model: VIDEO_MODEL,
       prompt: promptText

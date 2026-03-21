@@ -7,7 +7,6 @@ import {
 } from "@/components/mock/ui";
 import HeroSection from "@/components/palenke/HeroSection";
 import DocumentCard from "@/components/palenke/DocumentCard";
-import { getGeneratedImage } from "@/lib/generate-image";
 import { getVisibleCampaigns, getVisibleMjnDocuments, mjnContext, mjnQuote, mjnStories } from "@/lib/mock-data";
 import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 import { PiezasAutorizadasSection } from "@/components/PiezasAutorizadasSection";
@@ -38,17 +37,6 @@ export default async function MjnPage({
 
   const campaigns = getVisibleCampaigns(role, "mjn");
 
-  const heroImage = await getGeneratedImage(
-    "mjn-hero-v3", 
-    "A breathtaking and vibrant digital illustration representing Afro-Colombian women, youth, and childhood. Featuring a beautiful stylized composition of traditional woven palm textures, flowing river currents, and tropical lush leaves. Warm sunset colors blending with rich earth tones, golden yellows, terracotta, and deep forest green. Symbolizing intergenerational connection, ancestral knowledge, and care for the territory. Modern, elegant, highly detailed, institutional graphic art style. No people faces to remain abstract and inclusive. Perfect for a website hero background. No text.",
-    "16:9"
-  );
-
-  const thumbUrl = await getGeneratedImage(
-    "doc-thumbnail", 
-    "A beautiful, elegant minimalist icon-style illustration of a mangrove tree root system meeting a river. Deep emerald green and warm gold colors. Clean, balanced, sophisticated. No text, perfect for a document cover thumbnail."
-  );
-
   // Filter mjnStories just like the previous inline filter
   const visibleStories = mjnStories.filter((story) => {
     if (!story.publicationAuthorized) {
@@ -66,7 +54,6 @@ export default async function MjnPage({
         eyebrow="Agenda Estratégica"
         title={<>Mujeres, <br />Juventudes y Niñez</>}
         description="Espacio editorial para contexto político, materiales pedagógicos, memorias autorizadas y campañas activas de la agenda MJN."
-        generatedImageUrl={heroImage}
         actions={
           <Link href={withRole("/biblioteca", role)} className="button-primary">
             Explorar Documentos
@@ -122,7 +109,6 @@ export default async function MjnPage({
               category={document.section} 
               date={document.year.toString()} 
               visibility={document.visibility === "public" ? "publico" : document.visibility === "internal" ? "interno" : "sensible"} 
-              thumbnailUrl={thumbUrl}
               href={withRole(`/biblioteca/${document.slug}`, role)}
             />
           ))}

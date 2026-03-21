@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { getGeminiClient } from "@/lib/gemini-client";
 
-const ai = getGeminiClient();
 const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-image-preview";
 
 export async function getGeneratedImage(promptId: string, promptText: string, aspectRatio: string = '1:1'): Promise<string> {
@@ -14,13 +13,17 @@ export async function getGeneratedImage(promptId: string, promptText: string, as
     fs.mkdirSync(publicPath, { recursive: true });
   }
 
-  // Check cache
   if (fs.existsSync(filePath)) {
     return `/generated/${filename}`;
   }
 
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    return '';
+  }
+
   try {
     console.log(`Generating image for ${promptId}...`);
+    const ai = getGeminiClient();
     const response = await ai.models.generateContent({
         model: IMAGE_MODEL,
         contents: `${promptText}\nAspect ratio: ${aspectRatio}.`,
