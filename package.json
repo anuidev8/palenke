@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:hero-posters": "node scripts/generate-hero-card-posters.mjs",
+    "generate:hero-poster": "node scripts/generate-hero-card-posters.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",

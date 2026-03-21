@@ -6,13 +6,16 @@ import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Image from "next/image";
 import { ExpandableVideo } from "./ExpandableVideo";
 
+const ORIENTACION_VIDEO =
+  "/generated/admin/inicio-institucional-home-hero-1774051114373-video.mp4";
+
 const videos = [
   {
-    id: "presentacion",
-    title: "Video de presentación",
-    src: "/hero-bg.mp4",
+    id: "orientacion-politica",
+    title: "Nuestra orientación política",
+    src: ORIENTACION_VIDEO,
     thumbnail: "https://images.unsplash.com/photo-1542273917363-3b1817f69a5d?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3",
-    tag: "Introducción",
+    tag: "PCN",
   },
   {
     id: "historia",
@@ -101,12 +104,26 @@ export function HomeVideoGallery() {
           >
             <ExpandableVideo videoId={currentVideo.id} fullSrc={currentVideo.src}>
               <div className="group relative h-full w-full overflow-hidden transition-transform duration-300">
-                <Image
-                  src={currentVideo.thumbnail}
-                  alt={currentVideo.title}
-                  fill
-                  className="absolute inset-0 h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
-                />
+                {currentVideo.src.endsWith(".mp4") ? (
+                  <div className="absolute inset-0 overflow-hidden">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-80 transition-opacity duration-300 group-hover:opacity-95"
+                    >
+                      <source src={currentVideo.src} type="video/mp4" />
+                    </video>
+                  </div>
+                ) : (
+                  <Image
+                    src={currentVideo.thumbnail}
+                    alt={currentVideo.title}
+                    fill
+                    className="absolute inset-0 h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
                 <div
                   className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-90"
                   style={{

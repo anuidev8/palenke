@@ -33,28 +33,28 @@ export function HeroCards({
       desc: "Archivo histórico y cultural comunitario.",
       href: "/memoria-afroterritorial",
       video: "https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4",
-      poster: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=600",
+      poster: "/assets/hero-cards/memoria-afroterritorial.png",
     },
     {
       title: "Gobierno Propio",
       desc: "Instrumentos de protección y autonomía.",
       href: "/gobierno-propio",
       video: "https://cdn.pixabay.com/video/2021/08/17/85376-589953466_tiny.mp4",
-      poster: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&q=80&w=600",
+      poster: "/assets/hero-cards/gobierno-propio.png",
     },
     {
       title: "SCITA",
       desc: "Sistema Comunitario de Información Territorial y Ambiental.",
       href: "/scita",
       video: "https://cdn.pixabay.com/video/2020/04/18/36551-413154868_tiny.mp4",
-      poster: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=600",
+      poster: "/assets/hero-cards/scita.png",
     },
     {
       title: "Incidencia",
       desc: "Pronunciamientos, agenda y memoria viva del territorio.",
       href: "/incidencia",
       video: "https://cdn.pixabay.com/video/2023/10/22/185986-876934526_tiny.mp4",
-      poster: "https://images.unsplash.com/photo-1505235687559-28b5f54645b7?auto=format&fit=crop&q=80&w=600",
+      poster: "/assets/hero-cards/incidencia.png",
     },
   ];
 

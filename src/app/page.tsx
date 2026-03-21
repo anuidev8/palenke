@@ -58,7 +58,10 @@ export default async function HomePage({
             playsInline
             className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-screen"
           >
-            <source src="/hero-bg.mp4" type="video/mp4" />
+            <source
+              src="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
+              type="video/mp4"
+            />
           </video>
           <div
             className="absolute inset-0"
@@ -142,29 +145,31 @@ export default async function HomePage({
                   >
                     Conoce Nuestra Lucha
                   </a>
-                  <Link
-                    href={withRole("/incidencia", role)}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-                  >
-                    Incidencia
-                  </Link>
                 </div>
               </div>
 
               {/* Right: Presentation Video Container */}
               <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <ExpandableVideo videoId="hero" fullSrc="/hero-bg.mp4">
-                  <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-[#1a1a1a] shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
-                    {/* Simulated Presentation Video Background */}
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity duration-300 group-hover:opacity-100"
-                    >
-                      <source src="https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4" type="video/mp4" />
-                    </video>
+                <ExpandableVideo
+                  videoId="hero"
+                  fullSrc="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
+                >
+                  <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-black shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
+                    {/* Scale past in-file letterboxing so the card stays fully covered */}
+                    <div className="absolute inset-0 overflow-hidden">
+                      <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+                      >
+                        <source
+                          src="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
+                          type="video/mp4"
+                        />
+                      </video>
+                    </div>
                     <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/10" />
 
                     {/* Play Icon Overlay */}

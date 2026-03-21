@@ -37,13 +37,16 @@ export function ExpandableVideo({ videoId, fullSrc, children }: ExpandableVideoP
               className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-[28px] bg-black shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <video
-                autoPlay
-                controls
-                playsInline
-                className="h-full w-full object-contain"
-                src={fullSrc}
-              />
+              <div className="absolute inset-0 overflow-hidden">
+                <video
+                  autoPlay
+                  controls
+                  muted
+                  playsInline
+                  className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center"
+                  src={fullSrc}
+                />
+              </div>
               <button
                 type="button"
                 className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-black/70 hover:scale-105"

@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Palenke Pensamiento — Análisis Completo del Proyecto</title>
+<style>
+  :root {
+    --forest: #0d1f0a;
+    --forest-soft: #173114;
+    --page: #f5edd6;
+    --surface: #fff9ec;
+    --surface-muted: #efe4c5;
+    --gold-500: #c8943a;
+    --gold-700: #9f6f24;
+    --gold-100: #f1e0b6;
+    --muted: #697560;
+    --danger: #a54a46;
+    --danger-soft: #f8d5d5;
+    --success: #d8ead2;
+    --success-strong: #21542c;
+    --border-soft: rgba(13,31,10,0.10);
+    --border-strong: rgba(13,31,10,0.22);
+    /* PCN v2 colors */
+    --pcn-red: #c0392b;
+    --pcn-green: #1a6b2f;
+    --pcn-yellow: #e6a817;
+    --pcn-black: #111111;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--page);
+    color: var(--forest);
+    line-height: 1.6;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--forest);
+    color: #fff9ec;
+    padding: 64px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(200,148,58,0.15);
+  }
+  .cover-badge {
+    display: inline-block;
+    background: var(--gold-500);
+    color: var(--forest);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .cover h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 16px;
+  }
+  .cover p {
+    font-size: 1.05rem;
+    color: #c8b89a;
+    max-width: 580px;
+    margin-bottom: 32px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item { font-size: 0.85rem; color: #a89878; }
+  .cover-meta-item strong { color: var(--gold-500); display: block; font-size: 1rem; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── NAV PILLS ── */
+  .nav-pills {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 0 32px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .nav-pill {
+    padding: 14px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .nav-pill:hover { color: var(--forest); }
+
+  /* ── SECTIONS ── */
+  section { padding: 56px 0 40px; }
+  section + section { border-top: 1px solid var(--border-soft); }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-700);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--forest);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 680px;
+    margin-bottom: 36px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 20px rgba(13,31,10,0.05);
+  }
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+  .card-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
+
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  @media (max-width: 800px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 1.8rem; }
+  }
+
+  /* ── STATUS BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .badge-done    { background: var(--success); color: var(--success-strong); }
+  .badge-pending { background: var(--gold-100); color: var(--gold-700); }
+  .badge-new     { background: var(--danger-soft); color: var(--danger); }
+  .badge-partial { background: #dde8f5; color: #2c5282; }
+
+  /* ── MODULE CARDS ── */
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 20px 0 0 20px;
+  }
+  .mod-forest::before { background: var(--forest); }
+  .mod-gold::before   { background: var(--gold-500); }
+  .mod-green::before  { background: var(--pcn-green); }
+  .mod-red::before    { background: var(--pcn-red); }
+  .mod-blue::before   { background: #2c5282; }
+  .mod-yellow::before { background: var(--pcn-yellow); }
+
+  .module-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  .module-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--forest);
+    margin-bottom: 4px;
+  }
+  .module-tag {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .module-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .feature-list li {
+    font-size: 0.82rem;
+    color: var(--forest);
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.4;
+  }
+  .feature-list li::before {
+    content: '→';
+    color: var(--gold-500);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .compare-table th {
+    background: var(--forest);
+    color: #f5edd6;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .compare-table th:first-child { border-radius: 12px 0 0 0; }
+  .compare-table th:last-child  { border-radius: 0 12px 0 0; }
+  .compare-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: top;
+    color: var(--forest);
+    line-height: 1.45;
+  }
+  .compare-table tr:nth-child(even) td { background: rgba(13,31,10,0.02); }
+  .compare-table tr:last-child td { border-bottom: none; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  .callout-info    { background: #dde8f5; border-left: 4px solid #2c5282; color: #1a365d; }
+  .callout-warn    { background: var(--gold-100); border-left: 4px solid var(--gold-500); color: var(--gold-700); }
+  .callout-success { background: var(--success); border-left: 4px solid var(--pcn-green); color: var(--success-strong); }
+  .callout-danger  { background: var(--danger-soft); border-left: 4px solid var(--danger); color: var(--danger); }
+  .callout strong  { font-weight: 700; }
+
+  /* ── PCN COLOR STRIP ── */
+  .pcn-strip {
+    display: flex;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .pcn-strip div { flex: 1; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+    padding-bottom: 28px;
+    position: relative;
+  }
+  .timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 24px; top: 44px;
+    width: 2px;
+    height: calc(100% - 44px);
+    background: var(--border-soft);
+  }
+  .timeline-item:last-child::after { display: none; }
+  .timeline-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    border: 2px solid var(--border-soft);
+    background: var(--surface);
+    z-index: 1;
+  }
+  .timeline-content { padding-top: 6px; }
+  .timeline-title { font-size: 0.95rem; font-weight: 700; color: var(--forest); margin-bottom: 4px; }
+  .timeline-desc  { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── ROUTE PILLS ── */
+  .route-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .route-pill {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    background: var(--forest);
+    color: var(--gold-100);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  /* ── ROLE BLOCKS ── */
+  .role-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .role-card {
+    border-radius: 16px;
+    padding: 20px 22px;
+    border: 1px solid var(--border-soft);
+  }
+  .role-public   { background: var(--success); }
+  .role-internal { background: var(--gold-100); }
+  .role-admin    { background: var(--danger-soft); }
+  .role-name { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .role-public .role-name   { color: var(--success-strong); }
+  .role-internal .role-name { color: var(--gold-700); }
+  .role-admin .role-name    { color: var(--danger); }
+
+  /* ── STACK ── */
+  .stack-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .stack-row:last-child { border-bottom: none; }
+  .stack-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--surface-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .stack-name { font-size: 0.92rem; font-weight: 600; color: var(--forest); }
+  .stack-detail { font-size: 0.8rem; color: var(--muted); }
+
+  /* ── PRIORITY TABLE ── */
+  .priority-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+  .p-high   { background: var(--pcn-red); }
+  .p-medium { background: var(--pcn-yellow); }
+  .p-low    { background: var(--pcn-green); }
+
+  /* ── FOOTER ── */
+  .report-footer {
+    background: var(--forest);
+    color: #a89878;
+    padding: 32px 48px;
+    font-size: 0.82rem;
+    margin-top: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .report-footer strong { color: var(--gold-500); }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border-soft);
+    margin: 32px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Análisis de Proyecto · Marzo 2026</div>
+  <h1>Palenke Pensamiento<br/>Análisis Completo del Proyecto</h1>
+  <p>Revisión integral de la plataforma digital del Proceso de Comunidades Negras (PCN): estado actual del MVP, especificación v2, módulos, requerimientos de usuario y hoja de ruta.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>Stack</strong>Next.js 15 · React 19 · TypeScript · Tailwind v4</div>
+    <div class="cover-meta-item"><strong>Estado actual</strong>MVP Fase 1 — Frontend Mock</div>
+    <div class="cover-meta-item"><strong>Versión objetivo</strong>Palenke v2 — Spec Completa</div>
+    <div class="cover-meta-item"><strong>Revisado</strong>19 de Marzo, 2026</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-pills">
+  <a class="nav-pill" href="#vision">Visión</a>
+  <a class="nav-pill" href="#mvp">MVP Actual</a>
+  <a class="nav-pill" href="#modulos">Módulos v2</a>
+  <a class="nav-pill" href="#features">Características</a>
+  <a class="nav-pill" href="#gapanalysis">Gap Analysis</a>
+  <a class="nav-pill" href="#stack">Stack & Diseño</a>
+  <a class="nav-pill" href="#roadmap">Hoja de Ruta</a>
+  <a class="nav-pill" href="#prioridades">Prioridades</a>
+</nav>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 1 · VISIÓN -->
+<!-- ══════════════════════════════════ -->
+<section id="vision">
+<div class="container">
+  <div class="section-label">01 · Contexto y Visión</div>
+  <div class="section-title">¿Qué es Palenke Pensamiento?</div>
+  <div class="section-desc">La "casa digital" del Palenke de Pensamiento y Cuidadores del Territorio — vinculado al Proceso de Comunidades Negras (PCN).</div>
+
+  <div class="pcn-strip">
+    <div style="background:var(--pcn-black)"></div>
+    <div style="background:var(--pcn-green)"></div>
+    <div style="background:var(--pcn-red)"></div>
+    <div style="background:var(--pcn-yellow)"></div>
+  </div>
+
+  <div class="grid-2" style="gap:24px; margin-bottom:28px;">
+    <div class="card">
+      <div class="card-title">🎯 Objetivo Global</div>
+      <div class="card-desc">Que al entrar, cualquier persona entienda rápidamente: <strong>quiénes son</strong>, <strong>qué hacen</strong>, <strong>qué es importante ahora</strong> (Entérate / Lo último) y <strong>por dónde entrar</strong> — Memoria Afroterritorial, Gobierno Propio, SCITA, ACC.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Públicos objetivo</div>
+      <div class="card-desc">
+        <strong>Comunidad y personas externas</strong> — acceso libre a info política, territorial y cultural.<br/><br/>
+        <strong>Equipo PCN / Palenke</strong> — acceso a documentos internos, instrumentos de Gobierno Propio, geoportal y paneles estadísticos.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Filosofía visual:</strong> "Estética afro-contemporánea con raíces territoriales." Cada decisión de diseño refleja los valores del consejo comunitario: soberanía de datos, memoria institucional, acceso democrático y orgullo territorial. Colores PCN — negro, verde, rojo, amarillo — tienen significado político y cultural preciso.
+  </div>
+
+  <div class="grid-4" style="margin-top:24px;">
+    <div class="card" style="text-align:center; padding:20px 16px;">
+      <div style="font-size:1.8rem; margin-bottom:8px;">🏛️</div>
+      <div class="card-title">Soberanía</div>
+      <div class="card-desc">Niveles de visibilidad como elemento visual de primer nivel</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px 16px;">
+      <div style="font-size:1.8rem; margin-bottom:8px;">📚</div>
+      <div class="card-title">Memoria</div>
+      <div class="card-desc">Tipografía serif con autoridad y permanencia</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px 16px;">
+      <div style="font-size:1.8rem; margin-bottom:8px;">🌍</div>
+      <div class="card-title">Territorio</div>
+      <div class="card-desc">Paleta orgánica derivada del paisaje natural</div>
+    </div>
+    <div class="card" style="text-align:center; padding:20px 16px;">
+      <div style="font-size:1.8rem; margin-bottom:8px;">⚖️</div>
+      <div class="card-title">Ética Visual</div>
+      <div class="card-desc">Evitar folklorización o estética "afro" decorativa</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 2 · MVP ACTUAL -->
+<!-- ══════════════════════════════════ -->
+<section id="mvp">
+<div class="container">
+  <div class="section-label">02 · Estado Actual del MVP</div>
+  <div class="section-title">MVP Fase 1 — Frontend Mock Funcional</div>
+  <div class="section-desc">El repositorio actual implementa un mock interactivo completo construido con Next.js App Router para validar estructura, flujos de roles y capacidades de gestión antes de integrar backend real.</div>
+
+  <div class="callout callout-warn">
+    <strong>Naturaleza del MVP:</strong> No hay autenticación real, API conectada ni base de datos. Los datos viven en <code>src/lib/mock-data.ts</code>. El comportamiento de roles se simula por query string (<code>?role=public|internal|admin</code>).
+  </div>
+
+  <div class="role-grid" style="margin-bottom:28px;">
+    <div class="role-card role-public">
+      <div class="role-name">🌐 Público</div>
+      <div style="font-size:0.85rem; color:var(--success-strong);">Visible para todos. Sin autenticación. Contenido marcado como <code>public</code>.</div>
+    </div>
+    <div class="role-card role-internal">
+      <div class="role-name">🔐 Interno</div>
+      <div style="font-size:0.85rem; color:var(--gold-700);">Solo miembros autenticados del consejo. Accede a contenido <code>internal</code>.</div>
+    </div>
+    <div class="role-card role-admin">
+      <div class="role-name">⚙️ Admin</div>
+      <div style="font-size:0.85rem; color:var(--danger);">Administradores. Panel completo. Accede a contenido <code>sensitive</code>. Panel en <code>/admin</code>.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:28px;">
+    <div>
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--forest);">✅ Módulos Implementados (MVP)</h3>
+      <table class="compare-table" style="border-radius:12px; overflow:hidden;">
+        <thead><tr><th>Módulo / Ruta</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Home (<code>/</code>) — Hero + campañas + accesos rápidos</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Biblioteca (<code>/biblioteca</code>) — Filtros, chips, estados</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Detalle de documento (<code>/biblioteca/[slug]</code>)</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>MJN — Mujeres, Juventudes, Niñez</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Estadísticas / Power BI embed</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Geoportal (enlace externo)</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Login / recuperar contraseña</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Panel Admin — Documentos, Dashboards, ACCs</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Panel Admin — Usuarios, Campañas</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+          <tr><td>Política de datos / 404</td><td><span class="badge badge-done">✓ Hecho</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--forest);">📦 Datos Mock Incluidos</h3>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-desc">
+          El archivo <code>src/lib/mock-data.ts</code> contiene datos de ejemplo para probar todos los flujos:
+        </div>
+        <div style="margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">7</div>
+            <div style="font-size:0.78rem; color:var(--muted);">Documentos</div>
+          </div>
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">3</div>
+            <div style="font-size:0.78rem; color:var(--muted);">Campañas</div>
+          </div>
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">3</div>
+            <div style="font-size:0.78rem; color:var(--muted);">Dashboards</div>
+          </div>
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">3</div>
+            <div style="font-size:0.78rem; color:var(--muted);">ACCs</div>
+          </div>
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">4</div>
+            <div style="font-size:0.78rem; color:var(--muted);">Usuarios</div>
+          </div>
+          <div style="text-align:center; background:var(--surface-muted); border-radius:12px; padding:12px;">
+            <div style="font-size:1.6rem; font-weight:800; color:var(--forest);">4</div>
+            <div style="font-size:0.78rem; color:var(--muted);">Historias MJN</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px; color:var(--forest);">🗺️ Rutas Implementadas</h3>
+      <div class="route-list">
+        <span class="route-pill">/</span>
+        <span class="route-pill">/biblioteca</span>
+        <span class="route-pill">/biblioteca/[slug]</span>
+        <span class="route-pill">/mujeres-juventudes-ninez</span>
+        <span class="route-pill">/estadisticas</span>
+        <span class="route-pill">/estadisticas/[slug]</span>
+        <span class="route-pill">/geoportal</span>
+        <span class="route-pill">/login</span>
+        <span class="route-pill">/admin</span>
+        <span class="route-pill">/admin/documentos</span>
+        <span class="route-pill">/admin/dashboards</span>
+        <span class="route-pill">/admin/accs</span>
+        <span class="route-pill">/admin/usuarios</span>
+        <span class="route-pill">/admin/campanas</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 3 · MÓDULOS V2 -->
+<!-- ══════════════════════════════════ -->
+<section id="modulos">
+<div class="container">
+  <div class="section-label">03 · Módulos Requeridos — Palenke v2</div>
+  <div class="section-title">10 Pantallas / Módulos Especificados</div>
+  <div class="section-desc">La especificación completa de Palenke v2 define una plataforma con 4 secciones principales públicas, sub-pantallas de contenido y panel interno.</div>
+
+  <div class="grid-2" style="gap:24px;">
+
+    <!-- INICIO -->
+    <div class="module-card mod-forest">
+      <div class="module-icon">🏠</div>
+      <div class="module-name">1. Inicio (Home)</div>
+      <div class="module-tag">Pantalla principal · Ruta: /</div>
+      <div class="module-desc">"Casa digital" del Palenke/PCN. Primera impresión, identidad y navegación a todos los módulos.</div>
+      <ul class="feature-list">
+        <li>Hero con imagen/video en movimiento (territorio, comunidad)</li>
+        <li>Sección "¿Quiénes somos?" — 2 columnas, título + texto</li>
+        <li>Bloque Video + "Nuestro quehacer político" (sustituye misión/visión)</li>
+        <li>Accesos rápidos — 3 tarjetas: ACC, Protección hídrica, SIG Afro</li>
+        <li>Sección "Entérate" — Noticias publicadas por PCN</li>
+        <li>Sección "Lo último" — Talleres, eventos, actividades recientes</li>
+        <li>Frase icónica de cierre + navegación secundaria</li>
+        <li>Barra de búsqueda global visible</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-partial">Parcial en MVP</span> <span class="badge badge-new">Requiere rediseño v2</span></div>
+    </div>
+
+    <!-- MEMORIA -->
+    <div class="module-card mod-gold">
+      <div class="module-icon">📖</div>
+      <div class="module-name">2. Memoria Afroterritorial</div>
+      <div class="module-tag">Módulo Biblioteca · Ruta: /memoria-afroterritorial</div>
+      <div class="module-desc">Módulo de biblioteca y archivo vivo. Normativa vigente + memoria cultural y territorial del proceso.</div>
+      <ul class="feature-list">
+        <li>Encabezado de sección con tipografía fuerte + acento PCN</li>
+        <li>Hero: Video de presentación grande, ancho completo</li>
+        <li>Sección "¿Qué es?" — 2 columnas (texto + imagen representativa)</li>
+        <li>CTA "Normativa vigente" + "Qué se va a encontrar"</li>
+        <li>Bloque "Memoria viva del territorio" — artículos, crónicas, materiales</li>
+        <li>Sección "Vení te contamos" — eventos académicos y normativos</li>
+        <li>Listado de documentos filtrable (colección normativa)</li>
+        <li>Listado de artículos / relatos culturales</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-partial">Parcial en MVP</span> <span class="badge badge-new">Requiere reestructura v2</span></div>
+    </div>
+
+    <!-- GOBIERNO PROPIO -->
+    <div class="module-card mod-green">
+      <div class="module-icon">⚖️</div>
+      <div class="module-name">3. Gobierno Propio</div>
+      <div class="module-tag">Módulo · Ruta: /gobierno-propio</div>
+      <div class="module-desc">Instrumentos de gobierno comunitario. Reglamentos, planes, litigio y conservación organizados como puertas de entrada claras.</div>
+      <ul class="feature-list">
+        <li>Encabezado + texto intro explicando qué es Gobierno Propio</li>
+        <li>Bloque "¿Qué es?" / "¿Qué hace?" (1 o 2 columnas)</li>
+        <li>Grid 2×3 de 6 botones principales (instrumentos):
+          <ul style="margin-left:16px; font-size:0.8rem; color:var(--muted);">
+            <li>Reglamentos</li>
+            <li>Planes de uso y manejo</li>
+            <li>Litigio estratégico</li>
+            <li>Conservación comunitaria</li>
+            <li>Planes de etnodesarrollo</li>
+            <li>Protección hídrica</li>
+          </ul>
+        </li>
+        <li>Bloque "Gobierno propio en acción" (contextual)</li>
+        <li>Logos de aliados</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-partial">Parcial en MVP</span> <span class="badge badge-new">Requiere pantalla nueva</span></div>
+    </div>
+
+    <!-- SCITA -->
+    <div class="module-card mod-blue">
+      <div class="module-icon">🗺️</div>
+      <div class="module-name">4. SCITA</div>
+      <div class="module-tag">Sistema Comunitario Info Territorial · Ruta: /scita</div>
+      <div class="module-desc">Portal de lectura territorial. Vista curada del SIG con las capas clave — sin sustituir el geoportal completo. Participación comunitaria ambiental.</div>
+      <ul class="feature-list">
+        <li>Encabezado + frase: "Aquí ves las ACC y capas clave del territorio"</li>
+        <li>Hero: Mapa/Geovisor con todas las ACC visibles al entrar</li>
+        <li>Zoom +/–, arrastre, leyenda mínima en el mapa</li>
+        <li>Bloque "¿Qué es?" — Video izq. + texto der.</li>
+        <li>Selector de capas (2×3 grid) — toggle activo/inactivo en mapa:
+          <ul style="margin-left:16px; font-size:0.8rem; color:var(--muted);">
+            <li>Áreas de conservación (siempre activa)</li>
+            <li>Información hídrica, Fauna y flora</li>
+            <li>Cobertura boscosa, Infraestructura comunitaria</li>
+            <li>Alertas ambientales, Límites territoriales</li>
+          </ul>
+        </li>
+        <li>Botón "Ir al geoportal SIG" (nueva pestaña)</li>
+        <li>Bloque "Enviar información ambiental" + formulario modal</li>
+        <li>Enlace "Ver tableros territoriales" → Mirador</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-partial">Básico en MVP</span> <span class="badge badge-new">Mapa interactivo nuevo</span></div>
+    </div>
+
+    <!-- DETALLE NOTICIA -->
+    <div class="module-card mod-gold">
+      <div class="module-icon">📰</div>
+      <div class="module-name">5. Detalle de Noticia / Evento</div>
+      <div class="module-tag">Sub-pantalla · Ruta: /noticias/[slug]</div>
+      <div class="module-desc">Ficha individual de noticias de PCN o eventos internos. Accesible desde "Entérate", "Lo último" y "Vení te contamos".</div>
+      <ul class="feature-list">
+        <li>Imagen destacada + título + fecha + categoría</li>
+        <li>Cuerpo de la noticia o evento (texto completo)</li>
+        <li>Etiquetas / relación con módulo (Memoria, SCITA, Gobierno)</li>
+        <li>Navegación "Volver" o artículos relacionados</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-new">Módulo nuevo</span></div>
+    </div>
+
+    <!-- LISTADO DOCUMENTOS -->
+    <div class="module-card mod-green">
+      <div class="module-icon">📋</div>
+      <div class="module-name">6. Listado de Documentos</div>
+      <div class="module-tag">Plantilla reutilizable · Ruta: /documentos/[categoria]</div>
+      <div class="module-desc">Vista de biblioteca filtrada por categoría. Se accede desde Gobierno Propio (Reglamentos, Planes, etc.) o Memoria Afroterritorial (Normativa, Memoria viva).</div>
+      <ul class="feature-list">
+        <li>Filtros: búsqueda libre, sección, territorio, tipo, año</li>
+        <li>Tarjetas de documento con metadatos y badge de visibilidad</li>
+        <li>Estado de carga y estado vacío</li>
+        <li>Protección de visibilidad (public/internal/sensitive)</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-done">✓ Base en MVP</span></div>
+    </div>
+
+    <!-- FORMULARIO AMBIENTAL -->
+    <div class="module-card mod-red">
+      <div class="module-icon">📝</div>
+      <div class="module-name">7. Formulario Info Ambiental</div>
+      <div class="module-tag">Modal / Panel · Acceso desde SCITA</div>
+      <div class="module-desc">Permite a comunidades corregir y actualizar información territorial. "Esta quebrada ya no tiene agua", "Aquí hay más fauna de la que aparece".</div>
+      <ul class="feature-list">
+        <li>Tipo de observación (select)</li>
+        <li>Descripción del dato/corrección</li>
+        <li>Referencia al lugar (texto; futuro: selección en mapa)</li>
+        <li>Contacto opcional</li>
+        <li>Estado de éxito: "Gracias por tu aporte" + botón volver al mapa</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-new">Módulo nuevo</span></div>
+    </div>
+
+    <!-- MIRADOR DATOS -->
+    <div class="module-card mod-blue">
+      <div class="module-icon">📊</div>
+      <div class="module-name">8. Mirador de Datos del Territorio</div>
+      <div class="module-tag">Módulo estadístico · Ruta: /mirador-datos</div>
+      <div class="module-desc">Catálogo y visualización de tableros estadísticos (Power BI u otro). Accesible desde SCITA y desde accesos rápidos.</div>
+      <ul class="feature-list">
+        <li>Catálogo con filtros por tema y territorio</li>
+        <li>Embed de Power BI vía iframe</li>
+        <li>Estados: cargando, timeout, vacío</li>
+        <li>Protección de visibilidad por rol</li>
+        <li>Enlace de retorno a SCITA (mapa ACC)</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-done">✓ Base en MVP</span></div>
+    </div>
+
+    <!-- GEOPORTAL -->
+    <div class="module-card mod-green">
+      <div class="module-icon">🌐</div>
+      <div class="module-name">9 & 10. Geoportal Interno</div>
+      <div class="module-tag">Enlace externo · Acceso desde SCITA</div>
+      <div class="module-desc">Acceso al sistema SIG completo externo. El portal NO replica el geoportal — solo provee un enlace claro con contexto.</div>
+      <ul class="feature-list">
+        <li>Botón "Ir al geoportal SIG" (abre en nueva pestaña)</li>
+        <li>Usuarios internos/admin: acceso directo</li>
+        <li>Público: según configuración del consejo</li>
+        <li>Separación clara: "SCITA es vista parcial; el geoportal es el sistema completo"</li>
+      </ul>
+      <div style="margin-top:14px;"><span class="badge badge-done">✓ Básico en MVP</span></div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 4 · FEATURES COMPLETAS -->
+<!-- ══════════════════════════════════ -->
+<section id="features">
+<div class="container">
+  <div class="section-label">04 · Características y Requerimientos</div>
+  <div class="section-title">Inventario Completo de Features</div>
+  <div class="section-desc">Todas las funcionalidades requeridas, capturadas desde audios de usuario, mockups manuales, wireframes y la especificación v2.</div>
+
+  <div class="grid-3" style="gap:20px;">
+
+    <div class="card">
+      <div class="card-title">🧭 Navegación Global</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Header fijo o muy visible en todas las pantallas</li>
+        <li>Logo Palenke/PCN (negro, verde, rojo) — izquierda</li>
+        <li>Menú: Inicio, Memoria Afroterritorial, Gobierno Propio, SCITA</li>
+        <li>Barra de búsqueda global "Buscar"</li>
+        <li>Ítem activo con subrayado o acento en verde/rojo</li>
+        <li>Menú hamburguesa en mobile</li>
+        <li>Footer: logos aliados, aviso legal, política de datos, contacto/redes</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏠 Home — Requerimientos Usuario</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Imagen/video en movimiento como hero (impactante)</li>
+        <li>Sección "¿Quiénes somos?" con texto institucional</li>
+        <li>Video de presentación institucional</li>
+        <li>"Nuestro quehacer político" (no misión/visión clásica)</li>
+        <li>3 accesos rápidos: Áreas conservación, Protección hídrica, SIG Afro</li>
+        <li>"Entérate" — noticias PCN con miniatura + resumen</li>
+        <li>"Lo último" — lista eventos/talleres con fecha y lugar</li>
+        <li>Frase icónica representativa al cierre</li>
+        <li>Colores PCN visibles y significativos desde el inicio</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📖 Memoria Afroterritorial</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Video de presentación en hero (grande, horizontal)</li>
+        <li>Sección "¿Qué es?" con imagen representativa</li>
+        <li>CTA prominente "Normativa vigente" → listado documentos</li>
+        <li>Explicación "Qué se va a encontrar" al lado de normativa</li>
+        <li>"Memoria viva del territorio" — artículos, cultura, relatos</li>
+        <li>"Vení te contamos" — eventos académicos y normativos</li>
+        <li>Tono cercano, narrativo, no burocrático</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚖️ Gobierno Propio</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>6 botones/tarjetas de instrumentos (grid 2×3)</li>
+        <li>Cada tarjeta: ícono, título, línea de texto qué hay dentro</li>
+        <li>Hover: borde verde más fuerte + sombra sutil</li>
+        <li>Colores: Reglamentos/Planes=verde; Litigio=rojo; Hídrica=azul-verde</li>
+        <li>Bloque "¿Qué es? / ¿Qué hace?" antes del grid</li>
+        <li>Bloque "Gobierno propio en acción" (contextual)</li>
+        <li>Logos de aliados al final</li>
+        <li>Cada botón → listado filtrado de documentos de esa categoría</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗺️ SCITA — Mapa y Capas</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Mapa visible al entrar (sin clic previo) con todas las ACC</li>
+        <li>Zoom, arrastre, leyenda mínima</li>
+        <li>Capa base siempre activa: Áreas de conservación comunitaria</li>
+        <li>Capas toggleables: hídrica, fauna/flora, boscosa, infraestructura, alertas, límites</li>
+        <li>Activar capa NO cambia de página — solo actualiza el mapa</li>
+        <li>Múltiples capas seleccionables a la vez</li>
+        <li>Diferenciación clara: "Vista parcial — el SIG completo está en el geoportal"</li>
+        <li>Video + texto explicativo debajo del mapa</li>
+        <li>Formulario de información ambiental (modal)</li>
+        <li>Botón "Ir al geoportal SIG" prominente</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Datos y Estadísticas</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Catálogo de tableros Power BI (o equivalente)</li>
+        <li>Filtros por tema y territorio</li>
+        <li>Embed vía iframe con estados: cargando, timeout</li>
+        <li>Protección por rol (public/internal/admin)</li>
+        <li>Estado vacío con CTA</li>
+        <li>Enlace de retorno a SCITA</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔐 Autenticación y Roles</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Login con estados: error, cuenta desactivada, cargando</li>
+        <li>Recuperar contraseña (estado éxito)</li>
+        <li>Pantalla "acceso restringido" para contenido protegido</li>
+        <li>3 roles: público, interno, admin</li>
+        <li>Visibilidad de contenido: public / internal / sensitive</li>
+        <li>Guard en /admin → redirige si no es admin</li>
+        <li>En futuro: autenticación real con sesiones seguras</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Panel Administrativo</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>KPIs rápidos + actividad reciente en dashboard admin</li>
+        <li>CRUD completo: Documentos, Dashboards, ACCs, Usuarios, Campañas</li>
+        <li>Filtros y búsqueda en cada listado</li>
+        <li>Formularios con validación y estados de carga</li>
+        <li>Gestión de visibilidad y advertencias de riesgo</li>
+        <li>Reset de contraseñas, roles, estado activo/inactivo</li>
+        <li>Campañas con placement (home, MJN, biblioteca, todas)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📱 UX / Accesibilidad</div>
+      <ul class="feature-list" style="margin-top:10px;">
+        <li>Diseño mobile-first (menú hamburguesa, columnas apiladas)</li>
+        <li>Alto contraste WCAG AA (forest sobre page)</li>
+        <li>Sin modo oscuro (decisión intencional de identidad visual)</li>
+        <li>Animaciones suaves y con significado (Framer Motion)</li>
+        <li>Estados de carga, vacío y error en todos los módulos</li>
+        <li>Breadcrumbs en vistas de detalle</li>
+        <li>Texto corto y claro; buena respiración visual</li>
+        <li>Tono cálido, comunitario, no corporativo</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 5 · GAP ANALYSIS -->
+<!-- ══════════════════════════════════ -->
+<section id="gapanalysis">
+<div class="container">
+  <div class="section-label">05 · Gap Analysis</div>
+  <div class="section-title">MVP Actual vs. Palenke v2 — ¿Qué falta?</div>
+  <div class="section-desc">Comparación directa entre lo que existe hoy y lo que requiere la especificación v2 aprobada.</div>
+
+  <table class="compare-table" style="border-radius:16px; overflow:hidden; margin-bottom:28px;">
+    <thead>
+      <tr>
+        <th>Área</th>
+        <th>MVP Fase 1 (Actual)</th>
+        <th>Palenke v2 (Objetivo)</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Marca / Identidad</strong></td>
+        <td>Paleta arena-bosque-dorado. Fraunces + Public Sans.</td>
+        <td>Colores PCN explícitos: negro, verde, rojo, amarillo. Estética política y comunitaria.</td>
+        <td><span class="badge badge-new">Actualizar</span></td>
+      </tr>
+      <tr>
+        <td><strong>Inicio (Home)</strong></td>
+        <td>Hero + accesos rápidos + campañas. Sin noticias externas PCN.</td>
+        <td>Hero en movimiento, ¿Quiénes somos?, "Nuestro quehacer político", "Entérate" (PCN news), "Lo último", frase icónica.</td>
+        <td><span class="badge badge-new">Rediseño</span></td>
+      </tr>
+      <tr>
+        <td><strong>Biblioteca → Memoria Afroterritorial</strong></td>
+        <td>Biblioteca con filtros, documentos, detalle. Sin estructura narrativa.</td>
+        <td>Pantalla narrativa con video hero, "¿Qué es?", Normativa vigente (CTA), Memoria viva, "Vení te contamos".</td>
+        <td><span class="badge badge-new">Reestructurar</span></td>
+      </tr>
+      <tr>
+        <td><strong>MJN → Gobierno Propio</strong></td>
+        <td>Módulo MJN con tabs litigio/pedagógico/memorias. Bien implementado.</td>
+        <td>Pantalla Gobierno Propio con grid de 6 instrumentos (reglamentos, planes, litigio, conservación, etnodesarrollo, hídrica).</td>
+        <td><span class="badge badge-new">Renombrar + reestructurar</span></td>
+      </tr>
+      <tr>
+        <td><strong>Geoportal → SCITA</strong></td>
+        <td>Enlace externo simple con protección por rol.</td>
+        <td>Módulo completo: mapa con ACC, capas toggleables, video explicativo, formulario ambiental, botón geoportal.</td>
+        <td><span class="badge badge-new">Módulo nuevo</span></td>
+      </tr>
+      <tr>
+        <td><strong>Estadísticas → Mirador</strong></td>
+        <td>Catálogo dashboards + embed Power BI. Funcional.</td>
+        <td>Mismo módulo, rebautizado "Mirador de datos del territorio". Agregar enlace de retorno a SCITA.</td>
+        <td><span class="badge badge-partial">Ajuste menor</span></td>
+      </tr>
+      <tr>
+        <td><strong>Noticias y Eventos</strong></td>
+        <td>No existe un módulo de noticias. Solo campañas editoriales.</td>
+        <td>"Entérate" (feed PCN) + "Lo último" (eventos) + detalle de noticia/evento.</td>
+        <td><span class="badge badge-new">Módulo nuevo</span></td>
+      </tr>
+      <tr>
+        <td><strong>Formulario Ambiental</strong></td>
+        <td>No existe.</td>
+        <td>Modal desde SCITA: tipo observación, descripción, lugar, contacto. Estado de éxito.</td>
+        <td><span class="badge badge-new">Feature nueva</span></td>
+      </tr>
+      <tr>
+        <td><strong>Mapa Interactivo</strong></td>
+        <td>SVG animado estático (landing) + enlace externo geoportal.</td>
+        <td>Geovisor real con ACC, zoom/arrastre, capas toggleables en tiempo real.</td>
+        <td><span class="badge badge-new">Integración SIG</span></td>
+      </tr>
+      <tr>
+        <td><strong>Autenticación</strong></td>
+        <td>Mock por query string. No hay backend.</td>
+        <td>Autenticación real con sesiones seguras, permisos por usuario, auditoría.</td>
+        <td><span class="badge badge-new">Backend requerido</span></td>
+      </tr>
+      <tr>
+        <td><strong>Panel Admin</strong></td>
+        <td>Completo y funcional como mock.</td>
+        <td>Conectar a backend real. Auditoría y trazabilidad de cambios.</td>
+        <td><span class="badge badge-partial">Base sólida</span></td>
+      </tr>
+      <tr>
+        <td><strong>Búsqueda Global</strong></td>
+        <td>Filtros por módulo. Sin búsqueda global unificada.</td>
+        <td>Campo "Buscar" global en header, visible en todas las pantallas.</td>
+        <td><span class="badge badge-new">Feature nueva</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-success">
+    <strong>Lo que está bien:</strong> El MVP tiene una base técnica sólida (Next.js App Router, TypeScript estricto, sistema de componentes completo, admin CRUD, sistema de visibilidad por roles). No hay que empezar desde cero — hay que rediseñar la estructura de navegación y agregar los módulos nuevos de v2.
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 6 · STACK & DISEÑO -->
+<!-- ══════════════════════════════════ -->
+<section id="stack">
+<div class="container">
+  <div class="section-label">06 · Stack Técnico y Sistema de Diseño</div>
+  <div class="section-title">Tecnología y Diseño</div>
+  <div class="section-desc">Stack del proyecto actual y tokens del sistema de diseño Palenke.</div>
+
+  <div class="grid-2" style="gap:28px;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">⚙️ Stack Técnico</div>
+      <div class="stack-row">
+        <div class="stack-icon">⚡</div>
+        <div><div class="stack-name">Next.js 15 (App Router)</div><div class="stack-detail">Framework principal — SSR, rutas, layouts</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">⚛️</div>
+        <div><div class="stack-name">React 19</div><div class="stack-detail">UI components, hooks, estado local</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">🔷</div>
+        <div><div class="stack-name">TypeScript (estricto)</div><div class="stack-detail">Tipos en todo el proyecto — mock-data, viewer, admin</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">🎨</div>
+        <div><div class="stack-name">Tailwind CSS v4</div><div class="stack-detail">Tokens con @theme en globals.css</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">✨</div>
+        <div><div class="stack-name">Framer Motion 12</div><div class="stack-detail">Animaciones — fade/slide, stagger, SVG path, menu mobile</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">🔤</div>
+        <div><div class="stack-name">Fraunces + Public Sans</div><div class="stack-detail">Display serif (títulos) + sans legible (UI/body)</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon">🖼️</div>
+        <div><div class="stack-name">lucide-react</div><div class="stack-detail">Iconos en toda la interfaz</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">🎨 Tokens del Sistema de Diseño</div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em;">Paleta MVP (actual)</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#f5edd6;border:1px solid #ccc;"></span>#f5edd6 Arena</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#c8943a;border:1px solid #ccc;"></span>#c8943a Dorado</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#0d1f0a;border:1px solid #ccc;"></span>#0d1f0a Bosque</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#697560;border:1px solid #ccc;"></span>#697560 Neutro</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em;">Acentos PCN (v2 — con significado político)</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#111111;"></span>Negro — Identidad y dignidad</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#1a6b2f;"></span>Verde — Territorio y naturaleza</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#c0392b;"></span>Rojo — Lucha y resistencia</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:#e6a817;"></span>Amarillo — Esperanza y riqueza cultural</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.8rem; font-weight:600; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em;">Regla de uso de color PCN</div>
+        <div style="font-size:0.82rem; color:var(--muted); line-height:1.5;">Negro y verde como acentos principales. Rojo solo en puntos clave (CTA fuertes, etiquetas de lucha, litigio). Amarillo en detalles finos (líneas, iconos, bordes). <strong style="color:var(--forest);">Nunca los 4 a la vez en una misma sección.</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">📐 Componentes UI Existentes (30+)</div>
+      <div style="font-size:0.83rem; color:var(--muted); line-height:1.6;">
+        <strong>Layout:</strong> SiteLayout, SiteHeader, SiteFooter, AdminLayout, Breadcrumbs<br/>
+        <strong>Contenido:</strong> PageHero, SectionHeader, PageBanner, Callout, MediaPlaceholder<br/>
+        <strong>Tarjetas:</strong> DocumentCard, DashboardCard, CampaignCard, StoryCard, MetricCard<br/>
+        <strong>Formularios:</strong> TextInput, TextArea, SelectInput, Field, InputLabel, DropZone<br/>
+        <strong>Estado:</strong> VisibilityBadge, StatusPill, Badge, Chip, FilterChip<br/>
+        <strong>Datos:</strong> TableCard, Toolbar, DetailList, SkeletonGrid, EmptyState<br/>
+        <strong>Botones:</strong> .button-primary, .button-secondary, .button-ghost
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">🗂️ Archivos Clave del Proyecto</div>
+      <div class="stack-row">
+        <div class="stack-icon" style="font-size:0.8rem;">CSS</div>
+        <div><div class="stack-name">src/app/globals.css</div><div class="stack-detail">Variables CSS, tokens, @theme Tailwind</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon" style="font-size:0.8rem;">UI</div>
+        <div><div class="stack-name">src/components/mock/ui.tsx</div><div class="stack-detail">Biblioteca completa de componentes UI</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon" style="font-size:0.8rem;">DB</div>
+        <div><div class="stack-name">src/lib/mock-data.ts</div><div class="stack-detail">Dataset y tipos principales del MVP</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon" style="font-size:0.8rem;">🔐</div>
+        <div><div class="stack-name">src/lib/viewer.ts</div><div class="stack-detail">Rol, visibilidad y utilidades URL</div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-icon" style="font-size:0.8rem;">⚙️</div>
+        <div><div class="stack-name">src/lib/admin-access.ts</div><div class="stack-detail">Guard de acceso al panel admin</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 7 · ROADMAP -->
+<!-- ══════════════════════════════════ -->
+<section id="roadmap">
+<div class="container">
+  <div class="section-label">07 · Hoja de Ruta</div>
+  <div class="section-title">Del MVP al Palenke v2 Completo</div>
+  <div class="section-desc">Fases propuestas de evolución, de menos a más complejidad técnica.</div>
+
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--gold-100); border-color:var(--gold-500);">✅</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 1 completada — MVP Frontend Mock</div>
+        <div class="timeline-desc">Next.js App Router, sistema de componentes, panel admin CRUD completo, sistema de visibilidad por roles, datos mock, wireframes de todas las pantallas. <strong>Base técnica sólida lista.</strong></div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:#dde8f5; border-color:#2c5282;">🎨</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 2A — Rediseño visual hacia v2 (PCN)</div>
+        <div class="timeline-desc">Actualizar paleta a colores PCN (negro, verde, rojo, amarillo con significado político). Rediseñar Home con todas las secciones v2. Renombrar módulos (MJN → Gobierno Propio, Geoportal → SCITA). Implementar nuevo header/footer con identidad v2.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--success); border-color:var(--pcn-green);">📰</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 2B — Módulos nuevos de contenido</div>
+        <div class="timeline-desc">Crear pantalla Memoria Afroterritorial (narrativa con video, normativa, memoria viva, Vení te contamos). Crear pantalla Gobierno Propio (grid de 6 instrumentos). Crear módulo de noticias/eventos ("Entérate" + "Lo último" + detalle). Búsqueda global.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--danger-soft); border-color:var(--danger);">🗺️</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 3 — SCITA: Mapa + Capas + Formulario Ambiental</div>
+        <div class="timeline-desc">Integrar geovisor real (Leaflet, MapLibre o embed geoportal) con ACC en el mapa. Implementar selector de capas con toggle activo/inactivo. Formulario de información ambiental (modal). Bloque "Ir al geoportal SIG". Vista "Mirador de datos" vinculada.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--surface-muted); border-color:var(--border-strong);">🔐</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 4 — Backend real y autenticación</div>
+        <div class="timeline-desc">Reemplazar mock-data por API/backend persistente. Autenticación real con sesiones seguras. Almacenamiento de archivos/documentos. Permisos por usuario real. Auditoría y trazabilidad de cambios. Integración Power BI o herramienta de visualización.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:var(--surface-muted); border-color:var(--border-strong);">🧪</div>
+      <div class="timeline-content">
+        <div class="timeline-title">Fase 5 — Calidad, tests y producción</div>
+        <div class="timeline-desc">Tests automatizados (unit/integration/e2e). Auditoría de accesibilidad WCAG AA. Performance y Core Web Vitals. Capacitación al equipo PCN. Documentación técnica y de usuario.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════ -->
+<!-- SECTION 8 · PRIORIDADES -->
+<!-- ══════════════════════════════════ -->
+<section id="prioridades">
+<div class="container">
+  <div class="section-label">08 · Prioridades Inmediatas</div>
+  <div class="section-title">¿Qué hacer primero?</div>
+  <div class="section-desc">Tareas ordenadas por impacto en la experiencia del usuario y alineación con los requerimientos de usuario documentados en audios y wireframes.</div>
+
+  <table class="compare-table" style="border-radius:16px; overflow:hidden; margin-bottom:28px;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tarea</th>
+        <th>Módulo</th>
+        <th>Prioridad</th>
+        <th>Fundamento (fuente)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Actualizar Home con estructura v2 completa (¿Quiénes somos?, Quehacer político, Entérate, Lo último, Frase icónica)</td>
+        <td>Inicio</td>
+        <td><span class="priority-dot p-high"></span><strong>Alta</strong></td>
+        <td>Requerimiento explícito en audios de usuario ("eso esté armado para el martes")</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Aplicar identidad visual PCN (negro, verde, rojo, amarillo) en toda la plataforma</td>
+        <td>Global</td>
+        <td><span class="priority-dot p-high"></span><strong>Alta</strong></td>
+        <td>Pedido directo: "que la página empiece a verse con los colores del PCN"</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Reestructurar pantalla de Biblioteca como Memoria Afroterritorial (narrativa v2)</td>
+        <td>Biblioteca</td>
+        <td><span class="priority-dot p-high"></span><strong>Alta</strong></td>
+        <td>Spec completa v2 + wireframes manuales IMAGE 3</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Crear pantalla Gobierno Propio con grid de 6 instrumentos</td>
+        <td>Gobierno Propio</td>
+        <td><span class="priority-dot p-high"></span><strong>Alta</strong></td>
+        <td>Audios usuario + spec v2 sec. 6</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Crear módulo SCITA con mapa ACC + selector de capas + formulario ambiental</td>
+        <td>SCITA</td>
+        <td><span class="priority-dot p-medium"></span>Media</td>
+        <td>Audios usuario (detallado) + spec v2 sec. 7 + wireframes IMAGE 4 y 5</td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>Crear módulo de noticias/eventos (Entérate + Lo último + detalle)</td>
+        <td>Noticias</td>
+        <td><span class="priority-dot p-medium"></span>Media</td>
+        <td>Spec v2 sec. 4.2.6 + mockups IMAGE 2</td>
+      </tr>
+      <tr>
+        <td><strong>7</strong></td>
+        <td>Implementar búsqueda global en header</td>
+        <td>Global</td>
+        <td><span class="priority-dot p-medium"></span>Media</td>
+        <td>Audios usuario ("un botón que dice buscar") + spec v2 sec. 2.3</td>
+      </tr>
+      <tr>
+        <td><strong>8</strong></td>
+        <td>Conectar a backend real (autenticación, API, almacenamiento)</td>
+        <td>Backend</td>
+        <td><span class="priority-dot p-low"></span>Siguiente fase</td>
+        <td>Prerequisito para producción real</td>
+      </tr>
+      <tr>
+        <td><strong>9</strong></td>
+        <td>Tests automatizados + auditoría de accesibilidad WCAG AA</td>
+        <td>QA</td>
+        <td><span class="priority-dot p-low"></span>Siguiente fase</td>
+        <td>Fase 5 del roadmap</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-2" style="gap:20px;">
+    <div class="callout callout-success">
+      <strong>💪 Fortalezas actuales:</strong> Sistema de componentes robusto (30+ componentes), admin panel completo, sistema de visibilidad por roles, routing bien estructurado con App Router, TypeScript estricto, diseño sistema documentado. El MVP tiene más del 50% de la base técnica lista para v2.
+    </div>
+    <div class="callout callout-warn">
+      <strong>⚠️ Puntos de atención:</strong> El mapa interactivo real (SCITA) requerirá integrar una librería de mapas (Leaflet/MapLibre). El feed de noticias de PCN requiere una fuente de datos o scraping/API. La autenticación real es necesaria antes de producción.
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <div>Análisis generado para <strong>Palenke Pensamiento / PCN</strong> · 19 Marzo 2026</div>
+  <div>Basado en: README, DESIGN-SYSTEM, PALENKE_V2_SPEC_COMPLETA, audios de usuario, wireframes manuales e índice de planes Fase 1</div>
+</div>
+
+</body>
+</html>
