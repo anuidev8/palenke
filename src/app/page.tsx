@@ -76,12 +76,12 @@ export default async function HomePage({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <Link href={withRole("/", role)} className="flex items-center gap-3">
               <Image
-                src="/brands/PALENKE.jpeg"
+                src="/brands/PALENKE.svg"
                 alt="Logo Palenke / PCN"
-                width={56}
-                height={56}
+                width={120}
+                height={240}
                 priority
-                className="h-12 w-12 shrink-0 sm:h-14 sm:w-14"
+                className="h-20 w-auto shrink-0 object-contain sm:h-24"
               />
               <span className="min-w-0">
                 <span className="block font-display text-xl leading-none text-white sm:text-2xl">

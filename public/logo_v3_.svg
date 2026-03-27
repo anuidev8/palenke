@@ -1,0 +1,111 @@
+<svg width="1400" height="460" viewBox="0 0 1400 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Palenke Pensamiento - Plataforma PCN</title>
+  <desc id="desc">Logotipo con círculo territorial, montaña, río, comunidad y nodos de información para representar soberanía digital y memoria afroterritorial.</desc>
+
+  <defs>
+    <linearGradient id="territoryRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1A5F3A"/>
+      <stop offset="55%" stop-color="#000000"/>
+      <stop offset="100%" stop-color="#C8102E"/>
+    </linearGradient>
+    <linearGradient id="mountainFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A5F3A"/>
+      <stop offset="100%" stop-color="#0F3C24"/>
+    </linearGradient>
+    <linearGradient id="riverFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2E86AB"/>
+      <stop offset="100%" stop-color="#1E6380"/>
+    </linearGradient>
+    <style>
+      .word-main {
+        font-family: 'Montserrat', 'Bebas Neue', 'Anton', 'Arial Black', sans-serif;
+        font-weight: 900;
+        letter-spacing: 0.6px;
+      }
+      .word-sub {
+        font-family: 'Poppins', 'Raleway', 'Noto Sans Display', 'Segoe UI', sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+      }
+      .descriptor {
+        font-family: 'Open Sans', 'Roboto Condensed', 'Segoe UI', sans-serif;
+        font-weight: 400;
+        letter-spacing: 2.4px;
+      }
+    </style>
+    <clipPath id="innerCircleClip">
+      <circle cx="230" cy="230" r="108"/>
+    </clipPath>
+  </defs>
+
+  <!-- Symbol block -->
+  <g transform="translate(0 0)">
+    <!-- Outer ring (territory/community) -->
+    <circle cx="230" cy="230" r="128" fill="none" stroke="url(#territoryRing)" stroke-width="24"/>
+    <circle cx="230" cy="230" r="111" fill="#F8F4E6"/>
+
+    <g clip-path="url(#innerCircleClip)">
+      <!-- Ground / territory base -->
+      <rect x="110" y="270" width="240" height="85" fill="#D4A574"/>
+
+      <!-- Mountain silhouette (ACC / territorio vivo) -->
+      <path d="M98 272 L168 178 L213 226 L256 156 L364 272 Z" fill="url(#mountainFill)"/>
+
+      <!-- Water basin / river -->
+      <path d="M126 291 C171 254, 229 255, 275 279 C302 294, 324 308, 353 316 L353 350 L126 350 Z" fill="url(#riverFill)" opacity="0.98"/>
+
+      <!-- Network lines (SIG / data intelligence) -->
+      <g stroke="#000000" stroke-opacity="0.35" stroke-width="2" fill="none">
+        <path d="M152 205 L210 186 L267 201 L309 178"/>
+        <path d="M165 240 L223 220 L287 234"/>
+        <path d="M180 266 L235 246 L298 261"/>
+      </g>
+
+      <!-- Network nodes -->
+      <g fill="#C8102E" stroke="#000000" stroke-width="1.4">
+        <circle cx="152" cy="205" r="4.8"/>
+        <circle cx="210" cy="186" r="4.8"/>
+        <circle cx="267" cy="201" r="4.8"/>
+        <circle cx="309" cy="178" r="4.8"/>
+        <circle cx="165" cy="240" r="4.8"/>
+        <circle cx="223" cy="220" r="4.8"/>
+        <circle cx="287" cy="234" r="4.8"/>
+        <circle cx="180" cy="266" r="4.8"/>
+        <circle cx="235" cy="246" r="4.8"/>
+        <circle cx="298" cy="261" r="4.8"/>
+      </g>
+
+      <!-- Community figures (3 stylized people) -->
+      <g fill="#000000">
+        <circle cx="184" cy="286" r="9"/>
+        <circle cx="230" cy="294" r="9"/>
+        <circle cx="276" cy="286" r="9"/>
+      </g>
+      <g fill="#C8102E">
+        <path d="M168 338 C168 317, 176 304, 184 304 C192 304, 200 317, 200 338 Z"/>
+        <path d="M214 344 C214 322, 222 309, 230 309 C238 309, 246 322, 246 344 Z"/>
+        <path d="M260 338 C260 317, 268 304, 276 304 C284 304, 292 317, 292 338 Z"/>
+      </g>
+
+      <!-- Memory spiral -->
+      <path d="M224 248
+               C236 244, 247 251, 247 262
+               C247 274, 234 282, 222 277
+               C211 273, 206 259, 213 248
+               C221 235, 240 231, 254 238"
+            fill="none" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Wordmark block -->
+  <g transform="translate(405 116)">
+    <text x="0" y="108" class="word-main" font-size="106" fill="#000000">Palenke</text>
+    <text x="3" y="192" class="word-sub" font-size="86" fill="#1A5F3A">Pensamiento</text>
+
+    <!-- Accent underline combining struggle + territory -->
+    <rect x="3" y="218" width="562" height="10" rx="5" fill="#C8102E"/>
+    <rect x="3" y="233" width="562" height="6" rx="3" fill="#1A5F3A" opacity="0.95"/>
+
+    <text x="4" y="287" class="descriptor" font-size="32" fill="#000000" opacity="0.9">PLATAFORMA PCN</text>
+  </g>
+</svg>

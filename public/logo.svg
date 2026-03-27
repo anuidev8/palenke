@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <!-- Gradients for depth -->
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#48CAE4"/>
+      <stop offset="50%" stop-color="#0077B6"/>
+      <stop offset="100%" stop-color="#023E8A"/>
+    </linearGradient>
+    
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE066"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
+    </linearGradient>
+
+    <!-- Text Paths -->
+    <path id="arcTop" d="M 80,300 A 220,220 0 0,1 520,300" fill="none" />
+    <path id="arcBotMain" d="M 80,310 A 220,220 0 0,0 520,310" fill="none" />
+    <path id="arcBotSub" d="M 40,310 A 260,260 0 0,0 560,310" fill="none" />
+  </defs>
+
+  <!-- Background Base -->
+  <circle cx="300" cy="300" r="290" fill="#FDFBF7" />
+  <circle cx="300" cy="300" r="280" fill="none" stroke="#1B4D3E" stroke-width="8"/>
+  <circle cx="300" cy="300" r="265" fill="none" stroke="#D4AF37" stroke-width="2" stroke-dasharray="6 4"/>
+
+  <!-- ==================== TREE CANOPY (Background) ==================== -->
+  <g id="Tree-Canopy" opacity="0.95">
+    <!-- Main leaf clusters -->
+    <circle cx="300" cy="140" r="90" fill="#1B4D3E"/>
+    <circle cx="200" cy="180" r="80" fill="#2D6A4F"/>
+    <circle cx="400" cy="180" r="80" fill="#2D6A4F"/>
+    <circle cx="140" cy="240" r="60" fill="#40916C"/>
+    <circle cx="460" cy="240" r="60" fill="#40916C"/>
+    <circle cx="250" cy="220" r="75" fill="#52B788"/>
+    <circle cx="350" cy="220" r="75" fill="#52B788"/>
+    
+    <!-- Fruits (Biodiversity) -->
+    <circle cx="270" cy="110" r="12" fill="#FFA62B"/>
+    <circle cx="330" cy="130" r="14" fill="#F94144"/>
+    <circle cx="180" cy="150" r="10" fill="#FFD166"/>
+    <circle cx="420" cy="160" r="11" fill="#FFA62B"/>
+    <circle cx="220" cy="200" r="13" fill="#F94144"/>
+    <circle cx="380" cy="220" r="10" fill="#FFD166"/>
+    <circle cx="130" cy="230" r="9" fill="#FFA62B"/>
+    <circle cx="450" cy="210" r="12" fill="#F94144"/>
+  </g>
+
+  <!-- ==================== THE HANDS & ROOTS ==================== -->
+  <g id="Hands-Roots">
+    <!-- Left Hand / Root -->
+    <path d="M 300,530 C 180,530 110,480 90,380 C 85,350 110,330 135,340 C 160,350 170,380 180,410 C 200,470 240,490 300,490 Z" fill="#5C3A21"/>
+    <path d="M 135,340 C 150,330 170,340 180,360 C 170,380 150,370 145,350 Z" fill="#3E2723"/> <!-- Thumb hint -->
+    
+    <!-- Right Hand / Root -->
+    <path d="M 300,530 C 420,530 490,480 510,380 C 515,350 490,330 465,340 C 440,350 430,380 420,410 C 400,470 360,490 300,490 Z" fill="#5C3A21"/>
+    <path d="M 465,340 C 450,330 430,340 420,360 C 430,380 450,370 455,350 Z" fill="#3E2723"/> <!-- Thumb hint -->
+  </g>
+
+  <!-- ==================== WATER (Fuentes Hídricas) ==================== -->
+  <g id="Water">
+    <!-- Waterfall coming from under the book -->
+    <path d="M 260,380 C 260,430 200,460 200,500 C 250,520 350,520 400,500 C 400,460 340,430 340,380 Z" fill="url(#waterGrad)"/>
+    <!-- Water ripples/waves inside the hands -->
+    <path d="M 150,420 Q 225,450 300,420 Q 375,450 450,420" fill="none" stroke="#90E0EF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 180,450 Q 240,470 300,450 Q 360,470 420,450" fill="none" stroke="#CAF0F8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 230,480 Q 265,495 300,480 Q 335,495 370,480" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  </g>
+
+  <!-- ==================== TREE TRUNK & SCALES (Justicia y Naturaleza) ==================== -->
+  <g id="Trunk-Scales">
+    <!-- Tree Trunk / Scale Pillar -->
+    <path d="M 285,380 C 285,300 250,230 200,180 C 240,190 275,230 295,290 L 305,290 C 325,230 360,190 400,180 C 350,230 315,300 315,380 Z" fill="#4A2E21"/>
+    
+    <!-- Scale Crossbeam hanging from branches -->
+    <rect x="180" y="240" width="240" height="8" rx="4" fill="url(#goldGrad)"/>
+    
+    <!-- Left Scale Bowl & Chains -->
+    <line x1="190" y1="245" x2="150" y2="320" stroke="#D4AF37" stroke-width="2"/>
+    <line x1="190" y1="245" x2="230" y2="320" stroke="#D4AF37" stroke-width="2"/>
+    <path d="M 140,320 Q 190,360 240,320 Z" fill="url(#goldGrad)"/>
+    
+    <!-- Right Scale Bowl & Chains -->
+    <line x1="410" y1="245" x2="370" y2="320" stroke="#D4AF37" stroke-width="2"/>
+    <line x1="410" y1="245" x2="450" y2="320" stroke="#D4AF37" stroke-width="2"/>
+    <path d="M 360,320 Q 410,360 460,320 Z" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- ==================== THE BOOK (Memoria y Pensamiento) ==================== -->
+  <g id="Book">
+    <!-- Left Pages -->
+    <path d="M 300,380 L 190,340 L 190,400 L 300,440 Z" fill="#FFFDF7" stroke="#D4AF37" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Right Pages -->
+    <path d="M 300,380 L 410,340 L 410,400 L 300,440 Z" fill="#F4E2C2" stroke="#D4AF37" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Book Center Fold / Spine -->
+    <line x1="300" y1="380" x2="300" y2="440" stroke="#D4AF37" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Page lines (representing text/memory) -->
+    <line x1="210" y1="365" x2="280" y2="395" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+    <line x1="210" y1="380" x2="270" y2="405" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+    
+    <line x1="390" y1="365" x2="320" y2="395" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+    <line x1="390" y1="380" x2="330" y2="405" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- ==================== TYPOGRAPHY ==================== -->
+  <!-- Top Title -->
+  <text font-family="Georgia, serif" font-weight="bold" font-size="28" fill="#1B4D3E" letter-spacing="2">
+    <textPath href="#arcTop" startOffset="50%" text-anchor="middle">PALENKE DE PENSAMIENTO</textPath>
+  </text>
+
+  <!-- Bottom Subtitle 1 -->
+  <text font-family="Georgia, serif" font-weight="bold" font-size="24" fill="#5C3A21" letter-spacing="1.5">
+    <textPath href="#arcBotMain" startOffset="50%" text-anchor="middle">CUIDADORES DEL TERRITORIO</textPath>
+  </text>
+
+  <!-- Bottom Subtitle 2 (Mission) -->
+  <text font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#1B4D3E" letter-spacing="2" opacity="0.8">
+    <textPath href="#arcBotSub" startOffset="50%" text-anchor="middle">GOBIERNO PROPIO, MEMORIA Y DEFENSA</textPath>
+  </text>
+
+</svg>

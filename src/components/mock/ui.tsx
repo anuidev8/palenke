@@ -46,15 +46,20 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 pb-16 pt-24 sm:px-6 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr] lg:px-8">
         {/* Brand column */}
         <div className="space-y-4">
-          <Link href={withRole("/", role)} className="flex items-center gap-3">
+          <Link href={withRole("/", role)} className="flex items-center gap-4">
             <Image
-              src="/brands/PALENKE.jpeg"
+              src="/brands/palenkelogo-light.svg"
               alt="Logo Palenke / PCN"
-              width={40}
-              height={40}
-              className="h-10 w-10 shrink-0"
+              width={120}
+              height={240}
+              className="h-24 w-auto shrink-0 object-contain"
             />
-            <span className="font-display text-xl text-white">Palenke</span>
+            <span>
+              <span className="block font-display text-2xl leading-none text-white">Palenke</span>
+              <span className="mt-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">
+                Pensamiento
+              </span>
+            </span>
           </Link>
           <p className="max-w-sm text-sm leading-6 text-white/60">
             Casa digital del Proceso de Comunidades Negras — espacio político, organizativo y de producción de conocimiento articulado por la Corporación Agencia Afrocolombiana Hileros.

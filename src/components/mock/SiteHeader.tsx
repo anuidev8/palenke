@@ -52,16 +52,16 @@ export function SiteHeader({
 
   return (
     <header className={headerClasses}>
-      <div className="mx-auto flex h-[73px] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[84px] w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* PCN Logo */}
         <Link href={withRole("/", role)} className="flex shrink-0 items-center gap-3">
           <Image
-            src="/brands/PALENKE.jpeg"
+            src="/brands/PALENKE.svg"
             alt="Logo Palenke / PCN"
-            width={40}
-            height={40}
+            width={96}
+            height={192}
             priority
-            className="h-10 w-10 shrink-0"
+            className="h-14 w-auto shrink-0 object-contain"
           />
           <span>
             <span className="block font-display text-[20px] leading-none text-[#1a1a1a]">Palenke</span>
