@@ -48,7 +48,7 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
         <div className="space-y-4">
           <Link href={withRole("/", role)} className="flex items-center gap-3">
             <Image
-              src="/assets/logo.svg"
+              src="/brands/PALENKE.jpeg"
               alt="Logo Palenke / PCN"
               width={40}
               height={40}

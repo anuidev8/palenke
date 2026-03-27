@@ -76,7 +76,7 @@ export default async function HomePage({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <Link href={withRole("/", role)} className="flex items-center gap-3">
               <Image
-                src="/assets/logo.svg"
+                src="/brands/PALENKE.jpeg"
                 alt="Logo Palenke / PCN"
                 width={56}
                 height={56}

@@ -56,7 +56,7 @@ export function SiteHeader({
         {/* PCN Logo */}
         <Link href={withRole("/", role)} className="flex shrink-0 items-center gap-3">
           <Image
-            src="/assets/logo.svg"
+            src="/brands/PALENKE.jpeg"
             alt="Logo Palenke / PCN"
             width={40}
             height={40}
