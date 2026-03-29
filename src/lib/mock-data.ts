@@ -186,6 +186,35 @@ type NormaDocSeed = {
   imageUrl?: string;
 };
 
+// ─── SharePoint internal documents URL helper ────────────────────────────────
+// Builds a SharePoint OneDrive viewer URL for files under INF. INTERNA
+const _SP_INTERNA =
+  "https://hileros-my.sharepoint.com/personal/fconu_renacientes_org/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Ffconu%5Frenacientes%5Forg%2FDocuments%2FARCHIVO%2F2026%2FINFORMACION%20PAGINA%20WEB%2FINF%2E%20INTERNA%2F";
+
+function spInternalUrl(relPath: string): string {
+  return (
+    _SP_INTERNA +
+    relPath
+      .split("/")
+      .map((s) =>
+        s
+          .replace(/ /g, "%20")
+          .replace(/\(/g, "%28")
+          .replace(/\)/g, "%29")
+          .replace(/Á/g, "%C3%81")
+          .replace(/É/g, "%C3%89")
+          .replace(/Ó/g, "%C3%93")
+          .replace(/Ú/g, "%C3%9A")
+          .replace(/á/g, "%C3%A1")
+          .replace(/é/g, "%C3%A9")
+          .replace(/ó/g, "%C3%B3")
+          .replace(/í/g, "%C3%AD")
+          .replace(/Í/g, "%C3%8D")
+      )
+      .join("%2F")
+  );
+}
+
 const constitution1991Url =
   "https://www1.funcionpublica.gov.co/documents/418537/37742455/constitucion-politica-de-colombia-91.pdf/10e1ba89-82ef-4c36-543d-447d99a6a17d";
 const senateLawUrl = (number: number, year: number) =>
@@ -1004,15 +1033,324 @@ export const documents: DocumentRecord[] = [
     municipality: "López de Micay",
     year: 2021,
     validity: "Vigente",
-    visibility: "public",
+    visibility: "internal",
     keywords: ["gobierno propio", "Naya", "reglamento", "2021"],
     genderFocus: false,
     mjnTags: [],
-    action: "file",
-    fileLabel: "Descargar PDF",
+    action: "external",
+    fileLabel: "Ver en SharePoint",
     fileSize: "3.2 MB",
-    url: "#",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC DIEGO LUIS CORDOBA/REGLAMENTO INTERNO DIEGO LUIS CORDOBA 19.pdf"),
   },
+
+  // ── REGLAMENTOS INTERNOS (desde SharePoint — INF. INTERNA) ─────────────────
+
+  {
+    id: "doc-reglamento-diego-luis-cordoba",
+    slug: "reglamento-interno-cc-diego-luis-cordoba",
+    title: "Reglamento interno — CC Diego Luis Córdoba",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Reglamento interno aprobado del Consejo Comunitario Diego Luis Córdoba con normas de convivencia, autoridad comunitaria, uso del territorio y mecanismos de resolución de conflictos.",
+    territory: "Chocó",
+    council: "Consejo Comunitario Diego Luis Córdoba",
+    department: "Chocó",
+    municipality: "Istmina",
+    year: 2019,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Diego Luis Córdoba", "gobierno propio", "Chocó"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "1.33 MB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC DIEGO LUIS CORDOBA/REGLAMENTO INTERNO DIEGO LUIS CORDOBA 19.pdf"),
+  },
+  {
+    id: "doc-reglamento-esperanza-viva",
+    slug: "reglamento-interno-cc-esperanza-viva",
+    title: "Reglamento interno — CC Esperanza Viva",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Instrumento normativo interno del Consejo Comunitario Esperanza Viva que regula la vida comunitaria, el uso del territorio y la organización del gobierno propio.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Esperanza Viva",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Esperanza Viva", "gobierno propio", "autonomía"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "810 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC ESPERANZA VIVA/REGLAMENTO INTERNO-- CC ESPERANZA VIVA.pdf"),
+  },
+  {
+    id: "doc-reglamento-llaves-futuro",
+    slug: "reglamento-interno-cc-llaves-del-futuro",
+    title: "Reglamento interno — CC Llaves del Futuro",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Normas internas del Consejo Comunitario Llaves del Futuro que establecen la estructura de gobierno, la participación comunitaria y la gestión del territorio colectivo.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Llaves del Futuro",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Llaves del Futuro", "gobierno propio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "1.52 MB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC LLAVES DEL FUTURO/REGLAMENTO INTERNO - CC LLAVES DEL FUTURO.pdf"),
+  },
+  {
+    id: "doc-reglamento-martin-luther-king",
+    slug: "reglamento-interno-cc-martin-luther-king",
+    title: "Reglamento interno — CC Martin Luther King",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Documento normativo del Consejo Comunitario Martin Luther King con los acuerdos colectivos de convivencia, organización y gobernanza territorial.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Martin Luther King",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Martin Luther King", "gobierno propio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "495 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC MARTIN LUTHER KING/REGLAMENTO INTERNO MARTIN LUTHER KING (1).pdf"),
+  },
+  {
+    id: "doc-reglamento-mayor-capitania",
+    slug: "reglamento-interno-cc-mayor-capitania",
+    title: "Reglamento interno — CC Mayor de Capitanía",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Reglamento interno del Consejo Comunitario Mayor de Capitanía que rige la vida organizativa, la autoridad propia y el uso del territorio colectivo afrodescendiente.",
+    territory: "Cauca",
+    council: "Consejo Comunitario Mayor de Capitanía",
+    department: "Cauca",
+    municipality: "Páez",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Capitanía", "gobierno propio", "Cauca"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "451 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC MAYOR DE CAPITANIA/REGLAMENTO INTERNO - CAPITANIA.pdf"),
+  },
+  {
+    id: "doc-reglamento-nelson-mandela-guaviare",
+    slug: "reglamento-interno-cc-nelson-mandela-guaviare",
+    title: "Reglamento interno — CC Nelson Mandela (Guaviare)",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Normas de gobierno propio del Consejo Comunitario Nelson Mandela en el departamento del Guaviare, con reglas de convivencia y manejo del territorio colectivo.",
+    territory: "Guaviare",
+    council: "Consejo Comunitario Nelson Mandela",
+    department: "Guaviare",
+    municipality: "San José del Guaviare",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Nelson Mandela", "Guaviare", "gobierno propio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "451 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC NELSON MANDELA - GUAVIARE/REGLAMENTO INTERNO NELSON MANDELA.pdf"),
+  },
+  {
+    id: "doc-reglamento-nelson-mandela-piamonte",
+    slug: "reglamento-interno-cc-nelson-mandela-piamonte",
+    title: "Reglamento interno — CC Nelson Mandela (Piamonte)",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Reglamento interno del Consejo Comunitario Nelson Mandela en Piamonte, Cauca, que regula la autoridad comunitaria y el gobierno del territorio colectivo.",
+    territory: "Cauca",
+    council: "Consejo Comunitario Nelson Mandela",
+    department: "Cauca",
+    municipality: "Piamonte",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Nelson Mandela", "Piamonte", "gobierno propio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "699 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC NELSON MANDELA - PIAMONTE/REGLAMENTO INTERNO - CC NELSON MANDELA.pdf"),
+  },
+  {
+    id: "doc-reglamento-nueva-esperanza",
+    slug: "reglamento-interno-cc-nueva-esperanza",
+    title: "Reglamento interno — CC Nueva Esperanza",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Instrumento de gobierno propio del Consejo Comunitario Nueva Esperanza con los acuerdos normativos sobre convivencia, organización y defensa territorial.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Nueva Esperanza",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "Nueva Esperanza", "gobierno propio"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "868 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC NUEVA ESPERANZA/REGLAMENTO INTERNO - CC NUEVA ESPERANZA.pdf"),
+  },
+  {
+    id: "doc-reglamento-orconepiac",
+    slug: "reglamento-interno-cc-orconepiac",
+    title: "Reglamento interno — CC ORCONEPIAC",
+    section: "Reglamentos internos",
+    type: "Reglamento interno",
+    description:
+      "Normas internas del Consejo Comunitario ORCONEPIAC que establecen la estructura organizativa, los mecanismos de participación y las reglas de uso y gobierno del territorio.",
+    territory: "Nariño",
+    council: "ORCONEPIAC",
+    department: "Nariño",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["reglamento interno", "ORCONEPIAC", "gobierno propio", "Nariño"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver reglamento",
+    fileSize: "757 KB",
+    url: spInternalUrl("REGLAMENTOS INTERNOS/CC ORCONEPIAC/REGLAMENTO INTERNO - CC ORCONEPIAC.pdf"),
+  },
+
+  // ── PLANES DE ETNODESARROLLO (desde SharePoint — INF. INTERNA) ────────────
+
+  {
+    id: "doc-ped-diego-luis-cordoba",
+    slug: "plan-etnodesarrollo-cc-diego-luis-cordoba-2024",
+    title: "Plan de Etnodesarrollo — CC Diego Luis Córdoba (2024)",
+    section: "Planes de etnodesarrollo",
+    type: "Plan de etnodesarrollo",
+    description:
+      "Plan estratégico de etnodesarrollo del Consejo Comunitario Diego Luis Córdoba (2024) con proyección económica, social, cultural y ambiental del territorio colectivo desde la identidad afrodescendiente.",
+    territory: "Chocó",
+    council: "Consejo Comunitario Diego Luis Córdoba",
+    department: "Chocó",
+    municipality: "Istmina",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["etnodesarrollo", "Diego Luis Córdoba", "planificación", "2024", "Chocó"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver plan",
+    fileSize: "5.81 MB",
+    url: spInternalUrl("PLAN DE ETNODESARROLLO/CC. DIEGO LUIS CORDOBA/PLAN ETNODESARROLLO DIEGO LUIS C%C3%93RDOBA 20241201.pdf"),
+  },
+  {
+    id: "doc-ped-martin-luther-king",
+    slug: "plan-etnodesarrollo-cc-martin-luther-king",
+    title: "Plan de Etnodesarrollo — CC Martin Luther King",
+    section: "Planes de etnodesarrollo",
+    type: "Plan de etnodesarrollo",
+    description:
+      "Plan de etnodesarrollo del Consejo Comunitario Martin Luther King con lineamientos de autonomía territorial, desarrollo propio y fortalecimiento organizativo comunitario.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Martin Luther King",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["etnodesarrollo", "Martin Luther King", "planificación", "autonomía"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver plan",
+    fileSize: "4.18 MB",
+    url: spInternalUrl("PLAN DE ETNODESARROLLO/CC. MARTIN LUTHER KING/PED MARTIN KUTHER KING.pdf"),
+  },
+  {
+    id: "doc-ped-nelson-mandela",
+    slug: "plan-etnodesarrollo-cc-nelson-mandela-2024",
+    title: "Plan de Etnodesarrollo — CC Nelson Mandela (2024)",
+    section: "Planes de etnodesarrollo",
+    type: "Plan de etnodesarrollo",
+    description:
+      "Plan de etnodesarrollo 2024 del Consejo Comunitario Nelson Mandela con estrategias de planeación propia, identidad cultural y proyección territorial a largo plazo.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Nelson Mandela",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["etnodesarrollo", "Nelson Mandela", "planificación", "2024"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver plan",
+    fileSize: "7.59 MB",
+    url: spInternalUrl("PLAN DE ETNODESARROLLO/CC. NELSON MANDELA/20241201 PLAN DE ETNODESARROLLO DE NELSON MANDELA.pdf"),
+  },
+
+  // ── PLAN DE USO Y MANEJO AMBIENTAL NEGRO — PUMANE ─────────────────────────
+
+  {
+    id: "doc-pumane-renacientes-diaspora",
+    slug: "pumane-cc-renacientes-diaspora-africana",
+    title: "PUMANE — CC Renacientes de la Diáspora Africana",
+    section: "Planes de uso y manejo",
+    type: "Plan de manejo",
+    description:
+      "Plan de Uso y Manejo Ambiental Negro (PUMANE) del Consejo Comunitario Renacientes de la Diáspora Africana, con zonificación territorial, manejo de recursos naturales y estrategias de conservación desde el conocimiento ancestral afrodescendiente.",
+    territory: "Nacional",
+    council: "Consejo Comunitario Renacientes de la Diáspora Africana",
+    department: "Nacional",
+    municipality: "Nacional",
+    year: 2024,
+    validity: "Vigente",
+    visibility: "internal",
+    keywords: ["PUMANE", "uso y manejo", "Renacientes", "diáspora africana", "conservación"],
+    genderFocus: false,
+    mjnTags: [],
+    action: "external",
+    fileLabel: "Ver PUMANE",
+    fileSize: "4.25 MB",
+    url: spInternalUrl("PLAN DE USO Y MANEJO AMBIENTAL NEGRO - PUMANE/RENACIENTES DE LA DIASPORA AFRICANA/PUMANE FINAL_CCCN_RENACIENTES_DE_LA_DI%C3%81SPORA_AFRICANA.pdf"),
+  },
+
   {
     id: "doc-manglar-baudó",
     slug: "plan-uso-manejo-manglar-baudo-2023",
@@ -1921,14 +2259,18 @@ export const adminQuickStats = [
 
 export function getVisibleDocuments(role: ViewerRole) {
   return documents.filter((document) => {
-    if (document.visibility === "sensitive") {
-      return false;
-    }
-    if (document.visibility === "internal") {
-      return role !== "public";
-    }
+    // Sensitive docs are never shown
+    if (document.visibility === "sensitive") return false;
+    // Internal docs are shown to everyone — download is gated in the UI layer
     return true;
   });
+}
+
+/** Returns true if the viewer can freely access/download this document */
+export function canDownloadDocument(role: ViewerRole, visibility: Visibility): boolean {
+  if (visibility === "sensitive") return false;
+  if (visibility === "internal") return role === "internal" || role === "admin";
+  return true;
 }
 
 export function getVisibleDashboards(role: ViewerRole) {

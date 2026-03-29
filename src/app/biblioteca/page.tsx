@@ -304,7 +304,7 @@ export default async function BibliotecaPage({
             {sectionActive === "Memoria viva del territorio" ? (
               <BibliotecaMemoriaGrid docs={pageResults} />
             ) : (
-              <BibliotecaDocGrid docs={pageResults} />
+              <BibliotecaDocGrid docs={pageResults} role={role} />
             )}
 
             {/* Pagination */}

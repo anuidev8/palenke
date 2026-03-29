@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Download, ExternalLink, Lock, PlayCircle, ChevronDown, ChevronUp } from "lucide-react";
-import type { DocumentRecord } from "@/lib/mock-data";
+import type { DocumentRecord, ViewerRole } from "@/lib/mock-data";
+import { canDownloadDocument } from "@/lib/mock-data";
 
 const typeMeta: Record<
   string,
@@ -79,8 +80,10 @@ function getDocumentAction(doc: DocumentRecord) {
 
 export default function BibliotecaDocGrid({
   docs,
+  role = "public",
 }: {
   docs: DocumentRecord[];
+  role?: ViewerRole;
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -96,6 +99,7 @@ export default function BibliotecaDocGrid({
         const ActionIcon = action.icon;
         const isFeatured = index % 6 === 0;
         const isExpanded = expandedId === doc.id;
+        const isGated = !canDownloadDocument(role, doc.visibility);
 
         return (
           <motion.article
@@ -179,15 +183,25 @@ export default function BibliotecaDocGrid({
                         <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: meta.accent }}>
                           {meta.eyebrow}
                         </p>
-                        <a
-                          href={action.href}
-                          {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                          className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3"
-                          style={{ color: meta.accent }}
-                        >
-                          {action.label}
-                          <ActionIcon className="h-4 w-4" aria-hidden="true" />
-                        </a>
+                        {isGated ? (
+                          <a
+                            href={`/login?redirect=/biblioteca&message=internal`}
+                            className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3 text-[#7a756e]"
+                          >
+                            <Lock className="h-4 w-4" aria-hidden="true" />
+                            Iniciar sesión para acceder
+                          </a>
+                        ) : (
+                          <a
+                            href={action.href}
+                            {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                            className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3"
+                            style={{ color: meta.accent }}
+                          >
+                            {action.label}
+                            <ActionIcon className="h-4 w-4" aria-hidden="true" />
+                          </a>
+                        )}
                       </div>
 
                       <button
@@ -257,15 +271,25 @@ export default function BibliotecaDocGrid({
                           Acción principal
                         </p>
                         <div className="mt-1">
-                          <a
-                            href={action.href}
-                            {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                            className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3"
-                            style={{ color: meta.accent }}
-                          >
-                            {action.label}
-                            <ActionIcon className="h-4 w-4" aria-hidden="true" />
-                          </a>
+                          {isGated ? (
+                            <a
+                              href={`/login?redirect=/biblioteca&message=internal`}
+                              className="inline-flex items-center gap-2 text-base font-semibold text-[#7a756e] transition hover:gap-3"
+                            >
+                              <Lock className="h-4 w-4" aria-hidden="true" />
+                              Iniciar sesión para acceder
+                            </a>
+                          ) : (
+                            <a
+                              href={action.href}
+                              {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                              className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3"
+                              style={{ color: meta.accent }}
+                            >
+                              {action.label}
+                              <ActionIcon className="h-4 w-4" aria-hidden="true" />
+                            </a>
+                          )}
                         </div>
                       </div>
                     </div>

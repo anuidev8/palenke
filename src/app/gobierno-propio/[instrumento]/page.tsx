@@ -5,7 +5,7 @@ import path from "path";
 import { ArrowLeft, ArrowRight, BookOpen, Download, Droplets, ExternalLink, FileText, Gavel, Leaf, Scale, Lock, UserCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import { SiteLayout } from "@/components/mock/ui";
-import { getVisibleDocuments } from "@/lib/mock-data";
+import { getVisibleDocuments, canDownloadDocument } from "@/lib/mock-data";
 import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
@@ -382,37 +382,49 @@ export default async function InstrumentoPage({
                         <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] font-medium text-base">{doc.year}</td>
                         <td className="px-6 py-5">
                           <div className="flex flex-col gap-2">
-                            {doc.action === "file" ? (
+                            {!canDownloadDocument(role, doc.visibility) ? (
                               <a
-                                href={doc.url}
-                                download
-                                className="inline-flex w-max items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white transition hover:bg-black"
+                                href="/login?redirect=/gobierno-propio&message=internal"
+                                className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
                               >
-                                <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                                Descargar
+                                <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                                Iniciar sesión para acceder
                               </a>
-                            ) : null}
-                            {doc.sourceUrl ? (
-                              <a
-                                href={doc.sourceUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                Fuente oficial
-                              </a>
-                            ) : doc.action === "external" ? (
-                              <a
-                                href={doc.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                {doc.fileLabel}
-                              </a>
-                            ) : null}
+                            ) : (
+                              <>
+                                {doc.action === "file" ? (
+                                  <a
+                                    href={doc.url}
+                                    download
+                                    className="inline-flex w-max items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white transition hover:bg-black"
+                                  >
+                                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                                    Descargar
+                                  </a>
+                                ) : null}
+                                {doc.sourceUrl ? (
+                                  <a
+                                    href={doc.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                                    Fuente oficial
+                                  </a>
+                                ) : doc.action === "external" ? (
+                                  <a
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                                    {doc.fileLabel}
+                                  </a>
+                                ) : null}
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
