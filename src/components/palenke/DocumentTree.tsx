@@ -1,7 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight, ChevronDown, FileText, Download, Lock, ExternalLink, Folder } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ChevronRight, 
+  FileText, 
+  Download, 
+  Lock, 
+  ExternalLink, 
+  Folder as FolderIcon,
+  Search,
+  Home,
+  X
+} from "lucide-react";
 import { type ViewerRole, canDownloadDocument } from "@/lib/mock-data";
 
 export type DocumentVisibility = "public" | "internal" | "sensitive";
@@ -30,21 +41,24 @@ type TreeNode = {
   doc?: DisplayDoc;
 };
 
+function hexToRgba(hex: string, alpha: number) {
+  const cleanHex = hex.replace("#", "");
+  const r = parseInt(cleanHex.slice(0, 2), 16) || 0;
+  const g = parseInt(cleanHex.slice(2, 4), 16) || 0;
+  const b = parseInt(cleanHex.slice(4, 6), 16) || 0;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function buildTree(docs: DisplayDoc[]): TreeNode[] {
   const root: TreeNode = { name: "root", path: "", type: "folder", children: [] };
 
   docs.forEach((doc) => {
-    // Determine the path to use
     let pathStr = doc.storagePath;
     if (!pathStr) {
-      // Fallback if no storage path: Territory -> File
       pathStr = `${doc.territory}/${doc.title}`;
     } else {
-      // Remove instrument prefix if present (e.g. "reglamentos/cc-foo/file.pdf" -> "cc-foo/file.pdf")
       const parts = pathStr.split("/");
       if (parts.length > 2) {
-        // e.g. reglamentos / cc-foo / file.pdf
-        // We drop the first part (instrument) to make the council the top level folder
         pathStr = parts.slice(1).join("/");
       }
     }
@@ -66,13 +80,10 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
         };
         if (isFile) {
           child.doc = doc;
-          // Format filename
           child.name = doc.title; 
         }
         currentNode.children.push(child);
       } else if (isFile && child.type === "file") {
-        // If there's a name collision, we just replace or skip.
-        // We'll replace it.
         child.doc = doc;
         child.name = doc.title;
       }
@@ -80,7 +91,6 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
     }
   });
 
-  // Sort: folders first, then files. Alphabetical within each type.
   const sortTree = (node: TreeNode) => {
     node.children.sort((a, b) => {
       if (a.type === b.type) {
@@ -95,92 +105,97 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
   return root.children;
 }
 
-function FolderNode({ node, color, role, level = 0 }: { node: TreeNode; color: string; role: ViewerRole; level?: number }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Auto-open top level
-  useState(() => {
-    if (level === 0) setIsOpen(true);
-  });
-
-  const toggle = () => setIsOpen(!isOpen);
-
+function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; onClick: () => void }) {
+  const bgAlpha = hexToRgba(color, 0.1);
   return (
-    <div className="flex flex-col select-none">
-      <div
-        className="flex items-center gap-3 py-3 px-4 hover:bg-[#fcfaf7] cursor-pointer rounded-lg transition-colors border-l-2 border-transparent"
-        style={{ paddingLeft: `${(level + 1) * 16}px` }}
-        onClick={toggle}
-      >
-        <button className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-[#e8dfd3] transition-colors" style={{ color }}>
-          {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-        </button>
-        <Folder className="w-5 h-5" style={{ fill: color, color }} />
-        <span className="font-bold text-[#1a1a1a] text-base">{node.name.replace(/-/g, " ").toUpperCase()}</span>
-      </div>
+    <motion.button
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="flex flex-col text-left p-6 bg-white rounded-[24px] border border-[#e8dfd3] shadow-sm transition-all relative overflow-hidden group"
+    >
+      <div 
+        className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full opacity-0 blur-3xl transition-all duration-700 group-hover:opacity-10 group-hover:scale-150 pointer-events-none" 
+        style={{ backgroundColor: color }} 
+      />
 
-      {isOpen && (
-        <div className="flex flex-col">
-          {node.children.map((child, idx) => (
-            child.type === "folder" ? (
-              <FolderNode key={`${child.path}-${idx}`} node={child} color={color} role={role} level={level + 1} />
-            ) : (
-              <FileNode key={`${child.path}-${idx}`} node={child} color={color} role={role} level={level + 1} />
-            )
-          ))}
+      <div className="flex items-start justify-between mb-6 relative z-10 w-full">
+        <div 
+          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner"
+          style={{ backgroundColor: bgAlpha, color }}
+        >
+          <FolderIcon className="w-7 h-7 fill-current" />
         </div>
-      )}
-    </div>
+        <span className="text-xs font-bold text-[#7a756e] bg-[#fcfaf7] border border-[#e8dfd3] px-3 py-1.5 rounded-full shadow-sm">
+          {node.children.length} {node.children.length === 1 ? 'ítem' : 'ítems'}
+        </span>
+      </div>
+      <h3 className="font-bold text-[#1a1a1a] text-lg leading-tight line-clamp-2 relative z-10" title={node.name}>
+        {node.name.replace(/-/g, " ").toUpperCase()}
+      </h3>
+    </motion.button>
   );
 }
 
-function FileNode({ node, color, role, level = 0 }: { node: TreeNode; color: string; role: ViewerRole; level?: number }) {
-  const doc = node.doc!;
+function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; color: string }) {
   const hasAccess = canDownloadDocument(role, doc.visibility);
   
-  const handleDownload = (e: React.MouseEvent) => {
-    if (!doc.usesSignedUrl) {
-      // Let it act as a normal link with download attr
-      return;
-    }
-  };
-
   return (
-    <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 pr-6 hover:bg-[#fcfaf7] transition-colors border-t border-[#e8dfd3]/50 group"
-      style={{ paddingLeft: `${(level + 1) * 16 + 36}px` }}
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="flex flex-col bg-white rounded-[24px] border border-[#e8dfd3] shadow-sm overflow-hidden group hover:shadow-md transition-shadow"
     >
-      <div className="flex items-start gap-3">
-        <FileText className="w-5 h-5 mt-0.5 shrink-0 text-[#7a756e] group-hover:text-[#4a4540] transition-colors" />
-        <div>
-          <p className="font-medium text-[#1a1a1a] text-base group-hover:text-black transition-colors">{doc.title}</p>
-          <div className="flex items-center gap-3 mt-1.5 text-xs text-[#7a756e]">
-            <span className="font-medium uppercase tracking-wider">{doc.territory}</span>
-            <span>•</span>
-            <span>{doc.year}</span>
+      <div className="p-6 flex-1 flex flex-col relative overflow-hidden">
+        {/* Decorative corner accent */}
+        <div 
+          className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-3xl transition-transform duration-700 group-hover:scale-150 pointer-events-none" 
+          style={{ backgroundColor: color }} 
+        />
+        
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 bg-[#f4f1ec] text-[#4a4540] group-hover:bg-[#e8dfd3] transition-colors relative z-10 shadow-inner">
+          <FileText className="w-6 h-6" />
+        </div>
+        
+        <h3 className="font-bold text-[#1a1a1a] text-xl leading-tight mb-4 line-clamp-3 relative z-10" title={doc.title}>
+          {doc.title}
+        </h3>
+        
+        <div className="mt-auto relative z-10">
+          <p className="text-sm font-bold text-[#4a4540] mb-1.5 line-clamp-1" title={doc.territory}>{doc.territory}</p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-[#7a756e] uppercase tracking-wider">{doc.year}</span>
+            <span className="text-[#d1ccc5]">•</span>
+            <span className="text-xs font-bold text-[#7a756e] uppercase tracking-wider">{doc.type}</span>
           </div>
         </div>
       </div>
-
-      <div className="flex items-center sm:ml-auto">
+      
+      <div className="p-4 border-t border-[#e8dfd3] bg-[#fcfaf7]">
         {!hasAccess ? (
           <a
             href="/login?redirect=/gobierno-propio&message=internal"
-            className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
           >
-            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-            Iniciar sesión
+            <Lock className="h-4 w-4" aria-hidden="true" />
+            Acceso restringido
           </a>
         ) : (
           <>
             {doc.action === "file" ? (
               <a
                 href={doc.url}
-                onClick={handleDownload}
                 {...(doc.usesSignedUrl ? {} : { download: true })}
-                className="inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-black shadow-sm hover:shadow-md"
+                className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+                style={{ backgroundColor: color }}
               >
-                <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                <Download className="h-4 w-4" aria-hidden="true" />
                 Descargar
               </a>
             ) : null}
@@ -189,9 +204,9 @@ function FileNode({ node, color, role, level = 0 }: { node: TreeNode; color: str
                 href={doc.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-5 py-2.5 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
               >
-                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 Fuente oficial
               </a>
             ) : doc.action === "external" ? (
@@ -199,47 +214,180 @@ function FileNode({ node, color, role, level = 0 }: { node: TreeNode; color: str
                 href={doc.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-5 py-2.5 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
               >
-                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 {doc.fileLabel}
               </a>
             ) : null}
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export function DocumentTree({ docs, role, color }: { docs: DisplayDoc[]; role: ViewerRole; color: string }) {
-  const tree = buildTree(docs);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPath, setCurrentPath] = useState<string[]>([]);
+
+  const tree = useMemo(() => buildTree(docs), [docs]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const query = searchQuery.toLowerCase();
+    return docs.filter(doc => 
+      doc.title.toLowerCase().includes(query) || 
+      doc.territory.toLowerCase().includes(query)
+    );
+  }, [docs, searchQuery]);
+
+  const currentNode = useMemo(() => {
+    let node: TreeNode = { name: "root", path: "", type: "folder", children: tree };
+    for (const segment of currentPath) {
+      const nextNode = node.children.find(c => c.name === segment && c.type === "folder");
+      if (nextNode) node = nextNode;
+      else break;
+    }
+    return node;
+  }, [tree, currentPath]);
 
   if (docs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-3xl border border-[#e8dfd3] border-dashed">
-        <Folder className="w-12 h-12 text-[#d1ccc5] mb-4" />
-        <p className="text-[#7a756e] font-medium text-center">No hay documentos internos disponibles.</p>
+      <div className="flex flex-col items-center justify-center py-24 px-4 bg-[#fcfaf7] rounded-[32px] border border-[#e8dfd3] border-dashed">
+        <FolderIcon className="w-16 h-16 text-[#d1ccc5] mb-6" />
+        <p className="text-[#4a4540] text-lg font-medium text-center">No hay documentos internos disponibles.</p>
       </div>
     );
   }
 
+  const handleNavigate = (segment: string) => {
+    setCurrentPath([...currentPath, segment]);
+  };
+
+  const handleBreadcrumb = (idx: number) => {
+    setCurrentPath(currentPath.slice(0, idx + 1));
+  };
+
+  const itemsToRender = searchResults !== null 
+    ? searchResults.map(doc => ({ type: "file" as const, doc, key: doc.id }))
+    : currentNode.children.map(child => ({ 
+        type: child.type, 
+        node: child, 
+        doc: child.doc,
+        key: child.path 
+      }));
+
   return (
-    <div className="relative bg-white rounded-[24px] border border-[#e8dfd3] shadow-lg overflow-hidden pb-4">
-      {/* Subtle modern gradient overlay */}
-      <div 
-        className="absolute top-0 left-0 w-full h-32 opacity-10 pointer-events-none mix-blend-multiply" 
-        style={{ background: `linear-gradient(to bottom, ${color}, transparent)` }}
-      />
-      <div className="relative z-10 pt-2">
-        {tree.map((node, idx) => (
-          node.type === "folder" ? (
-            <FolderNode key={`${node.path}-${idx}`} node={node} color={color} role={role} />
-          ) : (
-            <FileNode key={`${node.path}-${idx}`} node={node} color={color} role={role} />
-          )
-        ))}
+    <div className="flex flex-col gap-8">
+      {/* Navigation & Search Head */}
+      <div className="bg-white rounded-[32px] border border-[#e8dfd3] p-6 shadow-sm relative overflow-hidden">
+        {/* Subtle accent glow top-right */}
+        <div 
+          className="absolute -top-24 -right-24 w-64 h-64 rounded-full opacity-[0.03] blur-3xl pointer-events-none" 
+          style={{ backgroundColor: color }} 
+        />
+        
+        <div className="relative z-10">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-[#7a756e]" />
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por título o territorio..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-12 pr-12 py-4 bg-[#fcfaf7] border border-[#e8dfd3] rounded-2xl text-[#1a1a1a] placeholder-[#7a756e] focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all font-medium text-base shadow-inner"
+              style={{ '--tw-ring-color': hexToRgba(color, 0.5) } as React.CSSProperties}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-5 flex items-center text-[#7a756e] hover:text-[#1a1a1a] transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Breadcrumbs */}
+          {!searchResults && (
+            <div className="flex items-center gap-2 mt-6 overflow-x-auto pb-2 scrollbar-hide">
+              <button 
+                onClick={() => setCurrentPath([])}
+                className={`flex items-center gap-1.5 transition-colors font-medium px-3 py-1.5 rounded-lg ${currentPath.length === 0 ? 'bg-[#f4f1ec] text-[#1a1a1a]' : 'hover:bg-[#f4f1ec] text-[#7a756e] hover:text-[#1a1a1a]'}`}
+              >
+                <Home className="w-4 h-4" />
+                <span>Inicio</span>
+              </button>
+              {currentPath.map((segment, idx) => (
+                <React.Fragment key={idx}>
+                  <ChevronRight className="w-4 h-4 text-[#d1ccc5] shrink-0" />
+                  <button 
+                    onClick={() => handleBreadcrumb(idx)}
+                    className={`transition-colors whitespace-nowrap font-medium px-3 py-1.5 rounded-lg ${idx === currentPath.length - 1 ? 'bg-[#f4f1ec] text-[#1a1a1a]' : 'hover:bg-[#f4f1ec] text-[#7a756e] hover:text-[#1a1a1a]'}`}
+                  >
+                    {segment.replace(/-/g, " ").toUpperCase()}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Grid Content */}
+      {itemsToRender.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 px-4 bg-white rounded-[32px] border border-[#e8dfd3] shadow-sm">
+          <div className="w-20 h-20 rounded-full bg-[#f4f1ec] flex items-center justify-center mb-6 shadow-inner">
+            <Search className="w-8 h-8 text-[#a39f98]" />
+          </div>
+          <p className="text-[#4a4540] text-lg font-bold text-center mb-2">
+            {searchResults !== null ? "No se encontraron documentos" : "Esta carpeta está vacía"}
+          </p>
+          <p className="text-[#7a756e] text-center max-w-sm">
+            {searchResults !== null 
+              ? "Prueba buscar con otras palabras o limpia la búsqueda." 
+              : "No hay archivos disponibles en este directorio actualmente."}
+          </p>
+          {searchResults !== null && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="mt-6 font-bold text-sm px-6 py-3 rounded-xl bg-white border border-[#e8dfd3] shadow-sm hover:bg-[#f8f5f2] transition-colors"
+            >
+              Limpiar búsqueda
+            </button>
+          )}
+        </div>
+      ) : (
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence mode="popLayout">
+            {itemsToRender.map(item => {
+              if (item.type === "folder" && item.node) {
+                return (
+                  <FolderCard 
+                    key={item.key} 
+                    node={item.node} 
+                    color={color} 
+                    onClick={() => handleNavigate(item.node!.name)} 
+                  />
+                );
+              } else if (item.type === "file" && item.doc) {
+                return (
+                  <FileCard 
+                    key={item.key} 
+                    doc={item.doc} 
+                    role={role} 
+                    color={color} 
+                  />
+                );
+              }
+              return null;
+            })}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </div>
   );
 }
