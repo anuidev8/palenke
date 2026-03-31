@@ -160,20 +160,7 @@ type SupabaseInstrumentDoc = {
   created_at: string;
 };
 
-type DisplayDoc = {
-  id: string;
-  title: string;
-  section: string;
-  type: string;
-  territory: string;
-  year: string;
-  visibility: DocumentVisibility;
-  action: "file" | "external" | "video";
-  fileLabel: string;
-  url: string;
-  sourceUrl?: string;
-  usesSignedUrl: boolean;
-};
+import { DocumentTree, type DisplayDoc } from "@/components/palenke/DocumentTree";
 
 const dbInstrumentMap: Partial<Record<InstrumentoSlug, string>> = {
   reglamentos: "reglamentos",
@@ -236,6 +223,7 @@ function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): 
       ? (doc.storage_path as string)
       : `/api/documents/${doc.id}/signed-url?mode=redirect`,
     usesSignedUrl,
+    storagePath: doc.storage_path,
   };
 }
 
@@ -270,7 +258,7 @@ export default async function InstrumentoPage({
 
   const tableDbDocs = dbDocs.filter((d) => d.visibility !== "public");
   const displayDocs: DisplayDoc[] = usesSupabaseDocs
-    ? tableDbDocs.slice(0, 4).map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
+    ? tableDbDocs.map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
     : [];
 
   const isPublic = role === "public";
@@ -455,106 +443,10 @@ export default async function InstrumentoPage({
                   <h2 className="font-display text-3xl text-[#1a1a1a]">Documentos recientes</h2>
                   <p className="mt-2 text-[#4a4540] text-lg">Mostrando documentos internos relacionados a este instrumento.</p>
                 </div>
-                <Link
-                  href={withRole(`/biblioteca?section=${encodeURIComponent(inst.librarySection)}`, role)}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 rounded-full border-2 px-6 py-3 text-sm font-bold transition hover:opacity-80"
-                  style={{ borderColor: inst.color, color: inst.color }}
-                >
-                  Ver todos en biblioteca
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
               </div>
 
-              <div className="overflow-hidden rounded-[24px] border border-[#e8dfd3] shadow-sm">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr style={{ background: inst.color }}>
-                      {["Título", "Tipo", "Territorio", "Año", "Acciones"].map((h) => (
-                        <th
-                          key={h}
-                          className="px-6 py-4 text-xs font-bold uppercase tracking-[0.14em] text-white"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e8dfd3] bg-white">
-                    {displayDocs.map((doc) => {
-                      const usesSignedUrl = doc.usesSignedUrl;
-                      const downloadHref = doc.url;
+              <DocumentTree docs={displayDocs} role={role} color={inst.color} />
 
-                      return (
-                        <tr key={doc.id} className="align-top transition-colors hover:bg-[#fcfaf7]">
-                          <td className="px-6 py-5">
-                            <p className="font-bold text-[#1a1a1a] text-base">{doc.title}</p>
-                            <p className="mt-1.5 text-xs font-medium text-[#7a756e] uppercase tracking-wider">
-                              {doc.section}
-                            </p>
-                          </td>
-                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.type}</td>
-                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.territory}</td>
-                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] font-medium text-base">{doc.year}</td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col gap-2">
-                              {!canDownloadDocument(role, doc.visibility) ? (
-                                <a
-                                  href="/login?redirect=/gobierno-propio&message=internal"
-                                  className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
-                                >
-                                  <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                                  Iniciar sesión para acceder
-                                </a>
-                              ) : (
-                                <>
-                                  {doc.action === "file" ? (
-                                    <a
-                                      href={downloadHref}
-                                      {...(usesSignedUrl ? {} : { download: true })}
-                                      className="inline-flex w-max items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white transition hover:bg-black"
-                                    >
-                                      <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                                      Descargar
-                                    </a>
-                                  ) : null}
-                                  {doc.sourceUrl ? (
-                                    <a
-                                      href={doc.sourceUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                                    >
-                                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                      Fuente oficial
-                                    </a>
-                                  ) : doc.action === "external" ? (
-                                    <a
-                                      href={doc.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                                    >
-                                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                      {doc.fileLabel}
-                                    </a>
-                                  ) : null}
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {displayDocs.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="px-6 py-10 text-center text-sm text-[#7a756e]">
-                          No hay documentos disponibles para este instrumento.
-                        </td>
-                      </tr>
-                    ) : null}
-                  </tbody>
-                </table>
-              </div>
               {dbMode === "query-error" ? (
                 <p className="mt-4 text-sm text-[#9c5d00]">
                   No se pudo consultar la base de datos para este instrumento.

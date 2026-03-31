@@ -69,7 +69,7 @@ export async function GET(
     }
     const { data: signedData, error: signedError } = await supabase.storage
       .from(document.storage_bucket)
-      .createSignedUrl(document.storage_path, 3600);
+      .createSignedUrl(document.storage_path, 3600, { download: true });
     if (signedError || !signedData?.signedUrl) {
       return NextResponse.json({ error: "Failed to generate signed URL." }, { status: 500 });
     }
@@ -128,7 +128,7 @@ export async function GET(
   const expiresIn = visibility === "sensitive" ? 1800 : 3600;
   const { data: signedData, error: signedError } = await supabase.storage
     .from(document.storage_bucket)
-    .createSignedUrl(document.storage_path, expiresIn);
+    .createSignedUrl(document.storage_path, expiresIn, { download: true });
 
   if (signedError || !signedData?.signedUrl) {
     return NextResponse.json(
