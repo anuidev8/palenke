@@ -155,7 +155,40 @@ function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; o
 
 function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; color: string }) {
   const hasAccess = canDownloadDocument(role, doc.visibility);
-  
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!doc.usesSignedUrl) return; // Proceed with direct download native behavior
+    
+    e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
+
+    try {
+      // Fetch signed url via API without mode=redirect so we can get JSON
+      const url = doc.url.replace("?mode=redirect", "");
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to get download URL");
+      }
+      const data = await res.json();
+      if (data.url) {
+        // Create an invisible iframe/link to trigger download seamlessly without leaving page
+        const link = document.createElement("a");
+        link.href = data.url;
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error("Download failed", error);
+    } finally {
+      // Add slight artificial delay to make loading state visible if it resolves instantly
+      setTimeout(() => setIsLoading(false), 800);
+    }
+  };
+
   return (
     <motion.div
       layout
@@ -172,17 +205,17 @@ function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; col
         />
         
         {/* Modern Mac-style File Icon */}
-        <div className="relative w-14 h-[72px] mb-5 transition-transform group-hover:scale-105 z-10">
+        <div className="relative w-10 h-[52px] mb-5 transition-transform group-hover:scale-105 z-10">
           {/* File Base */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#f8f5f2] to-[#e8dfd3] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/50 overflow-hidden">
             {/* Horizontal lines to mock text */}
-            <div className="absolute top-6 left-3 w-8 h-0.5 bg-black/10 rounded-full" />
-            <div className="absolute top-8 left-3 w-6 h-0.5 bg-black/10 rounded-full" />
-            <div className="absolute top-10 left-3 w-7 h-0.5 bg-black/10 rounded-full" />
-            <div className="absolute top-12 left-3 w-5 h-0.5 bg-black/10 rounded-full" />
+            <div className="absolute top-4 left-2 w-5 h-[1.5px] bg-black/10 rounded-full" />
+            <div className="absolute top-[22px] left-2 w-4 h-[1.5px] bg-black/10 rounded-full" />
+            <div className="absolute top-[28px] left-2 w-[18px] h-[1.5px] bg-black/10 rounded-full" />
+            <div className="absolute top-[34px] left-2 w-3 h-[1.5px] bg-black/10 rounded-full" />
             
             {/* PDF Tag */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#d32f2f] text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 bg-[#d32f2f] text-white text-[7px] font-black px-1 py-0.5 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.1)] leading-none">
               PDF
             </div>
           </div>
@@ -218,12 +251,25 @@ function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; col
             {doc.action === "file" ? (
               <a
                 href={doc.url}
+                onClick={handleDownload}
                 {...(doc.usesSignedUrl ? {} : { download: true })}
-                className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+                className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition-all shadow-sm hover:shadow-md ${isLoading ? 'opacity-80 cursor-not-allowed scale-[0.98]' : 'hover:-translate-y-0.5'}`}
                 style={{ backgroundColor: color }}
               >
-                <Download className="h-4 w-4" aria-hidden="true" />
-                Descargar
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Preparando...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    Descargar
+                  </>
+                )}
               </a>
             ) : null}
             {doc.sourceUrl ? (
