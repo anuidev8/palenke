@@ -106,14 +106,14 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
 }
 
 function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; onClick: () => void }) {
-  const bgAlpha = hexToRgba(color, 0.1);
+  const bgAlpha = hexToRgba(color, 0.15);
   return (
     <motion.button
       layout
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+      whileHover={{ y: -4, boxShadow: "0 12px 30px -5px rgba(0, 0, 0, 0.08)" }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className="flex flex-col text-left p-6 bg-white rounded-[24px] border border-[#e8dfd3] shadow-sm transition-all relative overflow-hidden group"
@@ -124,16 +124,28 @@ function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; o
       />
 
       <div className="flex items-start justify-between mb-6 relative z-10 w-full">
-        <div 
-          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner"
-          style={{ backgroundColor: bgAlpha, color }}
-        >
-          <FolderIcon className="w-7 h-7 fill-current" />
+        {/* Modern Dribbble-style Folder Icon */}
+        <div className="relative w-16 h-14 transition-transform group-hover:scale-105">
+          {/* Back flap (Tab) */}
+          <div 
+            className="absolute top-0 left-0 w-8 h-4 rounded-tl-xl rounded-tr-md"
+            style={{ backgroundColor: color, opacity: 0.4 }}
+          />
+          {/* Front flap */}
+          <div 
+            className="absolute bottom-0 left-0 w-full h-11 rounded-xl shadow-sm border border-black/5"
+            style={{ backgroundColor: color, opacity: 0.9 }}
+          >
+             {/* Subtle internal shine/gradient on folder front */}
+             <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+          </div>
         </div>
-        <span className="text-xs font-bold text-[#7a756e] bg-[#fcfaf7] border border-[#e8dfd3] px-3 py-1.5 rounded-full shadow-sm">
+        
+        <span className="text-xs font-bold text-[#7a756e] bg-[#fcfaf7] border border-[#e8dfd3] px-3 py-1.5 rounded-full shadow-sm mt-1">
           {node.children.length} {node.children.length === 1 ? 'ítem' : 'ítems'}
         </span>
       </div>
+      
       <h3 className="font-bold text-[#1a1a1a] text-lg leading-tight line-clamp-2 relative z-10" title={node.name}>
         {node.name.replace(/-/g, " ").toUpperCase()}
       </h3>
@@ -159,8 +171,23 @@ function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; col
           style={{ backgroundColor: color }} 
         />
         
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 bg-[#f4f1ec] text-[#4a4540] group-hover:bg-[#e8dfd3] transition-colors relative z-10 shadow-inner">
-          <FileText className="w-6 h-6" />
+        {/* Modern Mac-style File Icon */}
+        <div className="relative w-14 h-[72px] mb-5 transition-transform group-hover:scale-105 z-10">
+          {/* File Base */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#f8f5f2] to-[#e8dfd3] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/50 overflow-hidden">
+            {/* Horizontal lines to mock text */}
+            <div className="absolute top-6 left-3 w-8 h-0.5 bg-black/10 rounded-full" />
+            <div className="absolute top-8 left-3 w-6 h-0.5 bg-black/10 rounded-full" />
+            <div className="absolute top-10 left-3 w-7 h-0.5 bg-black/10 rounded-full" />
+            <div className="absolute top-12 left-3 w-5 h-0.5 bg-black/10 rounded-full" />
+            
+            {/* PDF Tag */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#d32f2f] text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">
+              PDF
+            </div>
+          </div>
+          {/* Folded Corner */}
+          <div className="absolute top-0 right-0 w-4 h-4 bg-gradient-to-bl from-transparent via-[#fcfaf7] to-[#e8dfd3] border-b border-l border-white/40 shadow-sm rounded-bl-lg" />
         </div>
         
         <h3 className="font-bold text-[#1a1a1a] text-xl leading-tight mb-4 line-clamp-3 relative z-10" title={doc.title}>
