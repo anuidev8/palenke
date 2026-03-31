@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/viewer";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { createSupabaseService } from "@/lib/supabase/service";
 import {
+  getRutaMetodologicaStoragePath,
   getRutaMetodologicaTitleForInstrument,
   isRutaMetodologicaInstrument,
   type RutaMetodologicaInstrument,
@@ -61,7 +62,7 @@ export async function uploadRutaMetodologica(formData: FormData) {
     const titleInput = asText(formData, "title");
     const title = titleInput || getRutaMetodologicaTitleForInstrument(instrument);
     const storageBucket = "docs-public";
-    const storagePath = `${instrument}/base.pdf`;
+    const storagePath = getRutaMetodologicaStoragePath(instrument);
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const supabase = createSupabaseService();
@@ -77,20 +78,45 @@ export async function uploadRutaMetodologica(formData: FormData) {
       throw new Error(`No se pudo subir el archivo: ${uploadError.message}`);
     }
 
-    const { error: upsertError } = await supabase.from("documents").upsert(
-      {
+    const { data: existingPublicDoc, error: existingDocError } = await supabase
+      .from("documents")
+      .select("id")
+      .eq("instrument", instrument)
+      .eq("visibility", "public")
+      .limit(1)
+      .maybeSingle();
+
+    if (existingDocError) {
+      throw new Error(`No se pudo verificar metadata existente: ${existingDocError.message}`);
+    }
+
+    if (existingPublicDoc?.id) {
+      const { error: updateError } = await supabase
+        .from("documents")
+        .update({
+          title,
+          council: "Palenke PCN",
+          visibility: "public",
+          storage_bucket: storageBucket,
+          storage_path: storagePath,
+        })
+        .eq("id", existingPublicDoc.id);
+
+      if (updateError) {
+        throw new Error(`No se pudo actualizar metadata en documentos: ${updateError.message}`);
+      }
+    } else {
+      const { error: insertError } = await supabase.from("documents").insert({
         title,
         instrument,
         council: "Palenke PCN",
         visibility: "public",
         storage_bucket: storageBucket,
         storage_path: storagePath,
-      },
-      { onConflict: "instrument,storage_path" },
-    );
-
-    if (upsertError) {
-      throw new Error(`No se pudo guardar metadata en documentos: ${upsertError.message}`);
+      });
+      if (insertError) {
+        throw new Error(`No se pudo crear metadata en documentos: ${insertError.message}`);
+      }
     }
 
     revalidatePath("/admin/documentos");
