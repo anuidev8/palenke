@@ -34,9 +34,14 @@ export default async function AdminDocumentosPage({
     >
       <Toolbar
         actions={
-          <Link href={withRole("/admin/documentos/nuevo", role)} className="button-primary">
-            + Nuevo doc
-          </Link>
+          <>
+            <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="button-secondary">
+              Rutas metodológicas
+            </Link>
+            <Link href={withRole("/admin/documentos/nuevo", role)} className="button-primary">
+              + Nuevo doc
+            </Link>
+          </>
         }
       >
         <form action="/admin/documentos" className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">

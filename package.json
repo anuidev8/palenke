@@ -8,15 +8,25 @@
     "start": "next start",
     "lint": "eslint",
     "generate:hero-posters": "node scripts/generate-hero-card-posters.mjs",
-    "generate:hero-poster": "node scripts/generate-hero-card-posters.mjs"
+    "generate:hero-poster": "node scripts/generate-hero-card-posters.mjs",
+    "sync:plan-instrumentos-storage": "node scripts/upload-plan-instrumentos-storage.mjs",
+    "sync:plan-instrumentos-storage:dry": "node scripts/upload-plan-instrumentos-storage.mjs --dry-run",
+    "sync:plan-instrumentos-storage:verify": "node scripts/upload-plan-instrumentos-storage.mjs --verify",
+    "sync:plan-instrumentos-storage:verify-db": "node scripts/upload-plan-instrumentos-storage.mjs --verify-db",
+    "verify:plan-instrumentos-auth-e2e": "node scripts/verify-plan-instrumentos-auth-e2e.mjs",
+    "verify:plan-instrumentos-admin-actions-e2e": "node scripts/verify-plan-instrumentos-admin-actions-e2e.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.100.1",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "resend": "^6.9.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Callout, DetailList, SiteLayout, VisibilityBadge } from "@/components/mock/ui";
+import { hasSupabaseServiceConfig } from "@/lib/config";
 import { findDocumentBySlug } from "@/lib/mock-data";
 import { canOpenSiteVisibility, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
@@ -15,6 +16,7 @@ export default async function DocumentoDetallePage({
   const query = await searchParams;
   const role = getViewerRole(query);
   const document = findDocumentBySlug(slug);
+  const supportsSignedDownloads = hasSupabaseServiceConfig();
 
   if (!document || document.visibility === "sensitive") {
     notFound();
@@ -23,6 +25,11 @@ export default async function DocumentoDetallePage({
   if (!canOpenSiteVisibility(role, document.visibility)) {
     redirect(withRole("/acceso-restringido", role, { redirect: `/biblioteca/${slug}` }));
   }
+
+  const usesSignedUrl = document.visibility !== "public" && supportsSignedDownloads;
+  const downloadHref = usesSignedUrl
+    ? `/api/documents/${document.id}/signed-url?mode=redirect`
+    : document.url;
 
   return (
     <SiteLayout
@@ -87,7 +94,7 @@ export default async function DocumentoDetallePage({
           ) : (
             <div className="space-y-3 border-t border-[color:var(--border-soft)] pt-6">
               <div className="flex flex-wrap items-center gap-3">
-                <a href={document.url} className="button-primary">
+                <a href={downloadHref} {...(usesSignedUrl ? {} : { download: true })} className="button-primary">
                   {document.fileLabel}
                 </a>
                 {document.fileSize ? <span className="text-sm text-[color:var(--muted)]">Tamaño del archivo: {document.fileSize}</span> : null}
@@ -114,4 +121,3 @@ export default async function DocumentoDetallePage({
     </SiteLayout>
   );
 }
-

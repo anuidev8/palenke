@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Callout, Field, SiteLayout, TextInput } from "@/components/mock/ui";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { Callout, SiteLayout } from "@/components/mock/ui";
+import { hasSupabasePublicConfig } from "@/lib/config";
 import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function LoginPage({
@@ -12,6 +14,7 @@ export default async function LoginPage({
   const state = getFirstParam(params.state);
   const redirectTo = getFirstParam(params.redirect) ?? "/";
   const message = getFirstParam(params.message);
+  const supabaseReady = hasSupabasePublicConfig();
 
   const contextualMessage =
     message === "geoportal"
@@ -35,15 +38,9 @@ export default async function LoginPage({
             </Callout>
           ) : null}
 
-          <form className="grid gap-5">
-            <Field label="Correo electrónico" required error={state === "error" ? "Correo o contraseña incorrectos." : undefined}>
-              <TextInput type="email" defaultValue="maria@palenke.org" error={state === "error"} />
-            </Field>
+          <LoginForm redirectTo={redirectTo} />
 
-            <Field label="Contraseña" required>
-              <TextInput type="password" defaultValue="••••••••••" error={state === "error"} />
-            </Field>
-
+          <div className="grid gap-4">
             <Link href={withRole("/recuperar-contrasena", role)} className="text-sm text-[color:var(--gold-700)]">
               ¿Olvidaste tu contraseña?
             </Link>
@@ -53,38 +50,36 @@ export default async function LoginPage({
                 <p>Tu cuenta ha sido desactivada. Contacta a la coordinación del Palenke.</p>
               </Callout>
             ) : null}
+          </div>
 
-            <button type="button" className="button-primary justify-center" disabled={state === "loading"}>
-              {state === "loading" ? "Entrando…" : "Iniciar sesión"}
-            </button>
+          <p className="text-sm leading-6 text-[color:var(--muted-strong)]">
+            No se aceptan registros públicos. Las cuentas son gestionadas por la coordinación del
+            Palenke.
+          </p>
 
-            <p className="text-sm leading-6 text-[color:var(--muted-strong)]">
-              No se aceptan registros públicos. Las cuentas son gestionadas por la coordinación del Palenke.
-            </p>
-
-            <p className="text-xs leading-6 text-[color:var(--muted)]">
-              Al iniciar sesión aceptas nuestra{" "}
-              <Link href={withRole("/politica-de-datos", role)} className="underline">
-                Política de tratamiento de datos
-              </Link>
-              .
-            </p>
-          </form>
+          <p className="text-xs leading-6 text-[color:var(--muted)]">
+            Al iniciar sesión aceptas nuestra{" "}
+            <Link href={withRole("/politica-de-datos", role)} className="underline">
+              Política de tratamiento de datos
+            </Link>
+            .
+          </p>
         </article>
 
-        <Callout tone="info" title="Accesos de demostración del mock">
-          <p>Para recorrer el flujo sin backend, usa uno de estos accesos simulados:</p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link href={withRole(redirectTo, "internal")} className="button-secondary">
-              Entrar como Interno
-            </Link>
-            <Link href={withRole(redirectTo, "admin")} className="button-secondary">
-              Entrar como Admin
-            </Link>
-          </div>
-        </Callout>
+        {supabaseReady ? null : (
+          <Callout tone="info" title="Accesos de demostración del mock">
+            <p>Supabase no está configurado todavía. Puedes usar accesos simulados temporalmente:</p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link href={withRole(redirectTo, "internal")} className="button-secondary">
+                Entrar como Interno
+              </Link>
+              <Link href={withRole(redirectTo, "admin")} className="button-secondary">
+                Entrar como Admin
+              </Link>
+            </div>
+          </Callout>
+        )}
       </section>
     </SiteLayout>
   );
 }
-

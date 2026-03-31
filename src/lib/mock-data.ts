@@ -225,6 +225,9 @@ const conpesHomeUrl = "https://www.dnp.gov.co/conpes";
 const pnd2026Url = "https://www.dnp.gov.co/plan-nacional-desarrollo/pnd-2022-2026";
 const afroAffairsUrl =
   "https://www.mininterior.gov.co/direccion-de-asuntos-para-comunidades-negras-afrocolombianas-raizales-y-palenqueras/";
+const ley70LocalPdfUrl = "/docs/normativa/Ley_70_de_1993.pdf";
+const decreto1396LocalPdfUrl = "/docs/normativa/Decreto_1396_de_2023.pdf";
+const decreto129LocalPdfUrl = "/docs/normativa/Decreto_129_de_2024.pdf";
 
 function createNormaDoc({
   territory = "Nacional",
@@ -390,9 +393,37 @@ const normaVigenteDocuments: DocumentRecord[] = [
     council: "Congreso de Colombia",
     year: 1993,
     keywords: ["Ley 70", "comunidades negras", "territorio colectivo", "1993"],
-    fileLabel: "Ver en Senado",
-    url: senateLawUrl(70, 1993),
+    fileLabel: "Descargar PDF",
+    url: ley70LocalPdfUrl,
     sourceUrl: senateLawUrl(70, 1993),
+  }),
+  createNormaDoc({
+    id: "norma-decreto-1396-2023",
+    slug: "decreto-1396-2023",
+    title: "Decreto 1396 de 2023",
+    type: "Decreto",
+    description:
+      "Actualiza lineamientos institucionales para comunidades negras y fortalece mecanismos de coordinación estatal.",
+    council: "Presidencia de la República",
+    year: 2023,
+    keywords: ["Decreto 1396", "comunidades negras", "2023", "coordinación institucional"],
+    fileLabel: "Descargar PDF",
+    url: decreto1396LocalPdfUrl,
+    sourceUrl: senateDecreeUrl(1396, 2023),
+  }),
+  createNormaDoc({
+    id: "norma-decreto-129-2024",
+    slug: "decreto-129-2024",
+    title: "Decreto 129 de 2024",
+    type: "Decreto",
+    description:
+      "Instrumento normativo reciente con disposiciones aplicables al fortalecimiento territorial y organizativo afrodescendiente.",
+    council: "Presidencia de la República",
+    year: 2024,
+    keywords: ["Decreto 129", "2024", "gobierno propio", "territorio"],
+    fileLabel: "Descargar PDF",
+    url: decreto129LocalPdfUrl,
+    sourceUrl: senateDecreeUrl(129, 2024),
   }),
   createNormaDoc({
     id: "norma-ley21",
@@ -2323,6 +2354,10 @@ export function getVisibleMjnStories(role: ViewerRole) {
 
 export function findDocumentBySlug(slug: string) {
   return documents.find((document) => document.slug === slug);
+}
+
+export function findDocumentById(id: string) {
+  return documents.find((document) => document.id === id);
 }
 
 export function findDashboardBySlug(slug: string) {

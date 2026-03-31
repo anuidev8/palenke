@@ -740,11 +740,13 @@ export function AdminLayout({
   active,
   title,
   intro,
+  pendingSolicitudesCount,
   children,
 }: {
   role: ViewerRole;
   active:
     | "inicio"
+    | "solicitudes"
     | "documentos"
     | "dashboards"
     | "accs"
@@ -753,10 +755,12 @@ export function AdminLayout({
     | "contenido-visual";
   title: string;
   intro?: string;
+  pendingSolicitudesCount?: number;
   children: ReactNode;
 }) {
   const navItems = [
     { id: "inicio", label: "Inicio", href: "/admin" },
+    { id: "solicitudes", label: "Solicitudes", href: "/admin/solicitudes" },
     { id: "documentos", label: "Biblioteca", href: "/admin/documentos" },
     { id: "dashboards", label: "Dashboards", href: "/admin/dashboards" },
     { id: "accs", label: "ACCs", href: "/admin/accs" },
@@ -802,7 +806,14 @@ export function AdminLayout({
                     active === item.id ? "bg-[color:var(--forest)] text-[color:var(--sand)]" : "bg-[color:var(--sand-strong)] text-[color:var(--forest)]"
                   }`}
                 >
-                  {item.label}
+                  <span className="inline-flex items-center gap-2">
+                    <span>{item.label}</span>
+                    {item.id === "solicitudes" && pendingSolicitudesCount ? (
+                      <span className="rounded-full bg-[color:var(--danger)] px-2 py-0.5 text-xs font-semibold text-white">
+                        {pendingSolicitudesCount}
+                      </span>
+                    ) : null}
+                  </span>
                 </Link>
               ))}
             </nav>
@@ -820,7 +831,14 @@ export function AdminLayout({
                     : "bg-[color:var(--sand-strong)] text-[color:var(--forest)] hover:bg-[color:var(--gold-100)]"
                 }`}
               >
-                {item.label}
+                <span className="inline-flex items-center gap-2">
+                  <span>{item.label}</span>
+                  {item.id === "solicitudes" && pendingSolicitudesCount ? (
+                    <span className="rounded-full bg-[color:var(--danger)] px-2 py-0.5 text-xs font-semibold text-white">
+                      {pendingSolicitudesCount}
+                    </span>
+                  ) : null}
+                </span>
               </Link>
             ))}
           </nav>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PlayCircle, Download, ArrowRight, Volume2, ChevronUp, X } from "lucide-react";
 import Image from "next/image";
@@ -37,6 +37,10 @@ export default function BibliotecaMemoriaGrid({
         
         const isExpanded = expandedId === doc.id;
 
+        const cardStyle: CSSProperties = {
+          minHeight: isExpanded ? undefined : baseHeight,
+        };
+
         return (
           <motion.article
             layout
@@ -51,9 +55,7 @@ export default function BibliotecaMemoriaGrid({
                   ? "sm:col-span-2 lg:col-span-3 hover:-translate-y-2 hover:shadow-[0_24px_60px_rgba(0,0,0,0.15)] z-0"
                   : "hover:-translate-y-2 hover:shadow-[0_24px_60px_rgba(0,0,0,0.15)] z-0"
             }`}
-            style={{
-              minHeight: isExpanded ? "auto" : baseHeight,
-            } as any}
+            style={cardStyle}
           >
             {/* Image & Gradient Overlay */}
             {doc.imageUrl ? (

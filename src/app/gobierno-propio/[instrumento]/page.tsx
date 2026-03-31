@@ -2,10 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, ArrowRight, BookOpen, Download, Droplets, ExternalLink, FileText, Gavel, Leaf, Scale, Lock, UserCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Download, Droplets, ExternalLink, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { SiteLayout } from "@/components/mock/ui";
-import { getVisibleDocuments, canDownloadDocument } from "@/lib/mock-data";
+import { AdminGatedUI } from "@/components/palenke/AdminGatedUI";
+import { CoordinationGatedUI } from "@/components/palenke/CoordinationGatedUI";
+import { hasSupabaseServiceConfig } from "@/lib/config";
+import { canDownloadDocument } from "@/lib/mock-data";
+import { createSupabaseService } from "@/lib/supabase/service";
+import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
@@ -37,6 +42,7 @@ const instrumentos = {
       "Condiciones de pertenencia y participación comunitaria",
     ],
     librarySection: "Reglamentos",
+    accessLevel: "admin",
   },
   "planes-uso": {
     title: "Planes de uso y manejo",
@@ -56,6 +62,7 @@ const instrumentos = {
       "Articulación con planes de vida comunitarios",
     ],
     librarySection: "Planes de uso",
+    accessLevel: "coordination",
   },
   litigio: {
     title: "Litigio estratégico",
@@ -75,6 +82,7 @@ const instrumentos = {
       "Litigio climático y derechos de los ríos como sujetos",
     ],
     librarySection: "Litigio",
+    accessLevel: "admin",
   },
   conservacion: {
     title: "Áreas bioculturales de conservación comunitaria",
@@ -94,6 +102,7 @@ const instrumentos = {
       "Requieren plan de manejo biocultural comunitario",
     ],
     librarySection: "Conservación",
+    accessLevel: "coordination",
   },
   etnodesarrollo: {
     title: "Etnodesarrollo",
@@ -113,6 +122,7 @@ const instrumentos = {
       "Articulación entre producción y conservación territorial",
     ],
     librarySection: "Etnodesarrollo",
+    accessLevel: "admin",
   },
   "proteccion-hidrica": {
     title: "Protección hídrica",
@@ -132,10 +142,102 @@ const instrumentos = {
       "Planes de manejo de cuencas en territorios colectivos",
     ],
     librarySection: "Protección hídrica",
+    accessLevel: "admin",
   },
 } as const;
 
 type InstrumentoSlug = keyof typeof instrumentos;
+type AccessLevel = "admin" | "coordination";
+type DocumentVisibility = "public" | "internal" | "sensitive";
+
+type SupabaseInstrumentDoc = {
+  id: string;
+  title: string;
+  instrument: string;
+  council: string | null;
+  visibility: DocumentVisibility;
+  storage_path: string | null;
+  created_at: string;
+};
+
+type DisplayDoc = {
+  id: string;
+  title: string;
+  section: string;
+  type: string;
+  territory: string;
+  year: string;
+  visibility: DocumentVisibility;
+  action: "file" | "external" | "video";
+  fileLabel: string;
+  url: string;
+  sourceUrl?: string;
+  usesSignedUrl: boolean;
+};
+
+const dbInstrumentMap: Partial<Record<InstrumentoSlug, string>> = {
+  reglamentos: "reglamentos",
+  "planes-uso": "planes-uso",
+  etnodesarrollo: "etnodesarrollo",
+  conservacion: "conservacion",
+};
+
+function isMissingTableError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const maybeCode = "code" in error ? String(error.code) : "";
+  const maybeMessage = "message" in error ? String(error.message) : "";
+  return maybeCode === "PGRST205" || maybeMessage.includes("schema cache");
+}
+
+async function listSupabaseInstrumentDocs(instrumento: InstrumentoSlug) {
+  const mapped = dbInstrumentMap[instrumento];
+  if (!mapped) {
+    return { mode: "not-mapped" as const, docs: [] as SupabaseInstrumentDoc[] };
+  }
+
+  if (!hasSupabaseServiceConfig()) {
+    return { mode: "missing-config" as const, docs: [] as SupabaseInstrumentDoc[] };
+  }
+
+  const supabase = createSupabaseService();
+  const { data, error } = await supabase
+    .from("documents")
+    .select("id,title,instrument,council,visibility,storage_path,created_at")
+    .eq("instrument", mapped)
+    .order("created_at", { ascending: false });
+
+  if (error && isMissingTableError(error)) {
+    return { mode: "missing-table" as const, docs: [] as SupabaseInstrumentDoc[] };
+  }
+
+  if (error) {
+    console.error(`Failed to load documents for instrumento=${instrumento}:`, error);
+    return { mode: "query-error" as const, docs: [] as SupabaseInstrumentDoc[] };
+  }
+
+  return { mode: "supabase" as const, docs: (data ?? []) as SupabaseInstrumentDoc[] };
+}
+
+function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): DisplayDoc {
+  const hasDirectPublicPath = doc.visibility === "public" && Boolean(doc.storage_path?.startsWith("/"));
+  const usesSignedUrl = !hasDirectPublicPath;
+
+  return {
+    id: doc.id,
+    title: doc.title,
+    section,
+    type: "Documento",
+    territory: doc.council ?? "Consejo comunitario",
+    year: String(new Date(doc.created_at).getFullYear()),
+    visibility: doc.visibility,
+    action: "file",
+    fileLabel: "Descargar",
+    url: hasDirectPublicPath
+      ? (doc.storage_path as string)
+      : `/api/documents/${doc.id}/signed-url?mode=redirect`,
+    usesSignedUrl,
+  };
+}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -148,20 +250,35 @@ export default async function InstrumentoPage({
 }) {
   const { instrumento } = await params;
   const sp = await searchParams;
-  const role = getViewerRole(sp);
+  const roleFromQuery = getViewerRole(sp);
+  const roleFromSession = await getViewerRoleFromSession();
+  const role = hasSupabaseServiceConfig() ? roleFromSession : roleFromQuery;
 
   if (!(instrumento in instrumentos)) notFound();
-  const inst = instrumentos[instrumento as InstrumentoSlug];
+  const instrumentoKey = instrumento as InstrumentoSlug;
+  const inst = instrumentos[instrumentoKey];
   const Icon = inst.icon;
+  const { mode: dbMode, docs: dbDocs } = await listSupabaseInstrumentDocs(instrumentoKey);
+  const usesSupabaseDocs = dbMode === "supabase";
 
-  const allDocs = getVisibleDocuments(role);
-  const relatedDocs = allDocs
-    .filter((d) => d.section.toLowerCase().includes(inst.librarySection.toLowerCase()))
-    .slice(0, 4);
-  const fallbackDocs = allDocs.toSorted((a, b) => b.year - a.year).slice(0, 4);
-  const displayDocs = relatedDocs.length > 0 ? relatedDocs : fallbackDocs;
+  const baseSupabaseDbDoc = usesSupabaseDocs
+    ? (dbDocs.find((d) => d.visibility === "public") ?? null)
+    : null;
+  const baseSupabaseDoc: DisplayDoc | null = baseSupabaseDbDoc
+    ? toDisplayDocFromSupabase(baseSupabaseDbDoc, inst.librarySection)
+    : null;
+
+  const tableDbDocs = dbDocs.filter((d) => d.visibility !== "public");
+  const displayDocs: DisplayDoc[] = usesSupabaseDocs
+    ? tableDbDocs.slice(0, 4).map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
+    : [];
 
   const isPublic = role === "public";
+  const accessLevel = inst.accessLevel as AccessLevel;
+  const requestHref = withRole(`/solicitar-acceso/${instrumento}`, role);
+  const canDownloadBaseSupabaseDoc = baseSupabaseDoc
+    ? canDownloadDocument(role, baseSupabaseDoc.visibility)
+    : false;
 
   return (
     <SiteLayout
@@ -260,17 +377,34 @@ export default async function InstrumentoPage({
                   <div className="flex-1">
                     <h3 className="font-display text-2xl text-[#1a1a1a] mb-2">Documento base metodológico</h3>
                     <p className="text-base text-[#4a4540] leading-relaxed">
-                      Guía general y estructura modelo (sin información específica de Consejos). Acceso público.
+                      {baseSupabaseDoc
+                        ? "Documento de referencia cargado en la base de datos para este instrumento."
+                        : "Guía general y estructura modelo (sin información específica de Consejos). Acceso público."}
                     </p>
                   </div>
-                  <a 
-                    href="#" 
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                    style={{ background: inst.color }}
-                  >
-                    <Download className="h-4 w-4" />
-                    Descargar PDF
-                  </a>
+                  {baseSupabaseDoc ? (
+                    canDownloadBaseSupabaseDoc ? (
+                      <a
+                        href={baseSupabaseDoc.url}
+                        className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                        style={{ background: inst.color }}
+                      >
+                        <Download className="h-4 w-4" />
+                        Descargar documento
+                      </a>
+                    ) : (
+                      <Link
+                        href={requestHref}
+                        className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f8f5f2] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] hover:bg-[#f0ebe4]"
+                      >
+                        Solicitar acceso
+                      </Link>
+                    )
+                  ) : (
+                    <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f4f1ec] px-7 py-3.5 text-sm font-bold text-[#7a756e]">
+                      Documento pendiente de carga
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -304,36 +438,11 @@ export default async function InstrumentoPage({
           
           {isPublic ? (
             /* Gated UI for Public Users */
-            <div className="relative overflow-hidden rounded-[32px] border border-[#e8dfd3] bg-[#f8f5f2] p-8 sm:p-16 text-center shadow-inner">
-              <div className="mx-auto max-w-2xl relative z-10">
-                <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-md border border-[#e8dfd3]">
-                  <Lock className="h-10 w-10 text-[#1a1a1a]" aria-hidden="true" />
-                </div>
-                <h2 className="font-display text-3xl sm:text-4xl text-[#1a1a1a] mb-5">
-                  Acceso restringido a la biblioteca
-                </h2>
-                <p className="text-lg text-[#4a4540] mb-10 leading-relaxed px-4">
-                  Para acceder a los instrumentos y documentos específicos de los Consejos Comunitarios, debes iniciar sesión. 
-                  El acceso es validado manualmente para usuarios públicos y otorgado automáticamente para colaboradores con correo institucional.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link
-                    href="/login"
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-[#1a1a1a] px-8 py-4 text-sm font-bold tracking-wide text-white transition hover:bg-black hover:scale-105"
-                  >
-                    <UserCircle className="h-5 w-5" />
-                    Iniciar sesión / Registrarse
-                  </Link>
-                  <Link
-                    href="/"
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border-2 border-[#e8dfd3] bg-white px-8 py-4 text-sm font-bold tracking-wide text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                  >
-                    Saber más sobre accesos
-                  </Link>
-                </div>
-              </div>
-            </div>
+            accessLevel === "coordination" ? (
+              <CoordinationGatedUI instrumento={instrumento} role={role} requestHref={requestHref} />
+            ) : (
+              <AdminGatedUI instrumento={instrumento} role={role} requestHref={requestHref} />
+            )
           ) : (
             /* Unlocked UI for Logged-in Users */
             <div>
@@ -371,67 +480,86 @@ export default async function InstrumentoPage({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#e8dfd3] bg-white">
-                    {displayDocs.map((doc) => (
-                      <tr key={doc.id} className="align-top transition-colors hover:bg-[#fcfaf7]">
-                        <td className="px-6 py-5">
-                          <p className="font-bold text-[#1a1a1a] text-base">{doc.title}</p>
-                          <p className="mt-1.5 text-xs font-medium text-[#7a756e] uppercase tracking-wider">{doc.section}</p>
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.type}</td>
-                        <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.territory}</td>
-                        <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] font-medium text-base">{doc.year}</td>
-                        <td className="px-6 py-5">
-                          <div className="flex flex-col gap-2">
-                            {!canDownloadDocument(role, doc.visibility) ? (
-                              <a
-                                href="/login?redirect=/gobierno-propio&message=internal"
-                                className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
-                              >
-                                <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                                Iniciar sesión para acceder
-                              </a>
-                            ) : (
-                              <>
-                                {doc.action === "file" ? (
-                                  <a
-                                    href={doc.url}
-                                    download
-                                    className="inline-flex w-max items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white transition hover:bg-black"
-                                  >
-                                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                                    Descargar
-                                  </a>
-                                ) : null}
-                                {doc.sourceUrl ? (
-                                  <a
-                                    href={doc.sourceUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                                  >
-                                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                    Fuente oficial
-                                  </a>
-                                ) : doc.action === "external" ? (
-                                  <a
-                                    href={doc.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
-                                  >
-                                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                                    {doc.fileLabel}
-                                  </a>
-                                ) : null}
-                              </>
-                            )}
-                          </div>
+                    {displayDocs.map((doc) => {
+                      const usesSignedUrl = doc.usesSignedUrl;
+                      const downloadHref = doc.url;
+
+                      return (
+                        <tr key={doc.id} className="align-top transition-colors hover:bg-[#fcfaf7]">
+                          <td className="px-6 py-5">
+                            <p className="font-bold text-[#1a1a1a] text-base">{doc.title}</p>
+                            <p className="mt-1.5 text-xs font-medium text-[#7a756e] uppercase tracking-wider">
+                              {doc.section}
+                            </p>
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.type}</td>
+                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] text-base">{doc.territory}</td>
+                          <td className="whitespace-nowrap px-6 py-5 text-[#4a4540] font-medium text-base">{doc.year}</td>
+                          <td className="px-6 py-5">
+                            <div className="flex flex-col gap-2">
+                              {!canDownloadDocument(role, doc.visibility) ? (
+                                <a
+                                  href="/login?redirect=/gobierno-propio&message=internal"
+                                  className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
+                                >
+                                  <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                                  Iniciar sesión para acceder
+                                </a>
+                              ) : (
+                                <>
+                                  {doc.action === "file" ? (
+                                    <a
+                                      href={downloadHref}
+                                      {...(usesSignedUrl ? {} : { download: true })}
+                                      className="inline-flex w-max items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white transition hover:bg-black"
+                                    >
+                                      <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                                      Descargar
+                                    </a>
+                                  ) : null}
+                                  {doc.sourceUrl ? (
+                                    <a
+                                      href={doc.sourceUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                                    >
+                                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                                      Fuente oficial
+                                    </a>
+                                  ) : doc.action === "external" ? (
+                                    <a
+                                      href={doc.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex w-max items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+                                    >
+                                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                                      {doc.fileLabel}
+                                    </a>
+                                  ) : null}
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {displayDocs.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-10 text-center text-sm text-[#7a756e]">
+                          No hay documentos disponibles para este instrumento.
                         </td>
                       </tr>
-                    ))}
+                    ) : null}
                   </tbody>
                 </table>
               </div>
+              {dbMode === "query-error" ? (
+                <p className="mt-4 text-sm text-[#9c5d00]">
+                  No se pudo consultar la base de datos para este instrumento.
+                </p>
+              ) : null}
             </div>
           )}
 
