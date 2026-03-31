@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { AdminLayout, TableCard, Toolbar, VisibilityBadge } from "@/components/mock/ui";
-import { documents, librarySections, territories } from "@/lib/mock-data";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
+import { createSupabaseServer } from "@/lib/supabase/server";
+import { hasSupabaseServiceConfig } from "@/lib/config";
+import { FileText, Folder, Lock, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default async function AdminDocumentosPage({
   searchParams,
@@ -11,103 +13,194 @@ export default async function AdminDocumentosPage({
 }) {
   const { role, searchParams: params } = await requireAdmin(searchParams);
   const query = (getFirstParam(params.q) ?? "").toLowerCase();
-  const section = getFirstParam(params.section) ?? "";
   const visibility = getFirstParam(params.visibility) ?? "";
-  const territory = getFirstParam(params.territory) ?? "";
+  const instrument = getFirstParam(params.instrument) ?? "";
 
-  const filtered = documents.filter((document) => {
-    const matchesQuery =
-      !query || `${document.title} ${document.description}`.toLowerCase().includes(query);
-    const matchesSection = !section || document.section === section;
-    const matchesVisibility = !visibility || document.visibility === visibility;
-    const matchesTerritory = !territory || document.territory === territory;
+  let documents = [];
+  let dbError = false;
 
-    return matchesQuery && matchesSection && matchesVisibility && matchesTerritory;
-  });
+  if (hasSupabaseServiceConfig()) {
+    try {
+      const supabase = await createSupabaseServer();
+      
+      let dbQuery = supabase
+        .from("documents")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (query) {
+        dbQuery = dbQuery.ilike("title", `%${query}%`);
+      }
+      if (visibility) {
+        dbQuery = dbQuery.eq("visibility", visibility);
+      }
+      if (instrument) {
+        dbQuery = dbQuery.eq("instrument", instrument);
+      }
+
+      const { data, error } = await dbQuery;
+      
+      if (error) {
+        console.error("Error fetching documents:", error);
+        dbError = true;
+      } else {
+        documents = data || [];
+      }
+    } catch (e) {
+      console.error(e);
+      dbError = true;
+    }
+  }
+
+  // Deduplicate instruments for filter
+  const uniqueInstruments = [...new Set(documents.map(d => d.instrument))].filter(Boolean).sort();
 
   return (
     <AdminLayout
       role={role}
       active="documentos"
-      title="Biblioteca Base — Documentos"
-      intro="Listado total de documentos, incluidos registros Sensibles que nunca se publican en la interfaz web."
+      title="Gestión de Documentos"
+      intro="Administra todos los archivos de la plataforma. Controla la visibilidad, organiza por instrumentos y gestiona las descargas directas."
     >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-2xl border border-[#e8dfd3] shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#e3f2fd] flex items-center justify-center text-[#1565c0]">
+            <Folder className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-[#7a756e] uppercase tracking-wider">Total Archivos</p>
+            <p className="text-3xl font-black text-[#1a1a1a]">{documents.length}</p>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-[#e8dfd3] shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#fce4ec] flex items-center justify-center text-[#c2185b]">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-[#7a756e] uppercase tracking-wider">Restringidos</p>
+            <p className="text-3xl font-black text-[#1a1a1a]">
+              {documents.filter(d => d.visibility === 'internal' || d.visibility === 'sensitive').length}
+            </p>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-[#e8dfd3] shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#e8f5e9] flex items-center justify-center text-[#2e7d32]">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-[#7a756e] uppercase tracking-wider">Públicos</p>
+            <p className="text-3xl font-black text-[#1a1a1a]">
+              {documents.filter(d => d.visibility === 'public').length}
+            </p>
+          </div>
+        </div>
+      </div>
+
       <Toolbar
         actions={
-          <>
-            <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="button-secondary">
+          <div className="flex gap-3">
+            <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="inline-flex items-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]">
+              <FileText className="w-4 h-4" />
               Rutas metodológicas
             </Link>
-            <Link href={withRole("/admin/documentos/nuevo", role)} className="button-primary">
-              + Nuevo doc
-            </Link>
-          </>
+          </div>
         }
       >
-        <form action="/admin/documentos" className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <form id="filter-form" action="/admin/documentos" className="flex flex-wrap gap-3 w-full">
           <input type="hidden" name="role" value={role} />
           <input
             name="q"
-            defaultValue={getFirstParam(params.q)}
-            placeholder="Buscar"
-            className="input-shell"
+            defaultValue={query}
+            placeholder="Buscar por título..."
+            className="flex-1 min-w-[200px] px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
           />
-          <select name="section" defaultValue={section} className="input-shell">
-            <option value="">Sección</option>
-            {librarySections.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+          <select 
+            name="instrument" 
+            defaultValue={instrument} 
+            className="px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
+          >
+            <option value="">Todos los instrumentos</option>
+            {uniqueInstruments.map((inst) => (
+              <option key={inst} value={inst}>{inst}</option>
             ))}
           </select>
-          <select name="visibility" defaultValue={visibility} className="input-shell">
-            <option value="">Visibilidad</option>
+          <select 
+            name="visibility" 
+            defaultValue={visibility} 
+            className="px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
+          >
+            <option value="">Todas las visibilidades</option>
             <option value="public">Público</option>
             <option value="internal">Interno</option>
             <option value="sensitive">Sensible</option>
           </select>
-          <select name="territory" defaultValue={territory} className="input-shell">
-            <option value="">Territorio</option>
-            {territories.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="button-secondary">
+          <button type="submit" className="px-6 py-2 bg-[#1a1a1a] text-white font-bold rounded-xl text-sm hover:bg-black transition-colors shrink-0">
             Filtrar
           </button>
         </form>
+  
       </Toolbar>
 
-      <TableCard
-        headers={["□", "Título", "Sección", "Territorio", "Año", "Visibilidad", "Última edición", "⋮"]}
-        columnWidths={["w-10", "min-w-[220px]", "min-w-[120px]", "min-w-[100px]", "w-16", "min-w-[110px]", "min-w-[130px]", "w-20"]}
-        rows={filtered.map((document) => [
-          <input key="checkbox" type="checkbox" />,
-          <Link key="title" href={withRole(`/admin/documentos/${document.id}/editar`, role)} className="font-medium text-[color:var(--forest)] underline">
-            {document.title}
-          </Link>,
-          <span key="section" className="chip">
-            {document.section}
-          </span>,
-          <span key="territory">{document.territory}</span>,
-          <span key="year">{document.year}</span>,
-          <VisibilityBadge key="visibility" visibility={document.visibility} />,
-          <span key="edited">10 Mar 2026 · María Torres</span>,
-          <button key="actions" type="button" className="button-ghost">
-            Editar
-          </button>,
-        ])}
-        footer={
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <p className="text-sm text-[color:var(--muted-strong)]">Paginación: &lt; 1 2 3 &gt;</p>
-            <div className="rounded-full bg-[color:var(--forest)] px-4 py-2 text-sm text-[color:var(--sand)]">
-              3 documentos seleccionados · Cambiar visibilidad · Archivar
-            </div>
+      {dbError ? (
+        <div className="p-6 bg-[#fff3e0] border border-[#ffb74d] rounded-2xl flex items-start gap-4 mb-8">
+          <AlertCircle className="w-6 h-6 text-[#e65100] shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-[#e65100] font-bold mb-1">Error de conexión</h3>
+            <p className="text-[#e65100]/80 text-sm">No se pudieron cargar los documentos desde la base de datos. Verifica la conexión a Supabase.</p>
           </div>
-        }
-      />
+        </div>
+      ) : documents.length === 0 ? (
+        <div className="py-20 flex flex-col items-center justify-center bg-white border border-[#e8dfd3] border-dashed rounded-3xl">
+          <Folder className="w-16 h-16 text-[#d1ccc5] mb-4" />
+          <p className="text-[#4a4540] font-medium text-lg">No se encontraron documentos</p>
+          <p className="text-[#7a756e] text-sm mt-1">Intenta con otros filtros o verifica la base de datos.</p>
+        </div>
+      ) : (
+        <div className="bg-white border border-[#e8dfd3] rounded-[24px] shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="bg-[#fcfaf7] border-b border-[#e8dfd3]">
+                  <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Título y Ubicación</th>
+                  <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Instrumento</th>
+                  <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Visibilidad</th>
+                  <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Fecha de registro</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e8dfd3]">
+                {documents.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-[#fcfaf7] transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-start gap-3">
+                        <FileText className="w-5 h-5 text-[#d1ccc5] mt-0.5 group-hover:text-[#4a4540] transition-colors" />
+                        <div>
+                          <p className="font-bold text-[#1a1a1a] text-base line-clamp-2">{doc.title}</p>
+                          <p className="text-xs text-[#7a756e] mt-1 line-clamp-1 font-mono">{doc.storage_path || doc.council || 'Sin ruta'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#f4f1ec] text-[#4a4540] uppercase tracking-wider">
+                        {doc.instrument}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <VisibilityBadge visibility={doc.visibility} />
+                    </td>
+                    <td className="px-6 py-4 text-[#7a756e]">
+                      {new Date(doc.created_at).toLocaleDateString("es-CO", {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
