@@ -65,7 +65,7 @@ const fileMap = [
     council: "CC Mayor de Capitania",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-mayor-de-capitania/acta-validacion-cc-capitania.pdf",
+    storagePath: "reglamentos/cc-mayor-de-capitania/ACTAS DE ACTUALIZACIÓN/acta-validacion-cc-capitania.pdf",
     title: "Acta de validación - CC Mayor de Capitania",
   },
   {
@@ -74,7 +74,7 @@ const fileMap = [
     council: "CC Llaves del Futuro",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-llaves-del-futuro/acta-validacion-cc-llaves-del-futuro.pdf",
+    storagePath: "reglamentos/cc-llaves-del-futuro/ACTAS DE VALIDACIÓN/acta-validacion-cc-llaves-del-futuro.pdf",
     title: "Acta de validación - CC Llaves del Futuro",
   },
   {
@@ -83,7 +83,7 @@ const fileMap = [
     council: "CC Martin Luther King",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-martin-luther-king/acta-validacion-martin-luther-king.pdf",
+    storagePath: "reglamentos/cc-martin-luther-king/ACTAS DE ACTUALIZACIÓN/acta-validacion-martin-luther-king.pdf",
     title: "Acta de validación - CC Martin Luther King",
   },
   {
@@ -92,7 +92,7 @@ const fileMap = [
     council: "CC Nelson Mandela - Guaviare",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-nelson-mandela-guaviare/acta-aprobacion-nelson-mandela-guaviare.pdf",
+    storagePath: "reglamentos/cc-nelson-mandela-guaviare/ACTAS DE ACTUALIZACIÓN/acta-aprobacion-nelson-mandela-guaviare.pdf",
     title: "Acta de aprobación - CC Nelson Mandela (Guaviare)",
   },
   {
@@ -101,7 +101,7 @@ const fileMap = [
     council: "CC ORCONEPIAC",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-orconepiac/acta-validacion-cc-orconepiac.pdf",
+    storagePath: "reglamentos/cc-orconepiac/ACTAS DE VALIDACIÓN/acta-validacion-cc-orconepiac.pdf",
     title: "Acta de validación - CC ORCONEPIAC",
   },
   {
@@ -110,7 +110,7 @@ const fileMap = [
     council: "CC Nueva Esperanza",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-nueva-esperanza/acta-validacion-cc-nueva-esperanza.pdf",
+    storagePath: "reglamentos/cc-nueva-esperanza/ACTAS DE VALIDACIÓN/acta-validacion-cc-nueva-esperanza.pdf",
     title: "Acta de validación - CC Nueva Esperanza",
   },
   {
@@ -119,7 +119,7 @@ const fileMap = [
     council: "CC Nelson Mandela - Piamonte",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-nelson-mandela-piamonte/acta-validacion-cc-nelson-mandela-piamonte.pdf",
+    storagePath: "reglamentos/cc-nelson-mandela-piamonte/ACTAS DE VALIDACIÓN/acta-validacion-cc-nelson-mandela-piamonte.pdf",
     title: "Acta de validación - CC Nelson Mandela (Piamonte)",
   },
   {
@@ -128,7 +128,7 @@ const fileMap = [
     council: "CC Esperanza Viva",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-esperanza-viva/acta-validacion-cc-esperanza-viva.pdf",
+    storagePath: "reglamentos/cc-esperanza-viva/ACTAS DE VALIDACIÓN/acta-validacion-cc-esperanza-viva.pdf",
     title: "Acta de validación - CC Esperanza Viva",
   },
   {
@@ -137,7 +137,7 @@ const fileMap = [
     council: "CC Diego Luis Cordoba",
     visibility: "internal",
     bucket: "docs-internal",
-    storagePath: "reglamentos/cc-diego-luis-cordoba/acta-aprobacion-diego-luis-cordoba.pdf",
+    storagePath: "reglamentos/cc-diego-luis-cordoba/ACTAS DE ACTUALIZACIÓN/acta-aprobacion-diego-luis-cordoba.pdf",
     title: "Acta de aprobación - CC Diego Luis Cordoba",
   },
 

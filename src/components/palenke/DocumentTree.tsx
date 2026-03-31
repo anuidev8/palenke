@@ -53,17 +53,22 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
   const root: TreeNode = { name: "root", path: "", type: "folder", children: [] };
 
   docs.forEach((doc) => {
-    let pathStr = doc.storagePath;
-    if (!pathStr) {
-      pathStr = `${doc.territory}/${doc.title}`;
+    let segments: string[] = [];
+    if (!doc.storagePath) {
+      segments = [doc.territory, doc.title];
     } else {
-      const parts = pathStr.split("/");
+      const parts = doc.storagePath.split("/").filter(Boolean);
       if (parts.length > 2) {
-        pathStr = parts.slice(1).join("/");
+        // e.g. ["reglamentos", "cc-foo", "subfolder?", "file.pdf"]
+        // Replace the "cc-foo" slug with the properly formatted territory name
+        segments = [doc.territory, ...parts.slice(2)];
+      } else if (parts.length === 2) {
+        // e.g. ["reglamentos", "file.pdf"] -> use territory as folder
+        segments = [doc.territory, parts[1]];
+      } else {
+        segments = [doc.territory, doc.title];
       }
     }
-
-    const segments = pathStr.split("/").filter(Boolean);
     let currentNode = root;
 
     for (let i = 0; i < segments.length; i++) {
@@ -124,16 +129,24 @@ function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; o
       />
 
       <div className="flex items-start justify-between mb-6 relative z-10 w-full">
-        {/* Modern Dribbble-style Folder Icon */}
+        {/* Modern Dribbble-style Folder Icon with Peeking File */}
         <div className="relative w-16 h-14 transition-transform group-hover:scale-105">
           {/* Back flap (Tab) */}
           <div 
             className="absolute top-0 left-0 w-8 h-4 rounded-tl-xl rounded-tr-md"
             style={{ backgroundColor: color, opacity: 0.4 }}
           />
+          
+          {/* Peeking File Inside */}
+          <div className="absolute bottom-2 left-2 w-10 h-10 bg-white rounded-md shadow-sm border border-[#e8dfd3] flex flex-col items-center justify-start pt-1.5 overflow-hidden">
+             <div className="w-6 h-[1px] bg-black/10 rounded-full mb-1" />
+             <div className="w-4 h-[1px] bg-black/10 rounded-full mb-1" />
+             <div className="w-5 h-[1px] bg-black/10 rounded-full" />
+          </div>
+
           {/* Front flap */}
           <div 
-            className="absolute bottom-0 left-0 w-full h-11 rounded-xl shadow-sm border border-black/5"
+            className="absolute bottom-0 left-0 w-full h-11 rounded-xl shadow-sm border border-black/5 backdrop-blur-sm"
             style={{ backgroundColor: color, opacity: 0.9 }}
           >
              {/* Subtle internal shine/gradient on folder front */}
@@ -147,7 +160,7 @@ function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; o
       </div>
       
       <h3 className="font-bold text-[#1a1a1a] text-lg leading-tight line-clamp-2 relative z-10" title={node.name}>
-        {node.name.replace(/-/g, " ").toUpperCase()}
+        {node.name}
       </h3>
     </motion.button>
   );
@@ -401,7 +414,7 @@ export function DocumentTree({ docs, role, color }: { docs: DisplayDoc[]; role: 
                     onClick={() => handleBreadcrumb(idx)}
                     className={`transition-colors whitespace-nowrap font-medium px-3 py-1.5 rounded-lg ${idx === currentPath.length - 1 ? 'bg-[#f4f1ec] text-[#1a1a1a]' : 'hover:bg-[#f4f1ec] text-[#7a756e] hover:text-[#1a1a1a]'}`}
                   >
-                    {segment.replace(/-/g, " ").toUpperCase()}
+                    {segment}
                   </button>
                 </React.Fragment>
               ))}
