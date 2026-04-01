@@ -35,7 +35,18 @@ function htmlToText(html: string) {
     .trim();
 }
 
-async function sendViaN8n(params: { to: string; subject: string; html: string }) {
+type N8nEmailPayload = {
+  to: string;
+  subject: string;
+  html: string;
+  documentTitle?: string;
+  downloadUrl?: string;
+  expiryLabel?: string;
+  instrument?: string;
+  rejectionReason?: string;
+};
+
+async function sendViaN8n(params: N8nEmailPayload) {
   if (!hasN8nEmailWebhookConfig()) {
     return {
       sent: false as const,
@@ -54,6 +65,12 @@ async function sendViaN8n(params: { to: string; subject: string; html: string })
         email: params.to,
         subject: params.subject,
         messages: htmlToText(params.html),
+        html: params.html,
+        documentTitle: params.documentTitle,
+        downloadUrl: params.downloadUrl,
+        expiryLabel: params.expiryLabel,
+        instrument: params.instrument,
+        rejectionReason: params.rejectionReason,
       }),
       cache: "no-store",
     });
@@ -74,11 +91,7 @@ async function sendViaN8n(params: { to: string; subject: string; html: string })
   }
 }
 
-async function safeSend(params: {
-  to: string;
-  subject: string;
-  html: string;
-}) {
+async function safeSend(params: N8nEmailPayload) {
   if (!hasN8nEmailWebhookConfig()) {
     return {
       sent: false,
@@ -121,6 +134,8 @@ export async function sendApprovalEmail(email: string, instrument: string, docum
     to: email,
     subject: `Solicitud aprobada — ${instrument}`,
     html: approvalEmailHtml(instrument, documentTitle),
+    instrument,
+    documentTitle,
   });
 }
 
@@ -134,6 +149,9 @@ export async function sendRejectionEmail(
     to: email,
     subject: `Solicitud rechazada — ${instrument}`,
     html: rejectionEmailHtml(instrument, documentTitle, reason),
+    instrument,
+    documentTitle,
+    rejectionReason: reason,
   });
 }
 
@@ -142,6 +160,8 @@ export async function sendSignedUrlEmail(email: string, signedUrl: string, expir
     to: email,
     subject: "Enlace temporal de descarga",
     html: signedUrlEmailHtml(signedUrl, expiry),
+    downloadUrl: signedUrl,
+    expiryLabel: expiry,
   });
 }
 
@@ -155,5 +175,8 @@ export async function sendRequestedDocumentEmail(
     to: email,
     subject: `Documento solicitado — ${documentTitle}`,
     html: requestedDocumentEmailHtml(documentTitle, signedUrl, expiry),
+    documentTitle,
+    downloadUrl: signedUrl,
+    expiryLabel: expiry,
   });
 }
