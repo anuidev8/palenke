@@ -7,7 +7,7 @@ import {
   type AccessRequestsDataMode,
 } from "@/lib/access-requests";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
-import { approveRequest, rejectRequest } from "./actions";
+import { approveRequest, emailRequestedDocument, rejectRequest } from "./actions";
 
 function formatDate(date: string | null) {
   if (!date) return "—";
@@ -53,6 +53,7 @@ export default async function AdminSolicitudDetailPage({
   }
 
   const approveAction = approveRequest.bind(null, request.id);
+  const emailDocumentAction = emailRequestedDocument.bind(null, request.id);
   const rejectAction = rejectRequest.bind(null, request.id);
 
   return (
@@ -105,6 +106,24 @@ export default async function AdminSolicitudDetailPage({
         </Callout>
       ) : null}
 
+      {notice === "document-sent" ? (
+        <Callout tone="success" title="Documento enviado">
+          <p>Se envió por correo un enlace temporal para el documento solicitado.</p>
+        </Callout>
+      ) : null}
+
+      {error === "missing-document" ? (
+        <Callout tone="danger" title="Documento no disponible">
+          <p>La solicitud no tiene un documento asociado o el archivo no está disponible.</p>
+        </Callout>
+      ) : null}
+
+      {error === "document-email-failed" ? (
+        <Callout tone="danger" title="No se pudo enviar el correo">
+          <p>Revisa la configuración de Resend y vuelve a intentarlo.</p>
+        </Callout>
+      ) : null}
+
       {mode !== "supabase" &&
       !(
         (mode === "mock_missing_service_config" && notice === "missing-config") ||
@@ -135,6 +154,9 @@ export default async function AdminSolicitudDetailPage({
             <strong>Instrumento:</strong> {request.instrument_slug}
           </p>
           <p>
+            <strong>Documento solicitado:</strong> {request.document_title ?? "No especificado"}
+          </p>
+          <p>
             <strong>Nivel:</strong>{" "}
             {request.access_level === "coordination" ? "Coordinación" : "Administrativo"}
           </p>
@@ -161,7 +183,7 @@ export default async function AdminSolicitudDetailPage({
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 lg:grid-cols-3">
         <form action={approveAction} className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">Aprobar solicitud</h3>
           <label className="grid gap-2">
@@ -172,6 +194,19 @@ export default async function AdminSolicitudDetailPage({
           </label>
           <button type="submit" className="button-primary justify-center">
             Aprobar
+          </button>
+        </form>
+
+        <form action={emailDocumentAction} className="surface-card grid gap-4">
+          <h3 className="font-display text-xl text-[color:var(--forest)]">
+            Enviar documento por correo
+          </h3>
+          <p className="text-sm leading-6 text-[color:var(--muted-strong)]">
+            Envía al correo del solicitante un enlace temporal para el archivo exacto que pidió,
+            sin cambiar el flujo actual de aprobación.
+          </p>
+          <button type="submit" className="button-secondary justify-center">
+            Enviar enlace del documento
           </button>
         </form>
 

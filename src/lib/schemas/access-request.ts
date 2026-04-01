@@ -11,6 +11,8 @@ export const AccessRequestSchema = z
     motivation: z.string().trim().min(10),
     pcn_affiliation: z.string().trim().optional(),
     instrument_slug: z.string().trim().min(2),
+    document_id: z.string().uuid(),
+    document_title: z.string().trim().min(2),
     access_level: AccessLevelSchema,
   });
 

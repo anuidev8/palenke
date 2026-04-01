@@ -2,10 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { sendApprovalEmail, sendRejectionEmail, sendSignedUrlEmail } from "@/lib/email";
+import {
+  sendApprovalEmail,
+  sendRejectionEmail,
+  sendRequestedDocumentEmail,
+} from "@/lib/email";
+import { grantDocumentDownload } from "@/lib/document-access";
+import {
+  getEffectiveDocumentSource,
+  isMissingPreferredSourceColumnError,
+} from "@/lib/document-source";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
-import { hasSupabaseServiceConfig } from "@/lib/config";
+import { config, hasSupabaseServiceConfig } from "@/lib/config";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
 
@@ -61,69 +70,149 @@ async function markRequestStatus(id: string, status: ReviewStatus, notes: string
   return data;
 }
 
-async function provisionInternalUser(email: string) {
+async function getRequestById(id: string) {
   const supabase = createSupabaseService();
+  const { data, error } = await supabase.from("access_requests").select("*").eq("id", id).single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Unable to load access request.");
+  }
+
+  return data;
+}
+
+async function ensureAccessUser(email: string) {
+  const supabase = createSupabaseService();
+  const normalizedEmail = email.trim().toLowerCase();
+  const inviteRedirectTo = `${config.appUrl}/login`;
 
   const usersResult = await supabase.auth.admin.listUsers({
     page: 1,
     perPage: 1000,
   });
 
-  const existing = usersResult.data.users.find((user) => user.email === email);
+  const existing = usersResult.data.users.find((user) => user.email === normalizedEmail);
 
   let userId = existing?.id ?? null;
   if (!userId) {
-    const inviteResult = await supabase.auth.admin.inviteUserByEmail(email);
+    const inviteResult = await supabase.auth.admin.inviteUserByEmail(normalizedEmail, {
+      redirectTo: inviteRedirectTo,
+    });
+
+    if (inviteResult.error) {
+      throw new Error(inviteResult.error.message);
+    }
+
     userId = inviteResult.data.user?.id ?? null;
   }
 
   if (!userId) {
-    return;
+    return null;
   }
 
-  await supabase.from("users").upsert(
+  const { data: profile } = await supabase.from("users").select("role").eq("id", userId).maybeSingle();
+  const nextRole = profile?.role === "admin" || profile?.role === "internal" ? profile.role : "public";
+
+  const { error: profileError } = await supabase.from("users").upsert(
     {
       id: userId,
-      email,
-      role: "internal",
+      email: normalizedEmail,
+      role: nextRole,
       active: true,
     },
     { onConflict: "id" },
   );
+
+  if (profileError) {
+    throw new Error(profileError.message);
+  }
+
+  return userId;
 }
 
-async function sendCoordinationDelivery(request: {
+async function provisionDocumentGrant(request: {
+  request_id: string;
   email: string;
+  document_id: string | null;
+  document_title: string | null;
   instrument_slug: string;
 }) {
+  if (!request.document_id) {
+    await sendApprovalEmail(
+      request.email,
+      request.instrument_slug,
+      request.document_title ?? "Documento solicitado",
+    );
+    return;
+  }
+
+  const reviewerId = await getReviewerId();
+  const userId = await ensureAccessUser(request.email);
+
+  await grantDocumentDownload({
+    documentId: request.document_id,
+    email: request.email,
+    userId,
+    sourceRequestId: request.request_id,
+    grantedBy: reviewerId,
+  });
+
+  await sendApprovalEmail(
+    request.email,
+    request.instrument_slug,
+    request.document_title ?? "Documento solicitado",
+  );
+}
+
+async function getRequestedDocumentDelivery(id: string) {
   const supabase = createSupabaseService();
-  const { data: document } = await supabase
+  let { data: document, error } = await supabase
     .from("documents")
-    .select("storage_bucket, storage_path")
-    .eq("instrument", request.instrument_slug)
-    .eq("visibility", "sensitive")
-    .not("storage_path", "is", null)
-    .limit(1)
+    .select("id,title,preferred_source,storage_bucket,storage_path,external_url")
+    .eq("id", id)
     .maybeSingle();
 
-  const bucket = document?.storage_bucket;
-  const storagePath = document?.storage_path;
-
-  if (!bucket || !storagePath) {
-    await sendApprovalEmail(request.email, request.instrument_slug);
-    return;
+  if (error && isMissingPreferredSourceColumnError(error)) {
+    const fallback = await supabase
+      .from("documents")
+      .select("id,title,storage_bucket,storage_path,external_url")
+      .eq("id", id)
+      .maybeSingle();
+    document = fallback.data ? { ...fallback.data, preferred_source: null } : fallback.data;
+    error = fallback.error;
   }
 
-  const { data: signedUrlData } = await supabase.storage
-    .from(bucket)
-    .createSignedUrl(storagePath, 1800);
-
-  if (!signedUrlData?.signedUrl) {
-    await sendApprovalEmail(request.email, request.instrument_slug);
-    return;
+  if (error || !document) {
+    throw new Error(error?.message ?? "Unable to load requested document.");
   }
 
-  await sendSignedUrlEmail(request.email, signedUrlData.signedUrl, "30 minutos");
+  const effectiveSource = getEffectiveDocumentSource(document);
+  if (effectiveSource === "external" && document.external_url) {
+    return {
+      title: document.title ?? "Documento solicitado",
+      url: document.external_url,
+      expiryLabel: "según disponibilidad del enlace externo",
+    };
+  }
+
+  if (!document.storage_bucket || !document.storage_path) {
+    throw new Error("The requested document is not available in storage.");
+  }
+
+  const expiresIn = 1800;
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from(document.storage_bucket)
+    .createSignedUrl(document.storage_path, expiresIn, { download: true });
+
+  if (signedError || !signedData?.signedUrl) {
+    throw new Error(signedError?.message ?? "Failed to generate signed URL.");
+  }
+
+  return {
+    title: document.title ?? "Documento solicitado",
+    url: signedData.signedUrl,
+    expiryLabel: "30 minutos",
+  };
 }
 
 export async function approveRequest(id: string, formData: FormData) {
@@ -135,15 +224,13 @@ export async function approveRequest(id: string, formData: FormData) {
     const notes = asText(formData, "notes");
     const request = await markRequestStatus(id, "approved", notes);
 
-    if (request.access_level === "admin") {
-      await provisionInternalUser(request.email);
-      await sendApprovalEmail(request.email, request.instrument_slug);
-    } else {
-      await sendCoordinationDelivery({
-        email: request.email,
-        instrument_slug: request.instrument_slug,
-      });
-    }
+    await provisionDocumentGrant({
+      request_id: request.id,
+      email: request.email,
+      document_id: request.document_id ?? null,
+      document_title: request.document_title ?? null,
+      instrument_slug: request.instrument_slug,
+    });
 
     revalidatePath("/admin/solicitudes");
     revalidatePath(`/admin/solicitudes/${id}`);
@@ -169,11 +256,52 @@ export async function rejectRequest(id: string, formData: FormData) {
 
   try {
     const request = await markRequestStatus(id, "rejected", reason);
-    await sendRejectionEmail(request.email, request.instrument_slug, reason);
+    await sendRejectionEmail(
+      request.email,
+      request.instrument_slug,
+      request.document_title ?? "Documento solicitado",
+      reason,
+    );
 
     revalidatePath("/admin/solicitudes");
     revalidatePath(`/admin/solicitudes/${id}`);
     redirect("/admin/solicitudes?notice=rejected");
+  } catch (error) {
+    if (isMissingTableError(error)) {
+      redirect(`/admin/solicitudes/${id}?notice=missing-table`);
+    }
+    throw error;
+  }
+}
+
+export async function emailRequestedDocument(id: string) {
+  await assertAdmin();
+  if (!hasSupabaseServiceConfig()) {
+    redirect(`/admin/solicitudes/${id}?notice=missing-config`);
+  }
+
+  try {
+    const request = await getRequestById(id);
+
+    if (!request.document_id) {
+      redirect(`/admin/solicitudes/${id}?error=missing-document`);
+    }
+
+    const delivery = await getRequestedDocumentDelivery(request.document_id);
+    const emailResult = await sendRequestedDocumentEmail(
+      request.email,
+      request.document_title ?? delivery.title,
+      delivery.url,
+      delivery.expiryLabel,
+    );
+
+    if (!emailResult.sent) {
+      redirect(`/admin/solicitudes/${id}?error=document-email-failed`);
+    }
+
+    revalidatePath("/admin/solicitudes");
+    revalidatePath(`/admin/solicitudes/${id}`);
+    redirect(`/admin/solicitudes/${id}?notice=document-sent`);
   } catch (error) {
     if (isMissingTableError(error)) {
       redirect(`/admin/solicitudes/${id}?notice=missing-table`);

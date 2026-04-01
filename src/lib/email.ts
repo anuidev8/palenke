@@ -5,6 +5,7 @@ import {
   approvalEmailHtml,
   coordinatorAlertHtml,
   rejectionEmailHtml,
+  requestedDocumentEmailHtml,
   signedUrlEmailHtml,
   type AccessRequestEmailData,
 } from "@/lib/email-templates";
@@ -70,19 +71,24 @@ export async function sendCoordinatorAlert(request: AccessRequestEmailData) {
   });
 }
 
-export async function sendApprovalEmail(email: string, instrument: string) {
+export async function sendApprovalEmail(email: string, instrument: string, documentTitle: string) {
   return safeSend({
     to: email,
     subject: `Solicitud aprobada — ${instrument}`,
-    html: approvalEmailHtml(instrument),
+    html: approvalEmailHtml(instrument, documentTitle),
   });
 }
 
-export async function sendRejectionEmail(email: string, instrument: string, reason: string) {
+export async function sendRejectionEmail(
+  email: string,
+  instrument: string,
+  documentTitle: string,
+  reason: string,
+) {
   return safeSend({
     to: email,
     subject: `Solicitud rechazada — ${instrument}`,
-    html: rejectionEmailHtml(instrument, reason),
+    html: rejectionEmailHtml(instrument, documentTitle, reason),
   });
 }
 
@@ -91,5 +97,18 @@ export async function sendSignedUrlEmail(email: string, signedUrl: string, expir
     to: email,
     subject: "Enlace temporal de descarga",
     html: signedUrlEmailHtml(signedUrl, expiry),
+  });
+}
+
+export async function sendRequestedDocumentEmail(
+  email: string,
+  documentTitle: string,
+  signedUrl: string,
+  expiry: string,
+) {
+  return safeSend({
+    to: email,
+    subject: `Documento solicitado — ${documentTitle}`,
+    html: requestedDocumentEmailHtml(documentTitle, signedUrl, expiry),
   });
 }

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Callout, SiteLayout } from "@/components/mock/ui";
 import { AccessRequestForm } from "@/components/palenke/AccessRequestForm";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
-import { type SearchParams, withRole } from "@/lib/viewer";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
 const instrumentRequestConfig = {
   reglamentos: {
@@ -45,6 +45,8 @@ export default async function SolicitarAccesoPage({
   const { instrumento } = await params;
   const sp = await searchParams;
   const role = await getViewerRoleFromRequest(sp);
+  const documentId = getFirstParam(sp.documentId) ?? "";
+  const documentTitle = getFirstParam(sp.documentTitle) ?? "";
 
   if (!(instrumento in instrumentRequestConfig)) {
     notFound();
@@ -80,7 +82,7 @@ export default async function SolicitarAccesoPage({
                 {inst.title}
               </h1>
               <p className="max-w-3xl text-base leading-7 text-[#4a4540] sm:text-lg">
-                Completa este formulario para solicitar acceso a documentos restringidos del
+                Completa este formulario para solicitar acceso a un archivo específico del
                 instrumento.
               </p>
             </div>
@@ -109,11 +111,22 @@ export default async function SolicitarAccesoPage({
             </p>
           </div>
 
-          <AccessRequestForm
-            instrumentSlug={instrumento}
-            instrumentTitle={inst.title}
-            accessLevel={inst.accessLevel}
-          />
+          {documentId && documentTitle ? (
+            <AccessRequestForm
+              instrumentSlug={instrumento}
+              instrumentTitle={inst.title}
+              documentId={documentId}
+              documentTitle={documentTitle}
+              accessLevel={inst.accessLevel}
+            />
+          ) : (
+            <Callout tone="warning" title="Selecciona un documento">
+              <p>
+                Esta ruta ahora gestiona solicitudes por archivo. Vuelve al instrumento y elige el
+                documento exacto que quieres solicitar.
+              </p>
+            </Callout>
+          )}
         </div>
       </section>
     </SiteLayout>

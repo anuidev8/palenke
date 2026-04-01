@@ -13,6 +13,8 @@ export type AccessRequestRecord = {
   motivation: string;
   pcn_affiliation: string | null;
   instrument_slug: string;
+  document_id: string | null;
+  document_title: string | null;
   access_level: AccessLevel;
   status: AccessRequestStatus;
   reviewer_notes: string | null;
@@ -58,6 +60,8 @@ const mockAccessRequests: AccessRequestRecord[] = [
     motivation: "Apoyar documentación comunitaria para taller de formación interna.",
     pcn_affiliation: "Allied organization",
     instrument_slug: "planes-uso",
+    document_id: "mock-doc-planes-uso-001",
+    document_title: "PUMA - Consejo Comunitario Renacientes",
     access_level: "coordination",
     status: "pending",
     reviewer_notes: null,
@@ -74,6 +78,8 @@ const mockAccessRequests: AccessRequestRecord[] = [
     motivation: "Consulta de reglamento para proceso organizativo local.",
     pcn_affiliation: "Yes",
     instrument_slug: "reglamentos",
+    document_id: "mock-doc-reglamentos-001",
+    document_title: "Reglamento Interno - CC Martin Luther King",
     access_level: "admin",
     status: "pending",
     reviewer_notes: null,
@@ -115,6 +121,8 @@ function normalizeAccessRequest(raw: Record<string, unknown>): AccessRequestReco
     motivation: String(raw.motivation ?? ""),
     pcn_affiliation: raw.pcn_affiliation ? String(raw.pcn_affiliation) : null,
     instrument_slug: String(raw.instrument_slug ?? ""),
+    document_id: raw.document_id ? String(raw.document_id) : null,
+    document_title: raw.document_title ? String(raw.document_title) : null,
     access_level: String(raw.access_level) === "coordination" ? "coordination" : "admin",
     status:
       String(raw.status) === "approved"
@@ -197,6 +205,8 @@ export async function getAccessRequestFilterOptionsWithMeta() {
       email: "",
       community: "",
       motivation: "",
+      document_id: null,
+      document_title: null,
       created_at: "",
       ...raw,
     }),
@@ -281,6 +291,54 @@ export async function getAccessRequestByIdWithMeta(id: string) {
 export async function getAccessRequestById(id: string) {
   const result = await getAccessRequestByIdWithMeta(id);
   return result.request;
+}
+
+export async function listAccessRequestsForEmailWithMeta(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    return {
+      requests: [] as AccessRequestRecord[],
+      mode: "mock_query_error" as const,
+    };
+  }
+
+  if (!hasSupabaseServiceConfig()) {
+    return {
+      requests: mockAccessRequests
+        .filter((record) => record.email.toLowerCase() === normalizedEmail)
+        .toSorted((a, b) => (a.created_at < b.created_at ? 1 : -1)),
+      mode: "mock_missing_service_config" as const,
+    };
+  }
+
+  const supabase = createSupabaseService();
+  const { data, error } = await supabase
+    .from("access_requests")
+    .select("*")
+    .eq("email", normalizedEmail)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    if (isMissingTableError(error)) {
+      return {
+        requests: mockAccessRequests
+          .filter((record) => record.email.toLowerCase() === normalizedEmail)
+          .toSorted((a, b) => (a.created_at < b.created_at ? 1 : -1)),
+        mode: "mock_missing_table" as const,
+      };
+    }
+
+    return {
+      requests: [] as AccessRequestRecord[],
+      mode: "mock_query_error" as const,
+    };
+  }
+
+  return {
+    requests: data.map((row) => normalizeAccessRequest(row as Record<string, unknown>)),
+    mode: "supabase" as const,
+  };
 }
 
 export async function countPendingAccessRequests() {

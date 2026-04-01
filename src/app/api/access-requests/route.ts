@@ -23,6 +23,7 @@ function buildUserWebhookMessage(input: {
   full_name: string;
   community: string;
   motivation: string;
+  document_title: string;
 }) {
   return [
     `Hola ${input.full_name},`,
@@ -30,6 +31,7 @@ function buildUserWebhookMessage(input: {
     "Tu solicitud de acceso al instrumento Planes de uso y manejo fue recibida correctamente por el equipo de Palenke.",
     "",
     "Resumen de la solicitud:",
+    `- Documento: ${input.document_title}`,
     `- Consejo comunitario / institución: ${input.community}`,
     `- Motivo: ${input.motivation}`,
     "",
@@ -49,6 +51,7 @@ async function sendUserWebhookIfNeeded(input: {
   email: string;
   community: string;
   motivation: string;
+  document_title: string;
 }) {
   if (input.instrument_slug !== PLANES_USO_SLUG) {
     return;
@@ -117,9 +120,12 @@ export async function POST(request: Request) {
     .from("access_requests")
     .insert({
       ...input,
+      email: input.email.trim().toLowerCase(),
       status: "pending",
     })
-    .select("id, full_name, email, community, motivation, instrument_slug, access_level")
+    .select(
+      "id, full_name, email, community, motivation, instrument_slug, document_title, access_level",
+    )
     .single();
 
   if (error || !data) {
@@ -150,6 +156,7 @@ export async function POST(request: Request) {
       community: data.community,
       motivation: data.motivation,
       instrument_slug: data.instrument_slug,
+      document_title: data.document_title,
       access_level: data.access_level,
     });
   } else {
@@ -160,6 +167,7 @@ export async function POST(request: Request) {
       community: data.community,
       motivation: data.motivation,
       instrument_slug: data.instrument_slug,
+      document_title: data.document_title,
       access_level: data.access_level,
     });
   }
@@ -170,6 +178,7 @@ export async function POST(request: Request) {
     email: data.email,
     community: data.community,
     motivation: data.motivation,
+    document_title: data.document_title,
   });
 
   return NextResponse.json({

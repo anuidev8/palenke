@@ -8,6 +8,8 @@ type AccessLevel = "admin" | "coordination";
 type AccessRequestFormProps = {
   instrumentSlug: string;
   instrumentTitle: string;
+  documentId: string;
+  documentTitle: string;
   accessLevel: AccessLevel;
 };
 
@@ -34,6 +36,8 @@ const INITIAL_VALUES: FormValues = {
 export function AccessRequestForm({
   instrumentSlug,
   instrumentTitle,
+  documentId,
+  documentTitle,
   accessLevel,
 }: AccessRequestFormProps) {
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
@@ -41,8 +45,6 @@ export function AccessRequestForm({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const isCoordination = accessLevel === "coordination";
 
   function getFieldErrorMessage(field: keyof FormValues, fallback?: string) {
     const map: Record<keyof FormValues, string> = {
@@ -79,6 +81,8 @@ export function AccessRequestForm({
         body: JSON.stringify({
           ...values,
           instrument_slug: instrumentSlug,
+          document_id: documentId,
+          document_title: documentTitle,
           access_level: accessLevel,
         }),
       });
@@ -131,12 +135,18 @@ export function AccessRequestForm({
           </p>
           <h3 className="mt-2 font-display text-3xl text-[#1a1a1a]">Hemos recibido tu solicitud</h3>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#4a4540]">
-            Tu solicitud para <strong>{instrumentTitle}</strong> fue registrada correctamente.
-            Nuestro equipo la validará y te responderá por correo.
+            Tu solicitud para <strong>{documentTitle}</strong> en <strong>{instrumentTitle}</strong>{" "}
+            fue registrada correctamente. Ahora entra a revisión y nuestro equipo te responderá por correo
+            cuando haya una decisión.
           </p>
-          <p className="mt-2 text-sm font-semibold text-[#2e7d32]">
-            Tiempo de respuesta estimado: 1 día hábil.
-          </p>
+          <div className="mx-auto mt-6 max-w-2xl rounded-[20px] border border-[#d8e7d5] bg-[#f5fbf3] p-5 text-left">
+            <p className="text-sm font-semibold text-[#234b1f]">Mientras esperas</p>
+            <ul className="mt-2 grid gap-2 text-sm leading-6 text-[#476243]">
+              <li>Te avisaremos al correo registrado cuando la solicitud sea aprobada, rechazada o atendida.</li>
+              <li>Si ya tienes cuenta, podrás revisar tus solicitudes iniciando sesión.</li>
+              <li>Tiempo estimado de respuesta: 1 día hábil.</li>
+            </ul>
+          </div>
           <button
             type="button"
             className="mt-8 inline-flex items-center justify-center rounded-[14px] bg-[#2e7d32] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1b5e20]"
@@ -161,9 +171,20 @@ export function AccessRequestForm({
           </p>
           <h2 className="mt-1 font-display text-2xl text-white sm:text-3xl">{instrumentTitle}</h2>
           <p className="mt-1 text-sm text-white/75">
-            Completa el formulario para validar tu acceso a información restringida.
+            Completa este formulario para pedir acceso a este archivo. La entrega no es inmediata:
+            primero debe ser revisada por el equipo administrador.
           </p>
         </div>
+      </div>
+
+      <div className="mb-4 overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-[#fffaf2] p-6 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a756e]">
+          Documento solicitado
+        </p>
+        <h3 className="mt-2 font-display text-2xl text-[#1a1a1a]">{documentTitle}</h3>
+        <p className="mt-2 text-sm leading-6 text-[#6b5f53]">
+          Tu solicitud quedará asociada a este documento exacto para que la revisión sea más clara y precisa.
+        </p>
       </div>
 
       <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">
@@ -291,7 +312,8 @@ export function AccessRequestForm({
 
       <div className="overflow-hidden rounded-[28px] bg-[#2e7d32] p-7">
         <p className="text-sm leading-6 text-white/80">
-          Al enviar, tus datos serán usados únicamente para validar y registrar esta solicitud de acceso.
+          Al enviar, tus datos se usarán únicamente para registrar y revisar esta solicitud. El acceso
+          depende de aprobación previa del equipo de Palenke.
         </p>
 
         {errorMessage ? (
@@ -310,7 +332,7 @@ export function AccessRequestForm({
           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-[14px] bg-white py-3.5 text-sm font-bold text-[#2e7d32] transition hover:bg-[#f0eae0] disabled:cursor-not-allowed disabled:opacity-70"
         >
           <Send className="h-4 w-4" aria-hidden="true" />
-          {isSubmitting ? "Enviando solicitud..." : "Enviar solicitud"}
+          {isSubmitting ? "Enviando solicitud..." : "Enviar solicitud a revisión"}
         </button>
       </div>
     </form>

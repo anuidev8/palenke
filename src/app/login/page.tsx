@@ -20,6 +20,8 @@ export default async function LoginPage({
   const contextualMessage =
     message === "geoportal"
       ? "Debes iniciar sesión para acceder al geoportal."
+      : message === "solicitudes"
+        ? "Inicia sesión para revisar el historial de tus solicitudes y su estado."
       : redirectTo !== "/studio" && redirectTo !== "/"
         ? "Este contenido es solo para miembros del Palenke/PCN. Inicia sesión para continuar."
         : "";

@@ -3,7 +3,6 @@ import { AdminLayout, Callout, StatusPill, TableCard, Toolbar } from "@/componen
 import { requireAdmin } from "@/lib/admin-access";
 import {
   countPendingAccessRequests,
-  formatAccessLevelLabel,
   formatAccessRequestStatusLabel,
   formatInstrumentLabel,
   getAccessRequestFilterOptionsWithMeta,
@@ -90,7 +89,7 @@ export default async function AdminSolicitudesPage({
             <option value="">Nivel</option>
             {options.accessLevels.map((value) => (
               <option key={value} value={value}>
-                {formatAccessLevelLabel(value)}
+                {value === "coordination" ? "Coordinación" : "Admin"}
               </option>
             ))}
           </select>
@@ -119,36 +118,32 @@ export default async function AdminSolicitudesPage({
       <TableCard
         headers={[
           "Nombre",
-          "Cédula",
-          "Email",
+          "Documento",
           "Instrumento",
-          "Nivel",
+          "Email",
           "Fecha",
           "Estado",
           "Acciones",
         ]}
         columnWidths={[
           "min-w-[180px]",
-          "min-w-[120px]",
           "min-w-[220px]",
           "min-w-[140px]",
-          "min-w-[110px]",
+          "min-w-[220px]",
           "min-w-[150px]",
           "min-w-[120px]",
           "w-24",
         ]}
         rows={requests.map((request) => [
-          <span key="name" className="font-medium text-[color:var(--forest)]">
-            {request.full_name}
-          </span>,
-          <span key="id">{request.national_id}</span>,
-          <span key="email">{request.email}</span>,
+          <div key="name" className="flex flex-col gap-0.5">
+            <span className="font-medium text-[color:var(--forest)]">{request.full_name}</span>
+            <span className="text-xs text-[color:var(--muted)]">{request.national_id}</span>
+          </div>,
+          <span key="document">{request.document_title ?? "No especificado"}</span>,
           <span key="instrument" className="chip">
             {formatInstrumentLabel(request.instrument_slug)}
           </span>,
-          <span key="level" className="chip">
-            {formatAccessLevelLabel(request.access_level)}
-          </span>,
+          <span key="email">{request.email}</span>,
           <span key="date">{formatDate(request.created_at)}</span>,
           <StatusPill
             key="status"

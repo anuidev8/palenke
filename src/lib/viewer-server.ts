@@ -10,6 +10,8 @@ export type ViewerSessionState = {
   role: ViewerRole;
   isAuthenticated: boolean;
   isActive: boolean;
+  userId: string | null;
+  email: string | null;
 };
 
 export const getViewerSessionState = cache(async (): Promise<ViewerSessionState> => {
@@ -18,6 +20,8 @@ export const getViewerSessionState = cache(async (): Promise<ViewerSessionState>
       role: "public",
       isAuthenticated: false,
       isActive: false,
+      userId: null,
+      email: null,
     };
   }
 
@@ -32,6 +36,8 @@ export const getViewerSessionState = cache(async (): Promise<ViewerSessionState>
         role: "public",
         isAuthenticated: false,
         isActive: false,
+        userId: null,
+        email: null,
       };
     }
 
@@ -58,6 +64,8 @@ export const getViewerSessionState = cache(async (): Promise<ViewerSessionState>
       role: resolveViewerRoleRecord(data),
       isAuthenticated: true,
       isActive: data?.active !== false,
+      userId: user.id,
+      email: user.email ?? null,
     };
   } catch (error) {
     console.error("Failed to resolve viewer session state:", error);
@@ -65,6 +73,8 @@ export const getViewerSessionState = cache(async (): Promise<ViewerSessionState>
       role: "public",
       isAuthenticated: false,
       isActive: false,
+      userId: null,
+      email: null,
     };
   }
 });
@@ -78,6 +88,8 @@ export async function getViewerRequestState(
       role,
       isAuthenticated: role !== "public",
       isActive: role !== "public",
+      userId: null,
+      email: null,
     };
   }
 

@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import { listGrantedDocumentIdsForViewer } from "@/lib/document-access";
 import { canDownloadDocument } from "@/lib/mock-data";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRequestState } from "@/lib/viewer-server";
@@ -261,6 +262,15 @@ export default async function InstrumentoPage({
   const displayDocs: DisplayDoc[] = usesSupabaseDocs
     ? tableDbDocs.map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
     : [];
+  const grantedDocIds = sessionState.isAuthenticated
+    ? Array.from(
+        await listGrantedDocumentIdsForViewer({
+          documentIds: displayDocs.map((doc) => doc.id),
+          userId: sessionState.userId,
+          email: sessionState.email,
+        }),
+      )
+    : [];
 
   const isPublic = role === "public";
   const accessLevel = inst.accessLevel as AccessLevel;
@@ -448,6 +458,7 @@ export default async function InstrumentoPage({
             docs={displayDocs} 
             role={role} 
             isAuthenticated={isAuthenticated}
+            grantedDocIds={grantedDocIds}
             color={inst.color} 
             instrumento={instrumento}
             instrumentTitle={inst.title}

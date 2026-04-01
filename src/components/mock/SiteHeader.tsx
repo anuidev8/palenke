@@ -6,7 +6,7 @@ import Image from "next/image";
 import type { ViewerRole } from "@/lib/mock-data";
 import { isInternal, withRole } from "@/lib/viewer";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { LogOut, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard, FolderClock } from "lucide-react";
 
 function getRoleLabel(role: ViewerRole) {
   if (role === "admin") {
@@ -155,6 +155,13 @@ export function SiteHeader({
                     <LayoutDashboard className="h-4 w-4" />
                     <span>Mi Estudio</span>
                   </Link>
+                  <Link
+                    href="/mis-solicitudes"
+                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--forest)] transition-colors hover:bg-[color:var(--sand-strong)]"
+                  >
+                    <FolderClock className="h-4 w-4" />
+                    <span>Mis solicitudes</span>
+                  </Link>
                   <button
                     type="button"
                     onClick={() => signOut()}
@@ -209,6 +216,13 @@ export function SiteHeader({
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Mi Estudio
+                    </Link>
+                    <Link
+                      href="/mis-solicitudes"
+                      className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
+                    >
+                      <FolderClock className="h-4 w-4" />
+                      Mis solicitudes
                     </Link>
                     <button
                       onClick={() => signOut()}

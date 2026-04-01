@@ -184,6 +184,8 @@ async function signInAndBuildCookieHeader({
 async function createPendingRequest(serviceClient, {
   email,
   instrumentSlug,
+  documentId,
+  documentTitle,
   accessLevel,
   motivation,
 }) {
@@ -196,12 +198,11 @@ async function createPendingRequest(serviceClient, {
       community: "QA Community",
       motivation,
       instrument_slug: instrumentSlug,
+      document_id: documentId,
+      document_title: documentTitle,
       access_level: accessLevel,
       status: "pending",
       pcn_affiliation: "QA Affiliation",
-      institution: accessLevel === "coordination" ? "QA Institution" : null,
-      use_purpose: accessLevel === "coordination" ? "QA validation run" : null,
-      data_protection: accessLevel === "coordination" ? "Acepto protocolo QA" : null,
     })
     .select("id")
     .single();
@@ -211,6 +212,22 @@ async function createPendingRequest(serviceClient, {
   }
 
   return data.id;
+}
+
+async function getSampleDocumentByInstrument(serviceClient, instrumentSlug) {
+  const { data, error } = await serviceClient
+    .from("documents")
+    .select("id,title")
+    .eq("instrument", instrumentSlug)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (error || !data?.id || !data?.title) {
+    throw error ?? new Error(`Unable to resolve sample document for ${instrumentSlug}`);
+  }
+
+  return data;
 }
 
 function decodeEntities(input) {
@@ -491,15 +508,21 @@ async function main() {
     role: "admin",
   });
 
+  const reglamentoDoc = await getSampleDocumentByInstrument(serviceClient, "reglamentos");
+
   const approveRequestId = await createPendingRequest(serviceClient, {
     email: `qa.plan.instrumentos.request.approve+${stamp}@example.org`,
     instrumentSlug: "reglamentos",
+    documentId: reglamentoDoc.id,
+    documentTitle: reglamentoDoc.title,
     accessLevel: "admin",
     motivation: "Validar flujo approve por Server Action.",
   });
   const rejectRequestId = await createPendingRequest(serviceClient, {
     email: `qa.plan.instrumentos.request.reject+${stamp}@example.org`,
     instrumentSlug: "reglamentos",
+    documentId: reglamentoDoc.id,
+    documentTitle: reglamentoDoc.title,
     accessLevel: "admin",
     motivation: "Validar flujo reject por Server Action.",
   });

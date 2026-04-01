@@ -177,6 +177,7 @@ function FileCard({
   doc,
   role,
   isAuthenticated,
+  hasGrant,
   color,
   onOpenRequestModal,
   instrumento,
@@ -184,11 +185,12 @@ function FileCard({
   doc: DisplayDoc;
   role: ViewerRole;
   isAuthenticated: boolean;
+  hasGrant: boolean;
   color: string;
   onOpenRequestModal?: () => void;
   instrumento?: string;
 }) {
-  const hasAccess = canDownloadDocument(role, doc.visibility);
+  const hasAccess = canDownloadDocument(role, doc.visibility) || hasGrant;
   const [isLoading, setIsLoading] = useState(false);
   const showApprovalMessage = doc.visibility === "sensitive";
   const showLoginCta = !isAuthenticated || doc.visibility !== "sensitive";
@@ -359,6 +361,7 @@ export function DocumentTree({
   docs,
   role,
   isAuthenticated,
+  grantedDocIds = [],
   color,
   instrumento,
   instrumentTitle,
@@ -367,6 +370,7 @@ export function DocumentTree({
   docs: DisplayDoc[];
   role: ViewerRole;
   isAuthenticated: boolean;
+  grantedDocIds?: string[];
   color: string;
   instrumento?: string;
   instrumentTitle?: string;
@@ -375,6 +379,8 @@ export function DocumentTree({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<DisplayDoc | null>(null);
+  const grantedDocIdSet = useMemo(() => new Set(grantedDocIds), [grantedDocIds]);
 
   const tree = useMemo(() => buildTree(docs), [docs]);
 
@@ -525,8 +531,16 @@ export function DocumentTree({
                     doc={item.doc} 
                     role={role} 
                     isAuthenticated={isAuthenticated}
+                    hasGrant={grantedDocIdSet.has(item.doc.id)}
                     color={color} 
-                    onOpenRequestModal={instrumentTitle && accessLevel && instrumento ? () => setIsModalOpen(true) : undefined}
+                    onOpenRequestModal={
+                      instrumentTitle && accessLevel && instrumento
+                        ? () => {
+                            setSelectedDoc(item.doc ?? null);
+                            setIsModalOpen(true);
+                          }
+                        : undefined
+                    }
                     instrumento={instrumento}
                   />
                 );
@@ -537,15 +551,20 @@ export function DocumentTree({
         </motion.div>
       )}
 
-      {instrumento && instrumentTitle && accessLevel && (
+      {instrumento && instrumentTitle && accessLevel && selectedDoc ? (
         <AccessRequestModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedDoc(null);
+          }}
           instrumentSlug={instrumento}
           instrumentTitle={instrumentTitle}
+          documentId={selectedDoc.id}
+          documentTitle={selectedDoc.title}
           accessLevel={accessLevel}
         />
-      )}
+      ) : null}
     </div>
   );
 }

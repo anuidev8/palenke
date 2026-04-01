@@ -4,6 +4,7 @@ import {
   isInternalRole,
   resolveViewerRoleRecord,
 } from "@/lib/auth/permissions";
+import { hasDocumentDownloadGrant } from "@/lib/document-access";
 import { sendSignedUrlEmail } from "@/lib/email";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import {
@@ -127,28 +128,34 @@ export async function GET(
   const role = resolveViewerRoleRecord(userRecord);
   const isAdmin = isAdminRole(role);
   const isInternal = isInternalRole(role);
+  const requesterEmail = (user.email ?? userRecord?.email ?? "").trim().toLowerCase();
+  const hasGrant = await hasDocumentDownloadGrant({
+    documentId: document.id,
+    userId: user.id,
+    email: requesterEmail,
+  });
+  let hasApprovedRequest = false;
 
-  if (visibility === "internal" && !isInternal) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  if (visibility === "sensitive" && !isInternal) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  if (!isAdmin && visibility === "sensitive") {
-    const requesterEmail = user.email ?? userRecord?.email ?? "";
+  if (!isAdmin && requesterEmail) {
     const { data: approvedRequest } = await supabase
       .from("access_requests")
       .select("id")
       .eq("email", requesterEmail)
-      .eq("instrument_slug", document.instrument)
+      .eq("document_id", document.id)
       .eq("status", "approved")
       .maybeSingle();
 
-    if (!approvedRequest) {
-      return NextResponse.json({ error: "Access request not approved." }, { status: 403 });
-    }
+    hasApprovedRequest = Boolean(approvedRequest);
+  }
+
+  const hasScopedAccess = hasGrant || hasApprovedRequest;
+
+  if (visibility === "internal" && !isInternal && !hasScopedAccess) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (visibility === "sensitive" && !isAdmin && !hasScopedAccess) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   if (!document.storage_bucket || !document.storage_path) {
@@ -167,7 +174,7 @@ export async function GET(
     );
   }
 
-  if (visibility === "sensitive") {
+  if (visibility === "sensitive" && isAdmin && !hasScopedAccess) {
     const destinationEmail = user.email ?? userRecord?.email;
     if (!destinationEmail) {
       return NextResponse.json({ error: "User email is required." }, { status: 400 });
