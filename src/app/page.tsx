@@ -17,7 +17,10 @@ import {
   HomePoliticalOrientationAccordion,
   HomeWhoWeAreAccordion,
 } from "@/components/home/HomeInfoAccordions";
-import { getHomePcnNews } from "@/lib/newsroom";
+import {
+  getExternalEnterateNews,
+  listInternalNews,
+} from "@/lib/content";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 import { HomeVideoGallery } from "@/components/home/HomeVideoGallery";
 
@@ -29,8 +32,10 @@ export default async function HomePage({
   const params = await searchParams;
   const role = getViewerRole(params);
   const notice = params.notice;
-  const noticias = getHomePcnNews(2);
-  const ultimasNoticias = getHomePcnNews(4);
+  const [noticias, ultimasNoticias] = await Promise.all([
+    getExternalEnterateNews(3),
+    listInternalNews({ limit: 4 }),
+  ]);
 
   return (
     <SiteLayout
@@ -209,29 +214,43 @@ export default async function HomePage({
       {/* ── ¿Quiénes somos? ── */}
       <section
         id="quienes-somos"
-        className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-20"
+        className="relative overflow-hidden bg-[#fcfaf7] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
-        {/* Left: accent bar + heading + PCN dots */}
-        <div className="flex gap-5">
-          <div className="w-1 shrink-0 rounded-full bg-[#2e7d32]" aria-hidden="true" />
-          <div>
-            <h2 className="font-display text-4xl leading-tight text-[#1a1a1a] sm:text-5xl">
-              QUIÉNES SOMOS
-            </h2>
-            <div className="mt-4 flex items-center gap-2" aria-hidden="true">
-              <span className="h-3 w-3 rounded-full bg-[#2e7d32]" />
-              <span className="h-3 w-3 rounded-full bg-[#d32f2f]" />
-              <span className="h-3 w-3 rounded-full bg-[#fbc02d]" />
+        {/* Decorative background elements */}
+        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-[#2e7d32]/5 blur-3xl" aria-hidden="true" />
+        <div className="absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-[#fbc02d]/10 blur-3xl" aria-hidden="true" />
+        <div 
+          className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 opacity-[0.03] mix-blend-overlay pointer-events-none" 
+          style={{ backgroundImage: "radial-gradient(#1a1a1a 2px, transparent 2px)", backgroundSize: "32px 32px" }} 
+          aria-hidden="true" 
+        />
+
+        <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-10 rounded-[32px] border border-[#e8dfd3] bg-white/70 p-8 shadow-sm backdrop-blur-xl sm:p-12">
+          {/* Top: accent bar + heading + PCN dots */}
+          <div className="flex gap-6">
+            <div className="w-1.5 shrink-0 rounded-full bg-gradient-to-b from-[#2e7d32] via-[#fbc02d] to-[#d32f2f]" aria-hidden="true" />
+            <div className="flex flex-col justify-start w-full">
+              <p className="eyebrow mb-3 text-[#2e7d32]">Nuestra esencia</p>
+              <h2 className="font-display text-4xl leading-tight text-[#1a1a1a] sm:text-5xl lg:text-6xl">
+                Quiénes somos
+              </h2>
+              <div className="mt-8 flex items-center gap-3" aria-hidden="true">
+                <span className="h-3.5 w-3.5 rounded-full bg-[#2e7d32] shadow-sm" />
+                <span className="h-3.5 w-3.5 rounded-full bg-[#d32f2f] shadow-sm" />
+                <span className="h-3.5 w-3.5 rounded-full bg-[#fbc02d] shadow-sm" />
+              </div>
             </div>
           </div>
+          {/* Bottom: paragraphs */}
+          <div className="relative w-full">
+            <HomeWhoWeAreAccordion
+              introParagraphs={homeIntro}
+              strategicFunctionsIntro={homeStrategicFunctionsIntro}
+              strategicFunctions={homeStrategicFunctions}
+              strategicFunctionsClosing={homeStrategicFunctionsClosing}
+            />
+          </div>
         </div>
-        {/* Right: paragraphs */}
-        <HomeWhoWeAreAccordion
-          introParagraphs={homeIntro}
-          strategicFunctionsIntro={homeStrategicFunctionsIntro}
-          strategicFunctions={homeStrategicFunctions}
-          strategicFunctionsClosing={homeStrategicFunctionsClosing}
-        />
       </section>
 
       {/* ── Video + Nuestra orientación política ── */}
@@ -345,7 +364,6 @@ export default async function HomePage({
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
 
-          {/* Entérate — news cards */}
           <div>
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -362,46 +380,46 @@ export default async function HomePage({
             </div>
 
             <div className="grid gap-5">
-              {noticias.map((n) => (
+              {noticias.slice(0, 2).map((n) => (
                 <article
-                  key={n.slug}
+                  key={n.id}
                   className="surface-card flex flex-col gap-4"
-                  style={{ borderTopColor: n.categoriaColor, borderTopWidth: "3px" }}
+                  style={{ borderTopColor: "#2e7d32", borderTopWidth: "3px" }}
                 >
-                  {/* placeholder image */}
                   <div
-                    className="flex h-[140px] items-end rounded-[20px] p-4"
+                    className="flex h-[140px] items-end rounded-[20px] bg-cover bg-center p-4"
                     style={{
-                      background: `linear-gradient(135deg, ${n.categoriaColor}cc, ${n.categoriaColor}66)`,
+                      backgroundImage: n.imageUrl
+                        ? `linear-gradient(180deg, rgba(26,26,26,0.1), rgba(26,26,26,0.7)), url(${n.imageUrl})`
+                        : "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
                     }}
                   >
                     <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white">
-                      {n.categoria}
+                      Fuente externa
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-[#7a756e]">
                     <span className="rounded-full bg-[#1a1a1a] px-2.5 py-1 font-semibold text-white">
-                      {n.publisher}
+                      {n.sourceLabel}
                     </span>
-                    <span>{n.fecha}</span>
-                    <span>·</span>
-                    <span>{n.territorio}</span>
+                    <span>{new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(new Date(n.publishedAt))}</span>
                   </div>
-                  <h3 className="font-display text-xl text-[#1a1a1a]">{n.titulo}</h3>
-                  <p className="line-clamp-2 text-sm leading-6 text-[#4a4540]">{n.resumen}</p>
-                  <Link
-                    href={withRole(`/noticias/${n.slug}`, role)}
+                  <h3 className="font-display text-xl text-[#1a1a1a]">{n.title}</h3>
+                  <p className="line-clamp-2 text-sm leading-6 text-[#4a4540]">{n.excerpt}</p>
+                  <a
+                    href={n.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-[#2e7d32] transition hover:text-[#1b5e20]"
                   >
                     Leer más
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
+                  </a>
                 </article>
               ))}
             </div>
           </div>
 
-          {/* Lo último — noticias de incidencia */}
           <div>
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -417,26 +435,23 @@ export default async function HomePage({
               </Link>
             </div>
 
-            <div className="divide-y divide-[#e8dfd3] rounded-[28px] border border-[#e8dfd3] bg-white overflow-hidden">
+            <div className="divide-y divide-[#e8dfd3] overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-white">
               {ultimasNoticias.map((n) => (
                 <Link
-                  key={n.slug}
+                  key={n.id}
                   href={withRole(`/incidencia/${n.slug}`, role)}
                   className="flex items-start gap-4 px-5 py-4 transition hover:bg-[#f8f5f2]"
                 >
-                  <div
-                    className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl text-xs font-bold text-white"
-                    style={{ background: n.categoriaColor }}
-                    aria-hidden="true"
-                  >
-                    {n.categoria.slice(0, 2).toUpperCase()}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fddede] text-xs font-bold text-[#d32f2f]">
+                    {n.category.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-[#7a756e]">
-                      {n.fecha} · <span className="font-semibold text-[#1a1a1a]">{n.categoria}</span>
+                      {new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(new Date(n.publishedAt))} ·{" "}
+                      <span className="font-semibold text-[#1a1a1a]">{n.category}</span>
                     </p>
-                    <p className="mt-1 text-sm font-medium leading-5 text-[#1a1a1a]">{n.titulo}</p>
-                    <p className="mt-0.5 text-xs text-[#7a756e]">{n.territorio}</p>
+                    <p className="mt-1 text-sm font-medium leading-5 text-[#1a1a1a]">{n.title}</p>
+                    <p className="mt-0.5 text-xs text-[#7a756e]">{n.location ?? "Palenke / PCN"}</p>
                   </div>
                   <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#7a756e]" aria-hidden="true" />
                 </Link>

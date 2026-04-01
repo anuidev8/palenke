@@ -2,8 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, ArrowRight, BookOpen, Download, Droplets, ExternalLink, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Download, Droplets, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
+import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
 import { AdminGatedUI } from "@/components/palenke/AdminGatedUI";
 import { CoordinationGatedUI } from "@/components/palenke/CoordinationGatedUI";
@@ -236,6 +237,7 @@ export default async function InstrumentoPage({
   params: Promise<{ instrumento: string }>;
   searchParams: Promise<SearchParams>;
 }) {
+  noStore();
   const { instrumento } = await params;
   const sp = await searchParams;
   const roleFromQuery = getViewerRole(sp);

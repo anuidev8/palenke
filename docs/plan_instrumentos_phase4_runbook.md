@@ -80,7 +80,7 @@ Upload internal/sensitive PDFs to Supabase Storage and sync rows in `public.docu
 - Reads source files from `docs/files/INF. INTERNA/...`
 - Uploads each PDF to the expected bucket/path
 - Creates missing rows in `public.documents` (skips existing `(instrument, storage_path)` entries)
-- Mirrors PUMANE sensitive assets for both `planes-uso` and `conservacion` using distinct storage paths
+- Uses strict source-to-instrument categorization (no mirroring across instruments)
 - Verify mode checks exact expected storage paths and reports `found/expected`
 - Verify-db mode checks remote `documents` metadata counts by instrument against expected managed rows
 

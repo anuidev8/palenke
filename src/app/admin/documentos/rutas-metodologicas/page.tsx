@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { AdminLayout, Callout, TableCard } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
@@ -52,6 +53,7 @@ export default async function RutasMetodologicasAdminPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  noStore();
   const { role, searchParams: params } = await requireAdmin(searchParams);
   const notice = getFirstParam(params.notice);
   const error = getFirstParam(params.error);

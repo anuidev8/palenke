@@ -48,20 +48,20 @@ export default async function MemoriaAfroterritorialPage({
 
           {/* Left — Definición y Función */}
           <div>
-            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Definición</h2>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Nuestra Memoria</h2>
             <p className="mt-5 text-base leading-8 text-[#4a4540]">
-              Este es un espacio del Palenke donde se resguarda y activa el conocimiento histórico,
-              jurídico, cultural y ancestral del Pueblo Negro. Aquí se integra la memoria normativa
-              y la memoria viva del territorio como base para la defensa de derechos, la identidad
-              colectiva y la toma de decisiones.
+              Nuestra memoria es el corazón que late en cada río, manglar y comunidad del Pacífico.
+              Este espacio del Palenke es un refugio vivo donde resguardamos las voces de nuestras mayoras y mayores,
+              nuestras luchas históricas y el conocimiento ancestral del Pueblo Negro. Aquí, la memoria se hace
+              semilla para defender nuestro territorio, reafirmar nuestra identidad colectiva y mantener vivo nuestro legado.
             </p>
-            <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Función</h3>
+            <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Nuestro Propósito</h3>
             <ul className="mt-6 space-y-3">
               {[
-                "Preservar y organizar el conocimiento jurídico y político del Pueblo Negro",
-                "Visibilizar la producción académica, cultural y comunitaria afrodescendiente",
-                "Fortalecer la identidad, la memoria histórica y el pensamiento propio",
-                "Servir como base para la formación política y la incidencia.",
+                "Cuidar como tesoro colectivo el conocimiento jurídico y político del Pueblo Negro.",
+                "Elevar las voces y saberes de nuestras comunidades, celebrando nuestra producción cultural.",
+                "Tejer lazos de identidad y pensamiento propio que conecten a las nuevas generaciones.",
+                "Ser faro e inspiración para la formación política y la defensa incansable de nuestros derechos.",
               ].map((fn) => (
                 <li key={fn} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
@@ -139,18 +139,19 @@ export default async function MemoriaAfroterritorialPage({
           {/* Right — Definición y Función */}
           <div>
             <p className="eyebrow mb-2">Normativa vigente</p>
-            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">Definición</h3>
+            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">El Marco de Nuestros Derechos</h3>
             <p className="mt-4 text-base leading-7 text-[#4a4540]">
-              Espacio que recopila y organiza el marco normativo nacional e internacional
-              relacionado con los derechos del Pueblo Negro, afrocolombiano, raizal y palenquero.
+              Aquí reunimos las leyes, decretos y sentencias que nuestras comunidades han conquistado
+              con sudor y resistencia. Es la herramienta jurídica que ampara nuestro derecho fundamental
+              a ser y existir en el territorio.
             </p>
-            <h4 className="mt-7 font-display text-2xl text-[#1a1a1a]">Función</h4>
+            <h4 className="mt-7 font-display text-2xl text-[#1a1a1a]">Nuestra Herramienta de Defensa</h4>
             <ul className="mt-6 space-y-4">
               {[
-                "Centralizar leyes, decretos, jurisprudencia y tratados",
-                "Facilitar el acceso a herramientas jurídicas para comunidades y liderazgos",
-                "Fortalecer procesos de exigibilidad de derechos",
-                "Servir como soporte para litigio estratégico e incidencia",
+                "Tener a mano las leyes y tratados que nos protegen como pueblo.",
+                "Entregar a nuestros liderazgos las herramientas legales necesarias para proteger su territorio.",
+                "Fortalecer la voz de la comunidad cuando exige respeto y justicia.",
+                "Respaldar con argumentos firmes nuestra incidencia y defensa jurídica territorial.",
               ].map((fn) => (
                 <li key={fn} className="flex items-start gap-3 text-base leading-7 text-[#4a4540]">
                   <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
@@ -169,18 +170,19 @@ export default async function MemoriaAfroterritorialPage({
           {/* Left — Definición y Función */}
           <div>
             <p className="eyebrow mb-3">Memoria viva del territorio</p>
-            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Definición</h2>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">El Latir de Nuestra Cultura</h2>
             <p className="mt-5 text-base leading-8 text-[#4a4540]">
-              Espacio de circulación de conocimiento afrodescendiente que recoge la producción
-              académica, cultural y comunitaria, así como las expresiones vivas del territorio.
+              Es el eco de nuestros alabaos, la fuerza de nuestros liderazgos y la sabiduría de nuestras abuelas.
+              Aquí circula el pensamiento afrodescendiente, abrazando la academia, la cultura comunitaria y las
+              expresiones vivas que hacen palpitar al territorio.
             </p>
-            <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Función</h3>
+            <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Cómo Mantenemos Viva la Llama</h3>
             <ul className="mt-6 space-y-3">
               {[
-                "Publicar artículos académicos producidos por personas afrodescendientes",
-                "Sistematizar experiencias comunitarias y territoriales",
-                "Visibilizar prácticas culturales, saberes ancestrales y expresiones artísticas",
-                "Fortalecer el diálogo entre academia, comunidad y procesos organizativos",
+                "Dar a conocer las investigaciones y el pensamiento propio nacido de nuestras entrañas.",
+                "Recoger con amor las historias, luchas y experiencias de cada rincón del territorio.",
+                "Celebrar nuestras prácticas culturales, saberes y el arte que nos define.",
+                "Construir puentes vivos entre el conocimiento comunitario, la organización y la academia.",
               ].map((fn) => (
                 <li key={fn} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
@@ -241,7 +243,7 @@ export default async function MemoriaAfroterritorialPage({
               </p>
             </div>
             <Link
-              href={withRole("/noticias", role)}
+              href={withRole("/agenda", role)}
               className="hidden shrink-0 items-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:inline-flex"
             >
               Ver todos los eventos
@@ -332,7 +334,7 @@ export default async function MemoriaAfroterritorialPage({
                     {ev.location}
                   </span>
                   <Link
-                    href={withRole("/noticias", role)}
+                    href={withRole("/agenda", role)}
                     className="text-xs font-semibold text-white/70 transition hover:text-white"
                   >
                     Ver más →

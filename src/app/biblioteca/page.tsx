@@ -4,6 +4,7 @@ import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
 import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
 import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
+import { getNormativaDocumentRecords } from "@/lib/content";
 import {
   getVisibleDocuments,
   territories,
@@ -95,7 +96,17 @@ export default async function BibliotecaPage({
   const initialSearchQuery = getFirstParam(params.aiq) ?? "";
   const page = Math.max(1, Number(getFirstParam(params.page) ?? "1"));
 
-  const visibleDocuments = getVisibleDocuments(role).toSorted((a, b) => b.year - a.year);
+  const visibleDocumentsBase = getVisibleDocuments(role);
+  const shouldLoadNormativa = filters.sections.length === 0 || filters.sections.includes(NORMATIVA_SECTION);
+  const normativaDocuments = shouldLoadNormativa ? await getNormativaDocumentRecords() : [];
+  const visibleDocuments = (
+    normativaDocuments.length > 0
+      ? [
+          ...visibleDocumentsBase.filter((document) => document.section !== NORMATIVA_SECTION),
+          ...normativaDocuments,
+        ]
+      : visibleDocumentsBase
+  ).toSorted((a, b) => b.year - a.year);
   const results = filterDocuments(visibleDocuments, filters);
   const years = getDocumentYears(visibleDocuments);
   const totalCount = results.length;

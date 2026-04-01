@@ -32,10 +32,5 @@ values
   ('PUMANE Final - CC Renacientes', 'planes-uso', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'planes-uso/cc-renacientes/pumane-final-cc-renacientes.pdf'),
   ('Anexo 1 PUMANE - Glosario', 'planes-uso', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'planes-uso/cc-renacientes/anexo-1-pumane-glosario.pdf'),
   ('Anexo 2 PUMANE - Memoria metodológica', 'planes-uso', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'planes-uso/cc-renacientes/anexo-2-memoria-metodologica-pumane.pdf'),
-  ('Anexo 3 PUMANE - Flora y fauna', 'planes-uso', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'planes-uso/cc-renacientes/anexo-3-especies-flora-fauna-pumane.pdf'),
-
-  ('PUMANE Final - CC Renacientes (Conservación)', 'conservacion', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'conservacion/cc-renacientes/pumane-final-cc-renacientes.pdf'),
-  ('Anexo 1 PUMANE - Glosario (Conservación)', 'conservacion', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'conservacion/cc-renacientes/anexo-1-pumane-glosario.pdf'),
-  ('Anexo 2 PUMANE - Memoria metodológica (Conservación)', 'conservacion', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'conservacion/cc-renacientes/anexo-2-memoria-metodologica-pumane.pdf'),
-  ('Anexo 3 PUMANE - Flora y fauna (Conservación)', 'conservacion', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'conservacion/cc-renacientes/anexo-3-especies-flora-fauna-pumane.pdf')
+  ('Anexo 3 PUMANE - Flora y fauna', 'planes-uso', 'CC Renacientes de la Diáspora Africana', 'sensitive', 'docs-sensitive', 'planes-uso/cc-renacientes/anexo-3-especies-flora-fauna-pumane.pdf')
 on conflict (instrument, storage_path) do nothing;

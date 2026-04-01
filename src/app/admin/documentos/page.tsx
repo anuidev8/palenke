@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { AdminLayout, TableCard, Toolbar, VisibilityBadge } from "@/components/mock/ui";
+import { unstable_noStore as noStore } from "next/cache";
+import { AdminLayout, Callout, Toolbar, VisibilityBadge } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
-import { createSupabaseServer } from "@/lib/supabase/server";
+import { createSupabaseService } from "@/lib/supabase/service";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { FileText, Folder, Lock, CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -11,6 +12,7 @@ export default async function AdminDocumentosPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  noStore();
   const { role, searchParams: params } = await requireAdmin(searchParams);
   const query = (getFirstParam(params.q) ?? "").toLowerCase();
   const visibility = getFirstParam(params.visibility) ?? "";
@@ -21,7 +23,7 @@ export default async function AdminDocumentosPage({
 
   if (hasSupabaseServiceConfig()) {
     try {
-      const supabase = await createSupabaseServer();
+      const supabase = createSupabaseService();
       
       let dbQuery = supabase
         .from("documents")
@@ -54,6 +56,19 @@ export default async function AdminDocumentosPage({
 
   // Deduplicate instruments for filter
   const uniqueInstruments = [...new Set(documents.map(d => d.instrument))].filter(Boolean).sort();
+  const requiredNorms = [
+    "Ley 70 de 1993",
+    "Decreto 1745 de 1995",
+    "Decreto 1384 de 2023",
+    "Decreto 1396 de 2023",
+    "Decreto 0129 de 2024",
+  ];
+  const availableNorms = documents
+    .filter((doc) => doc.instrument === "normativa-vigente")
+    .map((doc) => String(doc.title));
+  const missingNorms = requiredNorms.filter(
+    (title) => !availableNorms.some((available) => available.toLowerCase().includes(title.toLowerCase())),
+  );
 
   return (
     <AdminLayout
@@ -99,6 +114,9 @@ export default async function AdminDocumentosPage({
       <Toolbar
         actions={
           <div className="flex gap-3">
+            <Link href={withRole("/admin/documentos/nuevo", role)} className="inline-flex items-center gap-2 rounded-xl bg-[#1a1a1a] px-4 py-2 text-sm font-bold text-white transition hover:bg-black">
+              + Nuevo documento
+            </Link>
             <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="inline-flex items-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]">
               <FileText className="w-4 h-4" />
               Rutas metodológicas
@@ -141,6 +159,14 @@ export default async function AdminDocumentosPage({
   
       </Toolbar>
 
+      {!dbError && missingNorms.length > 0 ? (
+        <Callout tone="warning" title="Normativa priorizada incompleta">
+          <p>
+            Faltan documentos clave frente al listado priorizado de normativa vigente: {missingNorms.join(", ")}.
+          </p>
+        </Callout>
+      ) : null}
+
       {dbError ? (
         <div className="p-6 bg-[#fff3e0] border border-[#ffb74d] rounded-2xl flex items-start gap-4 mb-8">
           <AlertCircle className="w-6 h-6 text-[#e65100] shrink-0 mt-0.5" />
@@ -165,6 +191,7 @@ export default async function AdminDocumentosPage({
                   <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Instrumento</th>
                   <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Visibilidad</th>
                   <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Fecha de registro</th>
+                  <th className="px-6 py-4 font-bold text-[#7a756e] uppercase tracking-wider text-xs">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e8dfd3]">
@@ -174,7 +201,12 @@ export default async function AdminDocumentosPage({
                       <div className="flex items-start gap-3">
                         <FileText className="w-5 h-5 text-[#d1ccc5] mt-0.5 group-hover:text-[#4a4540] transition-colors" />
                         <div>
-                          <p className="font-bold text-[#1a1a1a] text-base line-clamp-2">{doc.title}</p>
+                          <Link
+                            href={withRole(`/admin/documentos/${doc.id}/editar`, role)}
+                            className="font-bold text-[#1a1a1a] text-base line-clamp-2 underline decoration-transparent hover:decoration-current"
+                          >
+                            {doc.title}
+                          </Link>
                           <p className="text-xs text-[#7a756e] mt-1 line-clamp-1 font-mono">{doc.storage_path || doc.council || 'Sin ruta'}</p>
                         </div>
                       </div>
@@ -193,6 +225,14 @@ export default async function AdminDocumentosPage({
                         month: 'short',
                         day: 'numeric'
                       })}
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={withRole(`/admin/documentos/${doc.id}/editar`, role)}
+                        className="inline-flex items-center rounded-lg border border-[#e8dfd3] px-3 py-1.5 text-xs font-bold text-[#1a1a1a] hover:bg-[#f8f5f2]"
+                      >
+                        Editar
+                      </Link>
                     </td>
                   </tr>
                 ))}

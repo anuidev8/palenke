@@ -9,6 +9,33 @@ const verifyOnly = process.argv.includes("--verify");
 const verifyDbOnly = process.argv.includes("--verify-db");
 const root = process.cwd();
 
+const MANAGED_SOURCE_ROOTS = {
+  reglamentos: "docs/files/INF. INTERNA/REGLAMENTOS INTERNOS",
+  etnodesarrollo: "docs/files/INF. INTERNA/PLAN DE ETNODESARROLLO",
+  "planes-uso": "docs/files/INF. INTERNA/PLAN DE USO Y MANEJO AMBIENTAL NEGRO - PUMANE",
+  conservacion: "docs/files/INF. INTERNA/AREAS DE CONSERVACIÓN COMUNITARIA",
+};
+
+const LEGACY_CONSERVACION_FALLBACK_PATHS = [
+  "conservacion/cc-renacientes/pumane-final-cc-renacientes.pdf",
+  "conservacion/cc-renacientes/anexo-1-pumane-glosario.pdf",
+  "conservacion/cc-renacientes/anexo-2-memoria-metodologica-pumane.pdf",
+  "conservacion/cc-renacientes/anexo-3-especies-flora-fauna-pumane.pdf",
+];
+
+const LEGACY_REGLAMENTOS_STALE_PATHS = [
+  "reglamentos/cc-martin-luther-king/acta-validacion-martin-luther-king.pdf",
+  "reglamentos/cc-esperanza-viva/acta-validacion-cc-esperanza-viva.pdf",
+  "reglamentos/cc-llaves-del-futuro/acta-validacion-cc-llaves-del-futuro.pdf",
+  "reglamentos/cc-mayor-de-capitania/acta-validacion-cc-capitania.pdf",
+  "reglamentos/cc-nelson-mandela-guaviare/acta-aprobacion-nelson-mandela-guaviare.pdf",
+  "reglamentos/cc-nelson-mandela-piamonte/acta-validacion-cc-nelson-mandela-piamonte.pdf",
+  "reglamentos/cc-nueva-esperanza/acta-validacion-cc-nueva-esperanza.pdf",
+  "reglamentos/cc-orconepiac/acta-validacion-cc-orconepiac.pdf",
+  "reglamentos/cc-diego-luis-cordoba/acta-aprobacion-diego-luis-cordoba.pdf",
+  "reglamentos/cc-martin-luther-king/acta-martin-luther-king.pdf",
+];
+
 function stripQuotes(value) {
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
@@ -57,6 +84,116 @@ const supabase =
     : createClient(supabaseUrl, serviceRoleKey, {
         auth: { autoRefreshToken: false, persistSession: false },
       });
+
+const NORMALIZED_INSTRUMENT_MARKERS = [
+  { marker: "REGLAMENTOS INTERNOS", instrument: "reglamentos" },
+  { marker: "PLAN DE ETNODESARROLLO", instrument: "etnodesarrollo" },
+  {
+    marker: "PLAN DE USO Y MANEJO AMBIENTAL NEGRO - PUMANE",
+    instrument: "planes-uso",
+  },
+  {
+    marker: "AREAS DE CONSERVACION COMUNITARIA",
+    instrument: "conservacion",
+  },
+];
+
+function normalizeForMatch(value) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\\/g, "/")
+    .toUpperCase();
+}
+
+function inferInstrumentFromSourcePath(sourcePath) {
+  const normalized = normalizeForMatch(sourcePath);
+  const matched = NORMALIZED_INSTRUMENT_MARKERS.find((item) =>
+    normalized.includes(item.marker),
+  );
+  return matched?.instrument ?? null;
+}
+
+function validateSourceCategorization(rows) {
+  for (const row of rows) {
+    const inferredInstrument = inferInstrumentFromSourcePath(row.source);
+    if (!inferredInstrument) {
+      continue;
+    }
+    if (inferredInstrument !== row.instrument) {
+      throw new Error(
+        `Source/instrument mismatch for "${row.source}". Inferred="${inferredInstrument}", configured="${row.instrument}".`,
+      );
+    }
+  }
+}
+
+function normalizeStoragePath(storagePath) {
+  return storagePath
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function normalizeRows(rows) {
+  return rows.map((row) => {
+    const normalizedStoragePath = normalizeStoragePath(row.storagePath);
+    return {
+      ...row,
+      storagePath: normalizedStoragePath,
+    };
+  });
+}
+
+async function countSourceFiles(dirPath) {
+  const allowedExt = new Set([".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"]);
+  let total = 0;
+  let pending = [dirPath];
+
+  while (pending.length > 0) {
+    const current = pending.pop();
+    let entries;
+    try {
+      entries = await fs.readdir(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(fullPath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const ext = path.extname(entry.name).toLowerCase();
+      if (allowedExt.has(ext)) {
+        total += 1;
+      }
+    }
+  }
+
+  return total;
+}
+
+async function printSourceCoverageDashboard() {
+  console.log("source coverage by instrument (local files vs sync map):");
+
+  const mappedByInstrument = {};
+  for (const row of allRows) {
+    mappedByInstrument[row.instrument] = (mappedByInstrument[row.instrument] ?? 0) + 1;
+  }
+
+  const instruments = Object.keys(MANAGED_SOURCE_ROOTS).sort();
+  for (const instrument of instruments) {
+    const rootDir = MANAGED_SOURCE_ROOTS[instrument];
+    const absoluteRoot = path.resolve(root, rootDir);
+    const localFileCount = await countSourceFiles(absoluteRoot);
+    const mappedCount = mappedByInstrument[instrument] ?? 0;
+    console.log(`- ${instrument}: local=${localFileCount} mapped=${mappedCount} root=${rootDir}`);
+  }
+}
 
 const fileMap = [
   {
@@ -287,16 +424,6 @@ const fileMap = [
   },
 ];
 
-function addConservationRows(rows) {
-  const sourceRows = rows.filter((item) => item.instrument === "planes-uso");
-  return sourceRows.map((item) => ({
-    ...item,
-    instrument: "conservacion",
-    storagePath: item.storagePath.replace(/^planes-uso\//, "conservacion/"),
-    title: `${item.title} (Conservación)`,
-  }));
-}
-
 function toUniqueRows(rows) {
   const map = new Map();
   for (const row of rows) {
@@ -305,7 +432,8 @@ function toUniqueRows(rows) {
   return [...map.values()];
 }
 
-const allRows = toUniqueRows([...fileMap, ...addConservationRows(fileMap)]);
+const allRows = toUniqueRows(normalizeRows(fileMap));
+validateSourceCategorization(allRows);
 let documentsTableAvailable = true;
 
 async function ensureDocumentRow(entry) {
@@ -345,6 +473,78 @@ async function ensureDocumentRow(entry) {
   }
 
   return { inserted: true };
+}
+
+async function cleanupLegacyConservacionFallbackRows() {
+  if (!supabase || !documentsTableAvailable) {
+    return { deleted: 0 };
+  }
+
+  const { data: staleRows, error: listError } = await supabase
+    .from("documents")
+    .select("id")
+    .eq("instrument", "conservacion")
+    .in("storage_path", LEGACY_CONSERVACION_FALLBACK_PATHS);
+
+  if (listError) {
+    throw listError;
+  }
+
+  if (!staleRows || staleRows.length === 0) {
+    return { deleted: 0 };
+  }
+
+  const ids = staleRows.map((row) => row.id).filter(Boolean);
+  if (ids.length === 0) {
+    return { deleted: 0 };
+  }
+
+  const { error: deleteError } = await supabase
+    .from("documents")
+    .delete()
+    .in("id", ids);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  return { deleted: ids.length };
+}
+
+async function cleanupLegacyReglamentosStaleRows() {
+  if (!supabase || !documentsTableAvailable) {
+    return { deleted: 0 };
+  }
+
+  const { data: staleRows, error: listError } = await supabase
+    .from("documents")
+    .select("id")
+    .eq("instrument", "reglamentos")
+    .in("storage_path", LEGACY_REGLAMENTOS_STALE_PATHS);
+
+  if (listError) {
+    throw listError;
+  }
+
+  if (!staleRows || staleRows.length === 0) {
+    return { deleted: 0 };
+  }
+
+  const ids = staleRows.map((row) => row.id).filter(Boolean);
+  if (ids.length === 0) {
+    return { deleted: 0 };
+  }
+
+  const { error: deleteError } = await supabase
+    .from("documents")
+    .delete()
+    .in("id", ids);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  return { deleted: ids.length };
 }
 
 async function ensureBucket(bucketName) {
@@ -391,6 +591,8 @@ async function runVerify() {
     );
   }
 
+  await printSourceCoverageDashboard();
+
   const byBucket = new Map();
   for (const row of allRows) {
     const list = byBucket.get(row.bucket) ?? [];
@@ -434,44 +636,122 @@ async function runVerifyDb() {
     );
   }
 
-  const expectedByInstrument = allRows.reduce((acc, row) => {
-    acc[row.instrument] = (acc[row.instrument] ?? 0) + 1;
+  await printSourceCoverageDashboard();
+
+  const expectedByInstrument = Object.keys(MANAGED_SOURCE_ROOTS).reduce((acc, instrument) => {
+    acc[instrument] = 0;
+    return acc;
+  }, {});
+  const expectedPathSetsByInstrument = Object.keys(MANAGED_SOURCE_ROOTS).reduce((acc, instrument) => {
+    acc[instrument] = new Set();
     return acc;
   }, {});
 
-  const { data, error } = await supabase.from("documents").select("id, instrument, storage_path");
+  allRows.forEach((row) => {
+    expectedByInstrument[row.instrument] = (expectedByInstrument[row.instrument] ?? 0) + 1;
+    expectedPathSetsByInstrument[row.instrument].add(row.storagePath);
+  });
+
+  const { data, error } = await supabase
+    .from("documents")
+    .select("id, instrument, visibility, storage_bucket, storage_path");
   if (error) {
     throw error;
   }
 
   const remoteByInstrument = {};
+  const remoteManagedByInstrument = {};
+  const unexpectedPrivateByInstrument = {};
+  const unexpectedPrivatePathsByInstrument = {};
   const remoteKeys = new Set();
   const sampleIdByInstrument = {};
+  const sampleManagedIdByInstrument = {};
+  const sampleUnexpectedPrivatePathByInstrument = {};
+  let legacyConservacionFallbackRows = 0;
   for (const row of data ?? []) {
     const id = String(row.id ?? "");
     const instrument = String(row.instrument ?? "");
+    const visibility = String(row.visibility ?? "");
+    const storageBucket = String(row.storage_bucket ?? "");
     const storagePath = String(row.storage_path ?? "");
-    if (!id || !instrument || !storagePath) continue;
+    if (!id || !instrument) continue;
     remoteByInstrument[instrument] = (remoteByInstrument[instrument] ?? 0) + 1;
-    remoteKeys.add(`${instrument}::${storagePath}`);
+    if (storagePath) {
+      remoteKeys.add(`${instrument}::${storagePath}`);
+    }
     if (!sampleIdByInstrument[instrument]) {
       sampleIdByInstrument[instrument] = id;
     }
+    if (instrument in expectedPathSetsByInstrument) {
+      const expectedSet = expectedPathSetsByInstrument[instrument];
+      const isExpectedManagedPath = storagePath && expectedSet.has(storagePath);
+      if (isExpectedManagedPath) {
+        remoteManagedByInstrument[instrument] = (remoteManagedByInstrument[instrument] ?? 0) + 1;
+        if (!sampleManagedIdByInstrument[instrument]) {
+          sampleManagedIdByInstrument[instrument] = id;
+        }
+      } else if (
+        storageBucket &&
+        ["docs-internal", "docs-sensitive"].includes(storageBucket) &&
+        visibility !== "public"
+      ) {
+        unexpectedPrivateByInstrument[instrument] =
+          (unexpectedPrivateByInstrument[instrument] ?? 0) + 1;
+        const currentList = unexpectedPrivatePathsByInstrument[instrument] ?? [];
+        if (storagePath && !currentList.includes(storagePath)) {
+          currentList.push(storagePath);
+        }
+        unexpectedPrivatePathsByInstrument[instrument] = currentList;
+        if (!sampleUnexpectedPrivatePathByInstrument[instrument]) {
+          sampleUnexpectedPrivatePathByInstrument[instrument] = storagePath || "(null)";
+        }
+      }
+    }
+
+    if (
+      instrument === "conservacion" &&
+      storageBucket === "docs-sensitive" &&
+      visibility === "sensitive" &&
+      LEGACY_CONSERVACION_FALLBACK_PATHS.includes(storagePath)
+    ) {
+      legacyConservacionFallbackRows += 1;
+    }
   }
 
-  console.log("documents by instrument (remote vs expected, managed by upload script):");
+  console.log("documents by instrument (managed private paths only, remote vs expected):");
   const managedInstruments = Object.keys(expectedByInstrument).sort();
   for (const instrument of managedInstruments) {
-    const remoteCount = remoteByInstrument[instrument] ?? 0;
+    const remoteCount = remoteManagedByInstrument[instrument] ?? 0;
     const expectedCount = expectedByInstrument[instrument] ?? 0;
-    const sampleId = sampleIdByInstrument[instrument];
+    const sampleId = sampleManagedIdByInstrument[instrument] ?? sampleIdByInstrument[instrument];
+    const unexpectedPrivateCount = unexpectedPrivateByInstrument[instrument] ?? 0;
+    const unexpectedPrivateSamplePath = sampleUnexpectedPrivatePathByInstrument[instrument];
     console.log(
-      `- ${instrument}: ${remoteCount}/${expectedCount}${sampleId ? ` (sample id: ${sampleId})` : ""}`,
+      `- ${instrument}: ${remoteCount}/${expectedCount}${
+        remoteCount > 0 && sampleId ? ` (sample id: ${sampleId})` : ""
+      }`,
     );
+    if (unexpectedPrivateCount > 0) {
+      console.log(
+        `  unexpected private rows for ${instrument}: ${unexpectedPrivateCount}${
+          unexpectedPrivateSamplePath ? ` (sample path: ${unexpectedPrivateSamplePath})` : ""
+        }`,
+      );
+      const unexpectedPaths = unexpectedPrivatePathsByInstrument[instrument] ?? [];
+      if (unexpectedPaths.length > 0) {
+        const toPrint = unexpectedPaths.slice(0, 20);
+        for (const path of toPrint) {
+          console.log(`    - ${path}`);
+        }
+        if (unexpectedPaths.length > toPrint.length) {
+          console.log(`    ... and ${unexpectedPaths.length - toPrint.length} more`);
+        }
+      }
+    }
   }
 
   const extraInstruments = Object.keys(remoteByInstrument)
-    .filter((instrument) => !expectedByInstrument[instrument])
+    .filter((instrument) => !(instrument in expectedByInstrument))
     .sort();
   if (extraInstruments.length > 0) {
     console.log("additional remote instruments (outside upload script scope):");
@@ -486,12 +766,17 @@ async function runVerifyDb() {
 
   if (missing.length === 0) {
     console.log("documents metadata check: all expected rows are present.");
-    return;
+  } else {
+    console.log("documents metadata check: missing rows detected:");
+    for (const key of missing) {
+      console.log(`- ${key}`);
+    }
   }
 
-  console.log("documents metadata check: missing rows detected:");
-  for (const key of missing) {
-    console.log(`- ${key}`);
+  if (legacyConservacionFallbackRows > 0) {
+    console.log(
+      `legacy conservacion fallback rows detected: ${legacyConservacionFallbackRows} (should be 0 after cleanup)`,
+    );
   }
 }
 
@@ -506,8 +791,11 @@ async function run() {
   }
 
   console.log(`Starting upload sync (${dryRun ? "dry-run" : "apply"})...`);
+  await printSourceCoverageDashboard();
   let uploadedCount = 0;
   let insertedCount = 0;
+  let cleanedLegacyRows = 0;
+  let cleanedLegacyReglamentosRows = 0;
 
   if (!dryRun) {
     await ensureBucket("docs-internal");
@@ -524,6 +812,18 @@ async function run() {
       console.warn(
         "Warning: public.documents table is not available yet. Files will upload, but metadata rows will be skipped.",
       );
+    } else {
+      const cleanup = await cleanupLegacyConservacionFallbackRows();
+      cleanedLegacyRows = cleanup.deleted;
+      if (cleanedLegacyRows > 0) {
+        console.log(`Removed legacy conservacion fallback rows: ${cleanedLegacyRows}.`);
+      }
+
+      const cleanupReglamentos = await cleanupLegacyReglamentosStaleRows();
+      cleanedLegacyReglamentosRows = cleanupReglamentos.deleted;
+      if (cleanedLegacyReglamentosRows > 0) {
+        console.log(`Removed legacy reglamentos stale rows: ${cleanedLegacyReglamentosRows}.`);
+      }
     }
   }
 
@@ -569,6 +869,16 @@ async function run() {
   console.log(
     `Done. Uploaded: ${uploadedCount}. Inserted document rows: ${insertedCount}.`,
   );
+  if (cleanedLegacyRows > 0) {
+    console.log(
+      "Legacy mirrored conservacion metadata has been removed. Conservacion now reflects only direct source files.",
+    );
+  }
+  if (cleanedLegacyReglamentosRows > 0) {
+    console.log(
+      "Legacy reglamentos metadata rows have been removed. Reglamentos now reflects normalized ACTAS path keys only.",
+    );
+  }
   if (!documentsTableAvailable) {
     console.log(
       "Action required: apply Supabase migrations (001_initial_schema.sql and 002_seed_documents.sql) to enable documents metadata.",

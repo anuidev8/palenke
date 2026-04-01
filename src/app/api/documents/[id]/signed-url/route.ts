@@ -33,7 +33,7 @@ export async function GET(
   const supabase = createSupabaseService();
   const { data: document, error: documentError } = await supabase
     .from("documents")
-    .select("id, instrument, visibility, storage_bucket, storage_path")
+    .select("id, instrument, visibility, storage_bucket, storage_path, external_url")
     .eq("id", id)
     .maybeSingle();
 
@@ -60,6 +60,13 @@ export async function GET(
 
   if (documentError || !document) {
     return NextResponse.json({ error: "Document not found." }, { status: 404 });
+  }
+
+  if (!document.storage_bucket && !document.storage_path && document.external_url) {
+    if (wantsRedirect) {
+      return NextResponse.redirect(document.external_url);
+    }
+    return NextResponse.json({ url: document.external_url, external: true });
   }
 
   // Public documents — no auth required, served directly from Supabase Storage

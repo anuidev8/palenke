@@ -18,7 +18,7 @@ export default async function AdminHomePage({
       role={role}
       active="inicio"
       title="Panel de gestión"
-      intro="Vista general del estado del sistema y accesos directos a Biblioteca, Dashboards, ACCs, Usuarios, Campañas y contenido visual IA."
+      intro="Vista general del estado del sistema y accesos directos a Biblioteca, Noticias y agenda, Dashboards, ACCs, Usuarios, Campañas y contenido visual IA."
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {adminQuickStats.map((stat) => (
@@ -32,6 +32,12 @@ export default async function AdminHomePage({
           <div className="grid gap-3">
             <Link href={withRole("/admin/documentos/nuevo", role)} className="button-secondary">
               + Nuevo documento
+            </Link>
+            <Link href={withRole("/admin/novedades/noticias", role)} className="button-secondary">
+              + Lo Último
+            </Link>
+            <Link href={withRole("/admin/novedades/eventos", role)} className="button-secondary">
+              + Nuevo evento
             </Link>
             <Link href={withRole("/admin/dashboards/nuevo", role)} className="button-secondary">
               + Nuevo dashboard

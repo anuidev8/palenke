@@ -43,15 +43,6 @@ function getCardMeta(doc: DocumentRecord) {
 }
 
 function getDocumentAction(doc: DocumentRecord) {
-  if (doc.sourceUrl) {
-    return {
-      href: doc.sourceUrl,
-      label: "Abrir fuente oficial",
-      icon: ExternalLink,
-      external: true,
-    };
-  }
-
   if (doc.action === "video") {
     return {
       href: doc.url,
@@ -292,6 +283,24 @@ export default function BibliotecaDocGrid({
                           )}
                         </div>
                       </div>
+                      {doc.sourceUrl && doc.sourceUrl !== action.href ? (
+                        <div className="rounded-2xl bg-black/5 px-5 py-4">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
+                            Fuente oficial
+                          </p>
+                          <div className="mt-1">
+                            <a
+                              href={doc.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-base font-semibold text-[#1565c0] transition hover:gap-3"
+                            >
+                              Abrir fuente oficial
+                              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                            </a>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
 
                     <div className="mt-auto pt-8 flex justify-end">

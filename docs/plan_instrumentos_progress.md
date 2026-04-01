@@ -196,3 +196,20 @@
        - Uses `ON CONFLICT (instrument, storage_path) DO NOTHING` (idempotent).
      - Pending: run `003_base_documents.sql` in Supabase SQL Editor, then upload base PDF files to
        `/public/docs/reglamentos-base.pdf`, `/public/docs/planes-uso-base.pdf`, etc.
+
+7. **Phase 6 — Categorization hardening + stale fallback cleanup**
+   - Status: `done`
+   - Date: `2026-03-31`
+   - Notes:
+     - Removed legacy `planes-uso -> conservacion` mirroring from `scripts/upload-plan-instrumentos-storage.mjs`.
+     - Added strict source-path categorization validation in sync script to prevent cross-instrument mapping errors.
+     - Added source coverage dashboard in sync/verify commands (`local` vs `mapped` counts by instrument).
+     - Added automatic cleanup for legacy mirrored conservacion metadata rows during sync runs.
+     - Added migration `supabase/migrations/005_remove_conservacion_fallback_rows.sql` to clean already-seeded environments.
+     - Added migration `supabase/migrations/006_remove_reglamentos_stale_acta_rows.sql` to remove legacy reglamentos rows created with pre-normalized storage keys.
+     - Updated `supabase/migrations/002_seed_documents.sql` to stop seeding mirrored conservacion PUMANE rows.
+     - Removed hardcoded document metadata enrichment in `src/components/palenke/DocumentTree.tsx`; document metadata now stays DB-driven.
+     - Added `noStore()` to DB-backed admin/instrument pages to avoid stale cached reads after content updates.
+     - `verify-db` now reports managed/private path counts only, lists unexpected private rows by path, and correctly handles `0` expected counts.
+     - `/admin/documentos/nuevo` migrated from mock to real create flow (Supabase insert + optional PDF upload).
+     - `/admin/documentos/[id]/editar` and `/admin/documentos` now expose direct edit/create actions for real document management from admin UI.

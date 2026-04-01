@@ -5,7 +5,6 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ChevronRight, 
-  FileText, 
   Download, 
   Lock, 
   ExternalLink, 
@@ -51,78 +50,25 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-
-// Hardcoded mapping to enrich DB data with exact Departments and Years of realization
-const METADATA_MAP: Record<string, { department?: string, year?: string }> = {
-  "CC Mayor de Capitania": { department: "Putumayo" },
-  "CC Llaves del Futuro": { department: "Putumayo" },
-  "CC Martin Luther King": { department: "Putumayo" },
-  "CC Nelson Mandela - Guaviare": { department: "Guaviare" },
-  "CC Nelson Mandela - Piamonte": { department: "Cauca" },
-  "CC ORCONEPIAC": { department: "Meta" },
-  "CC Nueva Esperanza": { department: "Putumayo" },
-  "CC Esperanza Viva": { department: "Putumayo" },
-  "CC Diego Luis Cordoba": { department: "Putumayo" },
-  "CC Renacientes de la Diáspora Africana": { department: "Putumayo" },
-  "CC Nelson Mandela": { department: "Guaviare" }, // Fallback
-};
-
-const TITLE_YEAR_MAP: Record<string, string> = {
-  "Reglamento Interno - CC Diego Luis Cordoba": "2019",
-  "Acta de aprobación - CC Diego Luis Cordoba": "2019",
-  "Plan de Etnodesarrollo - CC Nelson Mandela": "2024",
-  "Plan de Etnodesarrollo - CC Diego Luis Cordoba": "2024",
-  "Plan de Etnodesarrollo - CC Martin Luther King": "2023",
-  "PUMANE Final - CC Renacientes": "2023",
-  "Acta de aprobación - CC Nelson Mandela (Guaviare)": "2021",
-  "Acta de validación - CC Nueva Esperanza": "2022",
-  "Acta de validación - CC Llaves del Futuro": "2021",
-  "Acta de validación - CC Esperanza Viva": "2021",
-  "Acta de validación - CC Mayor de Capitania": "2021",
-  "Acta de validación - CC ORCONEPIAC": "2022",
-  "Reglamento Interno - CC Mayor de Capitania": "2021",
-  "Reglamento Interno - CC Llaves del Futuro": "2021",
-  "Reglamento Interno - CC Martin Luther King": "2021",
-  "Reglamento Interno - CC Nelson Mandela (Guaviare)": "2021",
-  "Reglamento Interno - CC ORCONEPIAC": "2022",
-  "Reglamento Interno - CC Nueva Esperanza": "2022",
-  "Reglamento Interno - CC Nelson Mandela (Piamonte)": "2021",
-  "Reglamento Interno - CC Esperanza Viva": "2021",
-};
-
-function enrichDocumentMetadata(doc: DisplayDoc): DisplayDoc {
-  // Original territory holds the council name
-  const originalCouncil = doc.territory;
-  const councilMap = METADATA_MAP[originalCouncil] || {};
-  const yearMap = TITLE_YEAR_MAP[doc.title];
-  
-  return {
-    ...doc,
-    territory: councilMap.department || doc.territory,
-    council: originalCouncil,
-    year: yearMap || "2021" // default fallback year if unknown
-  };
-}
-
 function buildTree(docs: DisplayDoc[]): TreeNode[] {
   const root: TreeNode = { name: "root", path: "", type: "folder", children: [] };
 
-  docs.forEach((rawDoc) => {
-    const doc = enrichDocumentMetadata(rawDoc);
+  docs.forEach((doc) => {
+    const councilName = doc.council || doc.territory;
     let segments: string[] = [];
     if (!doc.storagePath) {
-      segments = [doc.council || doc.territory, doc.title];
+      segments = [councilName, doc.title];
     } else {
       const parts = doc.storagePath.split("/").filter(Boolean);
       if (parts.length > 2) {
         // e.g. ["reglamentos", "cc-foo", "subfolder?", "file.pdf"]
         // Replace the "cc-foo" slug with the properly formatted territory name
-        segments = [doc.council || doc.territory, ...parts.slice(2)];
+        segments = [councilName, ...parts.slice(2)];
       } else if (parts.length === 2) {
         // e.g. ["reglamentos", "file.pdf"] -> use territory as folder
-        segments = [doc.council || doc.territory, parts[1]];
+        segments = [councilName, parts[1]];
       } else {
-        segments = [doc.council || doc.territory, doc.title];
+        segments = [councilName, doc.title];
       }
     }
     let currentNode = root;
@@ -173,7 +119,6 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
 }
 
 function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; onClick: () => void }) {
-  const bgAlpha = hexToRgba(color, 0.15);
   return (
     <motion.button
       layout

@@ -748,6 +748,7 @@ export function AdminLayout({
     | "inicio"
     | "solicitudes"
     | "documentos"
+    | "novedades"
     | "dashboards"
     | "accs"
     | "usuarios"
@@ -762,6 +763,7 @@ export function AdminLayout({
     { id: "inicio", label: "Inicio", href: "/admin" },
     { id: "solicitudes", label: "Solicitudes", href: "/admin/solicitudes" },
     { id: "documentos", label: "Biblioteca", href: "/admin/documentos" },
+    { id: "novedades", label: "Noticias y agenda", href: "/admin/novedades" },
     { id: "dashboards", label: "Dashboards", href: "/admin/dashboards" },
     { id: "accs", label: "ACCs", href: "/admin/accs" },
     { id: "usuarios", label: "Usuarios", href: "/admin/usuarios" },
