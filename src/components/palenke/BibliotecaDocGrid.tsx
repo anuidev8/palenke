@@ -69,6 +69,10 @@ function getDocumentAction(doc: DocumentRecord) {
   };
 }
 
+function hasDocumentLocation(doc: DocumentRecord) {
+  return Boolean(doc.department && doc.municipality);
+}
+
 export default function BibliotecaDocGrid({
   docs,
   role = "public",
@@ -91,6 +95,7 @@ export default function BibliotecaDocGrid({
         const isFeatured = index % 6 === 0;
         const isExpanded = expandedId === doc.id;
         const isGated = !canDownloadDocument(role, doc.visibility);
+        const isNormativa = doc.section === "Normativa vigente";
 
         return (
           <motion.article
@@ -234,6 +239,28 @@ export default function BibliotecaDocGrid({
                       ))}
                     </div>
 
+                    <div className="mt-8">
+                      {isGated ? (
+                        <a
+                          href={`/login?redirect=/biblioteca&message=internal`}
+                          className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-5 py-2.5 text-base font-semibold text-[#7a756e] transition hover:gap-3"
+                        >
+                          <Lock className="h-4 w-4" aria-hidden="true" />
+                          Iniciar sesión para acceder
+                        </a>
+                      ) : (
+                        <a
+                          href={action.href}
+                          {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                          className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-5 py-2.5 text-base font-semibold transition hover:gap-3"
+                          style={{ color: meta.accent }}
+                        >
+                          {action.label}
+                          <ActionIcon className="h-4 w-4" aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
+
                     <div className="mt-8 grid gap-4 sm:grid-cols-2">
                       <div className="rounded-2xl bg-black/5 px-5 py-4">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
@@ -246,7 +273,7 @@ export default function BibliotecaDocGrid({
                           Ubicación
                         </p>
                         <p className="mt-1 text-base font-medium text-[#1a1a1a]">
-                          {doc.department} · {doc.municipality}
+                          {hasDocumentLocation(doc) ? `${doc.department} · ${doc.municipality}` : "Sin dato disponible"}
                         </p>
                       </div>
                       <div className="rounded-2xl bg-black/5 px-5 py-4">
@@ -254,34 +281,8 @@ export default function BibliotecaDocGrid({
                           Territorio
                         </p>
                         <p className="mt-1 text-base font-medium text-[#1a1a1a]">
-                          {doc.territory}
+                          {doc.territory || "Sin dato disponible"}
                         </p>
-                      </div>
-                      <div className="rounded-2xl bg-black/5 px-5 py-4">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
-                          Acción principal
-                        </p>
-                        <div className="mt-1">
-                          {isGated ? (
-                            <a
-                              href={`/login?redirect=/biblioteca&message=internal`}
-                              className="inline-flex items-center gap-2 text-base font-semibold text-[#7a756e] transition hover:gap-3"
-                            >
-                              <Lock className="h-4 w-4" aria-hidden="true" />
-                              Iniciar sesión para acceder
-                            </a>
-                          ) : (
-                            <a
-                              href={action.href}
-                              {...(action.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                              className="inline-flex items-center gap-2 text-base font-semibold transition hover:gap-3"
-                              style={{ color: meta.accent }}
-                            >
-                              {action.label}
-                              <ActionIcon className="h-4 w-4" aria-hidden="true" />
-                            </a>
-                          )}
-                        </div>
                       </div>
                       {doc.sourceUrl && doc.sourceUrl !== action.href ? (
                         <div className="rounded-2xl bg-black/5 px-5 py-4">
@@ -299,6 +300,13 @@ export default function BibliotecaDocGrid({
                               <ExternalLink className="h-4 w-4" aria-hidden="true" />
                             </a>
                           </div>
+                        </div>
+                      ) : isNormativa ? (
+                        <div className="rounded-2xl bg-black/5 px-5 py-4">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
+                            Fuente oficial
+                          </p>
+                          <p className="mt-1 text-base font-medium text-[#1a1a1a]">Sin dato disponible</p>
                         </div>
                       ) : null}
                     </div>

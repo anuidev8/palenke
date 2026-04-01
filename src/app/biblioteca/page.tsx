@@ -99,14 +99,16 @@ export default async function BibliotecaPage({
   const visibleDocumentsBase = getVisibleDocuments(role);
   const shouldLoadNormativa = filters.sections.length === 0 || filters.sections.includes(NORMATIVA_SECTION);
   const normativaDocuments = shouldLoadNormativa ? await getNormativaDocumentRecords() : [];
-  const visibleDocuments = (
-    normativaDocuments.length > 0
-      ? [
-          ...visibleDocumentsBase.filter((document) => document.section !== NORMATIVA_SECTION),
-          ...normativaDocuments,
-        ]
-      : visibleDocumentsBase
-  ).toSorted((a, b) => b.year - a.year);
+  const nonNormativaDocuments = visibleDocumentsBase.filter((document) => document.section !== NORMATIVA_SECTION);
+  const mergedDocuments =
+    shouldLoadNormativa
+      ? [...nonNormativaDocuments, ...normativaDocuments]
+      : visibleDocumentsBase;
+  const shouldPreserveNormativaOrder =
+    filters.sections.length > 0 && filters.sections.every((section) => section === NORMATIVA_SECTION);
+  const visibleDocuments = shouldPreserveNormativaOrder
+    ? mergedDocuments
+    : mergedDocuments.toSorted((a, b) => b.year - a.year);
   const results = filterDocuments(visibleDocuments, filters);
   const years = getDocumentYears(visibleDocuments);
   const totalCount = results.length;
@@ -128,16 +130,7 @@ export default async function BibliotecaPage({
         { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
         ...(sectionActive ? [{ label: sectionActive }] : []),
       ]}
-      floatingPanel={
-        <BibliotecaAiSearchPanel
-          role={role}
-          documents={results}
-          initialQuery={initialSearchQuery}
-          activeFilters={activeFilters}
-          clearFiltersHref={withRole("/biblioteca", role)}
-          showInlineSummary={false}
-        />
-      }
+     
     >
       {/* ── Page header ── */}
       {sectionActive && SECTION_META[sectionActive] ? (() => {

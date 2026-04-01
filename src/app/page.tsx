@@ -214,16 +214,33 @@ export default async function HomePage({
       {/* ── ¿Quiénes somos? ── */}
       <section
         id="quienes-somos"
-        className="relative overflow-hidden bg-[#fcfaf7] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+        className="relative overflow-hidden bg-[#F2EFE9] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
-        {/* Decorative background elements */}
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-[#2e7d32]/5 blur-3xl" aria-hidden="true" />
-        <div className="absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-[#fbc02d]/10 blur-3xl" aria-hidden="true" />
-        <div 
-          className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 opacity-[0.03] mix-blend-overlay pointer-events-none" 
-          style={{ backgroundImage: "radial-gradient(#1a1a1a 2px, transparent 2px)", backgroundSize: "32px 32px" }} 
-          aria-hidden="true" 
-        />
+        {/* Dribbble-style Afro Abstract Background Graphics */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Large Abstract Mudcloth/Geometric Shapes */}
+          <svg className="absolute -top-32 -left-32 w-[600px] h-[600px] text-[#2e7d32]/5 rotate-12" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100,0 L200,100 L100,200 L0,100 Z" />
+            <circle cx="100" cy="100" r="50" fill="#F2EFE9" />
+            <circle cx="100" cy="100" r="20" />
+            <path d="M40,40 L160,160 M40,160 L160,40" stroke="#F2EFE9" strokeWidth="8" />
+          </svg>
+          
+          {/* Graphic Rhythmic Stepped Lines */}
+          <svg className="absolute top-1/2 -right-20 w-[400px] h-[400px] text-[#d32f2f]/5 -translate-y-1/2" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="20,100 60,60 100,100 140,60 180,100" />
+            <polyline points="20,140 60,100 100,140 140,100 180,140" />
+            <polyline points="20,180 60,140 100,180 140,140 180,180" />
+            <circle cx="100" cy="100" r="12" fill="currentColor" />
+          </svg>
+
+          {/* Yellow vibrant accent blob */}
+          <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] rounded-full bg-gradient-to-t from-[#fbc02d]/10 to-transparent blur-[120px]" />
+          
+          {/* Subtle repeating grid texture to reduce "white space" feel */}
+          <div className="absolute inset-0 opacity-[0.04] mix-blend-multiply"
+               style={{ backgroundImage: "radial-gradient(#1a1a1a 2px, transparent 2px)", backgroundSize: "32px 32px" }} />
+        </div>
 
         <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-10 rounded-[32px] border border-[#e8dfd3] bg-white/70 p-8 shadow-sm backdrop-blur-xl sm:p-12">
           {/* Top: accent bar + heading + PCN dots */}

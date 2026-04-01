@@ -43,8 +43,36 @@ export default async function MemoriaAfroterritorialPage({
       </section>
 
       {/* ── Definición + Función (left) | Imagen (right) ── */}
-      <section className="border-b border-[#e8dfd3] bg-white px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
+      <section className="relative overflow-hidden border-b border-[#e8dfd3] bg-[#F7F5F0] px-4 py-14 sm:px-6 lg:px-8">
+        {/* Dribbble-style Afro Abstract Background Graphics */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Topographic organic afro-territorial lines - GREEN */}
+          <svg className="absolute -top-[5%] -right-[5%] w-[800px] h-[800px] text-[#2e7d32]/[0.04] rotate-[15deg]" viewBox="0 0 400 400" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 50 200 Q 100 100 200 200 T 350 200" />
+            <path d="M 50 230 Q 100 130 200 230 T 350 230" />
+            <path d="M 50 260 Q 100 160 200 260 T 350 260" />
+            <path d="M 50 290 Q 100 190 200 290 T 350 290" />
+            <path d="M 50 320 Q 100 220 200 320 T 350 320" />
+            <circle cx="200" cy="200" r="100" strokeWidth="4" strokeDasharray="10 10" />
+            <circle cx="200" cy="200" r="150" strokeWidth="3" />
+          </svg>
+
+          {/* Abstract solid shapes representing earth and roots - RED */}
+          <svg className="absolute -bottom-10 -left-10 w-[500px] h-[500px] text-[#d32f2f]/[0.05]" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 200 L 200 200 L 200 100 Q 150 50 100 100 T 0 100 Z" />
+            <circle cx="50" cy="150" r="20" fill="#F7F5F0" />
+            <circle cx="150" cy="150" r="10" fill="#F7F5F0" />
+          </svg>
+
+          {/* Warm energetic glows (YELLOW & RED) */}
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-t from-[#fbc02d]/[0.08] to-transparent blur-[120px]" />
+          <div className="absolute top-10 left-10 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[#d32f2f]/[0.06] to-transparent blur-[100px]" />
+          
+          {/* Very faint tribal pattern mask */}
+          <div className="absolute inset-0 opacity-[0.02] mix-blend-multiply" style={{ backgroundImage: "radial-gradient(#1a1a1a 2px, transparent 2px)", backgroundSize: "32px 32px" }} />
+        </div>
+        
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
 
           {/* Left — Definición y Función */}
           <div>
@@ -58,14 +86,14 @@ export default async function MemoriaAfroterritorialPage({
             <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Nuestro Propósito</h3>
             <ul className="mt-6 space-y-3">
               {[
-                "Cuidar como tesoro colectivo el conocimiento jurídico y político del Pueblo Negro.",
-                "Elevar las voces y saberes de nuestras comunidades, celebrando nuestra producción cultural.",
-                "Tejer lazos de identidad y pensamiento propio que conecten a las nuevas generaciones.",
-                "Ser faro e inspiración para la formación política y la defensa incansable de nuestros derechos.",
-              ].map((fn) => (
-                <li key={fn} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
-                  {fn}
+                { text: "Cuidar como tesoro colectivo el conocimiento jurídico y político del Pueblo Negro.", color: "bg-[#2e7d32]" },
+                { text: "Elevar las voces y saberes de nuestras comunidades, celebrando nuestra producción cultural.", color: "bg-[#fbc02d]" },
+                { text: "Tejer lazos de identidad y pensamiento propio que conecten a las nuevas generaciones.", color: "bg-[#d32f2f]" },
+                { text: "Ser faro e inspiración para la formación política y la defensa incansable de nuestros derechos.", color: "bg-[#2e7d32]" },
+              ].map((item) => (
+                <li key={item.text} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
+                  <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${item.color}`} />
+                  {item.text}
                 </li>
               ))}
             </ul>
@@ -76,28 +104,35 @@ export default async function MemoriaAfroterritorialPage({
             className="relative min-h-[320px] overflow-hidden rounded-[28px] lg:min-h-[400px]"
             style={{
               background:
-                "radial-gradient(ellipse at 30% 70%, rgba(46,125,50,0.75), transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(27,94,32,0.5), transparent 50%), linear-gradient(150deg, #0d1f0d 0%, #2c3e2a 60%, #1a2a1a 100%)",
+                "radial-gradient(ellipse at 20% 80%, rgba(46,125,50,0.4), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 90% 90%, rgba(211,47,47,0.3), transparent 60%), linear-gradient(150deg, #1f1d1b 0%, #292420 60%, #171513 100%)",
             }}
           >
             <svg
-              className="absolute inset-0 h-full w-full opacity-20"
+              className="absolute inset-0 h-full w-full opacity-30"
               viewBox="0 0 600 400"
               preserveAspectRatio="xMidYMid slice"
               aria-hidden="true"
             >
+              {/* Decorative Brand Color Circles */}
+              <circle cx="180" cy="250" r="80" fill="#2e7d32" opacity="0.2" filter="blur(20px)" />
+              <circle cx="420" cy="120" r="100" fill="#fbc02d" opacity="0.15" filter="blur(25px)" />
+              <circle cx="480" cy="300" r="60" fill="#d32f2f" opacity="0.2" filter="blur(15px)" />
+              
+              {/* Connection paths */}
               <path
                 d="M50,400 Q150,240 200,180 Q280,100 350,120 Q420,140 500,70"
-                stroke="white" strokeWidth="3" fill="none" opacity="0.6"
+                stroke="white" strokeWidth="2" fill="none" opacity="0.5" strokeDasharray="4 8"
               />
               <path
                 d="M0,290 Q100,260 180,240 Q260,215 320,245 Q400,275 600,235"
                 stroke="white" strokeWidth="1.5" fill="none" opacity="0.4"
               />
-              <ellipse cx="180" cy="200" rx="65" ry="45" fill="#2e7d32" opacity="0.3" />
-              <ellipse cx="390" cy="130" rx="85" ry="52" fill="#1b5e20" opacity="0.25" />
-              <circle cx="170" cy="170" r="5" fill="white" opacity="0.8" />
-              <circle cx="310" cy="115" r="5" fill="white" opacity="0.8" />
-              <circle cx="460" cy="95" r="5" fill="white" opacity="0.8" />
+              
+              {/* Nodes representing communities */}
+              <circle cx="200" cy="180" r="4" fill="#2e7d32" stroke="white" strokeWidth="2" />
+              <circle cx="350" cy="120" r="5" fill="#fbc02d" stroke="white" strokeWidth="2" />
+              <circle cx="320" cy="245" r="4" fill="#d32f2f" stroke="white" strokeWidth="2" />
+              <circle cx="500" cy="70" r="3" fill="#ffffff" opacity="0.8" />
             </svg>
             <div className="absolute bottom-6 left-6 right-6">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
@@ -112,11 +147,12 @@ export default async function MemoriaAfroterritorialPage({
       </section>
 
       {/* ── Normativa vigente ── */}
-      <section className="bg-[#f8f5f2] px-4 py-14 sm:px-6 lg:px-8">
+      <section className="bg-[#f8f5f2] px-4 py-14 sm:px-6 lg:px-8 border-b border-[#e8dfd3]">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
 
-          {/* Left — Normativa vigente card */}
-          <div className="flex flex-col gap-6 rounded-[28px] border-2 border-[#2e7d32] bg-white p-8 shadow-sm">
+          {/* Left — Normativa vigente card (Gradient Border) */}
+          <div className="relative rounded-[28px] p-[2px] bg-gradient-to-br from-[#2e7d32] via-[#fbc02d] to-[#d32f2f] shadow-sm">
+            <div className="flex h-full flex-col gap-6 rounded-[26px] bg-white p-8">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2e7d32] text-sm font-bold text-white">
                 01
@@ -134,6 +170,7 @@ export default async function MemoriaAfroterritorialPage({
               Explorar normativa vigente
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
+            </div>
           </div>
 
           {/* Right — Definición y Función */}
@@ -164,8 +201,23 @@ export default async function MemoriaAfroterritorialPage({
       </section>
 
       {/* ── Memoria viva del territorio ── */}
-      <section className="bg-white px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-2 lg:gap-14">
+      <section className="relative overflow-hidden border-t border-[#e8dfd3] bg-[#FAFAF7] px-4 py-14 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+          {/* Rhythmic flowing ribbons with PCN Brand Colors */}
+          <svg className="absolute top-1/2 left-0 w-full h-[600px] -translate-y-1/2 opacity-[0.035]" preserveAspectRatio="none" viewBox="0 0 1000 200" fill="none" strokeWidth="6" strokeLinecap="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,100 C150,200 350,0 500,100 C650,200 850,0 1000,100" stroke="#fbc02d" />
+            <path d="M0,120 C150,220 350,20 500,120 C650,220 850,20 1000,120" stroke="#d32f2f" />
+            <path d="M0,140 C150,240 350,40 500,140 C650,240 850,40 1000,140" stroke="#2e7d32" />
+          </svg>
+          
+          {/* Soft multi-color glows */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-bl from-[#fbc02d]/[0.05] to-transparent blur-[140px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#d32f2f]/[0.03] to-transparent blur-[120px]" />
+          
+          {/* Extremely delicate dots matrix (less visible) */}
+          <div className="absolute inset-0 opacity-[0.015] mix-blend-multiply" style={{ backgroundImage: "radial-gradient(#1a1a1a 1.5px, transparent 1.5px)", backgroundSize: "64px 64px" }} />
+        </div>
+        <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-2 lg:gap-14">
 
           {/* Left — Definición y Función */}
           <div>
@@ -179,14 +231,14 @@ export default async function MemoriaAfroterritorialPage({
             <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Cómo Mantenemos Viva la Llama</h3>
             <ul className="mt-6 space-y-3">
               {[
-                "Dar a conocer las investigaciones y el pensamiento propio nacido de nuestras entrañas.",
-                "Recoger con amor las historias, luchas y experiencias de cada rincón del territorio.",
-                "Celebrar nuestras prácticas culturales, saberes y el arte que nos define.",
-                "Construir puentes vivos entre el conocimiento comunitario, la organización y la academia.",
-              ].map((fn) => (
-                <li key={fn} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2e7d32]" />
-                  {fn}
+                { text: "Dar a conocer las investigaciones y el pensamiento propio nacido de nuestras entrañas.", color: "bg-[#2e7d32]" },
+                { text: "Recoger con amor las historias, luchas y experiencias de cada rincón del territorio.", color: "bg-[#fbc02d]" },
+                { text: "Celebrar nuestras prácticas culturales, saberes y el arte que nos define.", color: "bg-[#d32f2f]" },
+                { text: "Construir puentes vivos entre el conocimiento comunitario, la organización y la academia.", color: "bg-[#2e7d32]" },
+              ].map((item) => (
+                <li key={item.text} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
+                  <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${item.color}`} />
+                  {item.text}
                 </li>
               ))}
             </ul>
@@ -197,13 +249,21 @@ export default async function MemoriaAfroterritorialPage({
             className="relative flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[28px] p-8"
             style={{
               background:
-                "radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.7), transparent 55%), linear-gradient(150deg, #1a2a1a 0%, #2c3e2a 60%, #0d1f0d 100%)",
+                "radial-gradient(ellipse at 80% 80%, rgba(211,47,47,0.35), transparent 60%), radial-gradient(ellipse at 20% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.4), transparent 60%), linear-gradient(150deg, #1c1a19 0%, #26211e 60%, #1a1614 100%)",
             }}
           >
-            {/* decorative dots */}
-            <div className="absolute right-6 top-6 grid grid-cols-4 gap-2 opacity-25" aria-hidden="true">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <span key={i} className="h-1.5 w-1.5 rounded-full bg-white" />
+            {/* abstract organic flow */}
+            <svg className="absolute inset-0 h-full w-full opacity-[0.15]" viewBox="0 0 400 300" preserveAspectRatio="none">
+              <path d="M-50,150 Q100,250 200,100 T450,150" fill="none" stroke="#fbc02d" strokeWidth="4" />
+              <path d="M-50,200 Q150,300 250,150 T450,200" fill="none" stroke="#d32f2f" strokeWidth="3" />
+            </svg>
+            
+            {/* decorative colored dots */}
+            <div className="absolute right-6 top-6 grid grid-cols-4 gap-2 opacity-60" aria-hidden="true">
+              {['bg-[#fbc02d]', 'bg-[#d32f2f]', 'bg-[#2e7d32]', 'bg-[#fbc02d]',
+                'bg-[#2e7d32]', 'bg-[#fbc02d]', 'bg-[#d32f2f]', 'bg-[#2e7d32]',
+                'bg-[#d32f2f]', 'bg-[#2e7d32]', 'bg-[#fbc02d]', 'bg-[#d32f2f]'].map((color, i) => (
+                <span key={i} className={`h-1.5 w-1.5 rounded-full ${color}`} />
               ))}
             </div>
             <h3 className="font-display text-2xl leading-tight text-white sm:text-3xl">

@@ -65,12 +65,14 @@ type ContentDocumentRow = {
   priority_order: number | null;
   featured: boolean | null;
   source_label: string | null;
+  territory: string | null;
+  department: string | null;
+  municipality: string | null;
   created_at: string;
 };
 
 const EXTERNAL_NEWS_CATEGORY_ID = 27;
 const EXTERNAL_NEWS_REVALIDATE_SECONDS = 60 * 15;
-
 const externalNewsFallback: ExternalNewsItem[] = pcnNewsArticles.slice(0, 4).map((article, index) => ({
   id: index + 1,
   slug: article.slug,
@@ -309,19 +311,31 @@ function inferDocumentType(row: ContentDocumentRow) {
 }
 
 function resolveDocumentUrl(row: ContentDocumentRow) {
-  if (row.external_url) {
-    return { action: "external" as const, url: row.external_url, fileLabel: row.source_label ?? "Abrir enlace" };
-  }
-
   if (row.storage_path?.startsWith("/")) {
-    return { action: "file" as const, url: row.storage_path, fileLabel: row.source_label ?? "Abrir archivo" };
+    return {
+      action: "file" as const,
+      url: row.storage_path,
+      fileLabel: row.instrument === "normativa-vigente" ? "Ver reglamento" : "Abrir documento",
+    };
   }
 
-  return {
-    action: "file" as const,
-    url: `/api/documents/${row.id}/signed-url?mode=redirect`,
-    fileLabel: row.source_label ?? "Descargar archivo",
-  };
+  if (row.storage_bucket || row.storage_path) {
+    return {
+      action: "file" as const,
+      url: `/api/documents/${row.id}/signed-url?mode=redirect`,
+      fileLabel: row.instrument === "normativa-vigente" ? "Ver reglamento" : "Descargar archivo",
+    };
+  }
+
+  if (row.external_url) {
+    return {
+      action: "external" as const,
+      url: row.external_url,
+      fileLabel: row.instrument === "normativa-vigente" ? "Ver reglamento" : row.source_label ?? "Abrir fuente",
+    };
+  }
+
+  return { action: "external" as const, url: "#", fileLabel: "Abrir recurso" };
 }
 
 function documentKeywords(row: ContentDocumentRow) {
@@ -352,10 +366,10 @@ function mapDocumentToRecord(row: ContentDocumentRow): DocumentRecord {
     section: "Normativa vigente",
     type: inferDocumentType(row),
     description: row.summary ?? "Documento normativo disponible para consulta y seguimiento.",
-    territory: "Nacional",
+    territory: row.territory ?? "",
     council: row.council ?? "Fuente oficial",
-    department: "Nacional",
-    municipality: "Bogotá",
+    department: row.department ?? "",
+    municipality: row.municipality ?? "",
     year: publishedYear,
     validity: "Vigente",
     visibility: row.visibility,
@@ -510,7 +524,8 @@ export async function getAgendaPreview(limit = 3) {
 
 export async function getNormativaDocumentRecords() {
   if (!hasSupabaseServiceConfig()) {
-    return getVisibleDocuments("public").filter((document) => document.section === "Normativa vigente");
+    console.error("Normativa vigente requires Supabase service configuration.");
+    return [];
   }
 
   try {
@@ -518,12 +533,13 @@ export async function getNormativaDocumentRecords() {
     const { data, error } = await supabase
       .from("documents")
       .select(
-        "id,title,instrument,council,visibility,storage_bucket,storage_path,summary,published_on,external_url,document_type,priority_order,featured,source_label,created_at",
+        "id,title,instrument,council,visibility,storage_bucket,storage_path,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,created_at",
       )
       .eq("instrument", "normativa-vigente");
 
     if (error && isMissingTableError(error)) {
-      return getVisibleDocuments("public").filter((document) => document.section === "Normativa vigente");
+      console.error("Normativa vigente requires the documents migration to be applied.");
+      return [];
     }
     if (error) throw error;
 
@@ -539,7 +555,7 @@ export async function getNormativaDocumentRecords() {
       .map(mapDocumentToRecord);
   } catch (error) {
     console.error("Failed to load normative documents:", error);
-    return getVisibleDocuments("public").filter((document) => document.section === "Normativa vigente");
+    return [];
   }
 }
 

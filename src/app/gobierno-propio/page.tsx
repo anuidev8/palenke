@@ -96,8 +96,29 @@ export default async function GobiernoPropioPage({
       ]}
     >
       {/* ── Dashboard Top Section (Row 1) ── */}
-      <section className="bg-[#fcfaf7] px-4 py-16 sm:px-6 lg:px-8 border-b border-[#e8dfd3]">
-        <div className="mx-auto w-full max-w-7xl">
+      <section className="relative overflow-hidden bg-[#EAE6DD] px-4 py-16 sm:px-6 lg:px-8 border-b border-[#e8dfd3]">
+        {/* Dribbble-style Afro Abstract Background Graphics */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Large dynamic circle & arch representing community and leadership */}
+          <svg className="absolute -top-40 -left-20 w-[800px] h-[800px] text-[#2e7d32]/[0.03]" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 0 100 A 100 100 0 0 1 200 100" />
+            <circle cx="100" cy="100" r="40" fill="#EAE6DD" />
+            <circle cx="100" cy="100" r="15" />
+            <path d="M 10 100 L 190 100" stroke="#EAE6DD" strokeWidth="4" />
+          </svg>
+
+          {/* Stepped ancestral patterns */}
+          <svg className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] text-[#d32f2f]/[0.025]" fill="none" stroke="currentColor" strokeWidth="6" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,200 40,200 40,160 80,160 80,120 120,120 120,80 160,80 160,40 200,40" />
+            <polyline points="0,160 40,160 40,120 80,120 80,80 120,80 120,40 160,40 160,0" />
+          </svg>
+
+          {/* Deep green rich blur overlay for PCN aesthetic */}
+          <div className="absolute top-[20%] right-[30%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#2e7d32]/[0.05] to-transparent blur-[140px]" />
+          <div className="absolute bottom-0 left-[20%] w-[400px] h-[400px] rounded-full bg-gradient-to-t from-[#fbc02d]/[0.05] to-transparent blur-[100px]" />
+        </div>
+        
+        <div className="relative z-10 mx-auto w-full max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start justify-between">
             {/* Left Column: Title & Intro */}
             <div className="flex-1 max-w-2xl space-y-6">
@@ -182,27 +203,25 @@ export default async function GobiernoPropioPage({
               </p>
 
               <div className="mt-6 flex flex-1 flex-col items-center">
-                <div className="w-full max-w-[210px] rounded-xl border border-[#d6e6d6] bg-white p-3 shadow-sm">
-                  <div className="relative aspect-[1/2] overflow-hidden rounded-lg border border-[#efefef] bg-[#f8f5f0]">
+                <div className="w-full max-w-[320px] rounded-xl border border-[#d6e6d6] bg-white p-3 shadow-sm">
+                  <div className="relative aspect-[9/4] overflow-hidden rounded-lg border border-[#efefef] bg-[#f8f5f0]">
                     <Image
-                      src="/brands/PALENKE.svg"
-                      alt="Portada del libro Palenke de pensamiento y cuidadores del territorio"
+                      src="/assets/logo.svg"
+                      alt="Logo de Proceso de Comunidades Negras (PCN)"
                       fill
-                      sizes="(max-width: 640px) 200px, 210px"
-                      className="object-cover"
+                      sizes="(max-width: 640px) 280px, 320px"
+                      className="object-contain"
                     />
                   </div>
                 </div>
 
                 <div className="mt-6 flex w-full max-w-md flex-col">
-                  <h4 className="text-xl font-semibold leading-tight text-[#1a1a1a]">
-                    Palenke de Pensamiento y Cuidadores del Territorio
-                  </h4>
+                  <h4 className="text-xl font-semibold leading-tight text-[#1a1a1a]">Proceso de Comunidades Negras (PCN)</h4>
                   <div className="mt-5 h-px w-full bg-gradient-to-r from-[#2e7d32]/40 to-transparent" />
                   <div className="mt-4">
                     <BookPreviewLightbox
-                      src="/brands/PALENKE.svg"
-                      alt="Portada del libro Palenke de pensamiento y cuidadores del territorio"
+                      src="/assets/logo.svg"
+                      alt="Logo de Proceso de Comunidades Negras (PCN)"
                     />
                   </div>
                 </div>
