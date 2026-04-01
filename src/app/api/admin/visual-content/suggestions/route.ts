@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdminApiRequest } from "@/lib/admin-access";
 import { generateVisualSuggestions } from "@/lib/visual-content/generator";
 import {
   type VisualScreenId,
@@ -12,16 +13,12 @@ export const maxDuration = 120;
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    if (body?.role !== "admin") {
-      return NextResponse.json(
-        {
-          error: "Admin permissions are required.",
-        },
-        { status: 403 },
-      );
+    const deniedResponse = await requireAdminApiRequest();
+    if (deniedResponse) {
+      return deniedResponse;
     }
 
+    const body = await request.json();
     const topicId = String(body?.topicId ?? "");
     const screenId = String(body?.screenId ?? "");
     const objectiveHint = String(body?.objectiveHint ?? "").trim();

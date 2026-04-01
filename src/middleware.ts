@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdminRole, resolveViewerRoleRecord } from "@/lib/auth/permissions";
 import { config as envConfig, hasSupabasePublicConfig, hasSupabaseServiceConfig } from "@/lib/config";
 import { createSupabaseService } from "@/lib/supabase/service";
 
@@ -63,7 +64,7 @@ export async function middleware(request: NextRequest) {
     roleRecord = roleLookup.data as { role?: string | null; active?: boolean | null } | null;
   }
 
-  const isAdmin = roleRecord?.role === "admin" && roleRecord.active !== false;
+  const isAdmin = isAdminRole(resolveViewerRoleRecord(roleRecord));
   if (!isAdmin) {
     if (isAdminApiRoute) {
       return unauthorizedApi();

@@ -11,7 +11,8 @@ import {
   homeStrategicFunctionsClosing,
   homeStrategicFunctionsIntro,
 } from "@/lib/mock-data";
-import { getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { isInternal, type SearchParams, withRole } from "@/lib/viewer";
 import { HeroCards } from "@/components/home/HeroCards";
 import {
   HomePoliticalOrientationAccordion,
@@ -30,7 +31,7 @@ export default async function HomePage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const notice = params.notice;
   const [noticias, ultimasNoticias] = await Promise.all([
     getExternalEnterateNews(3),
@@ -102,7 +103,6 @@ export default async function HomePage({
               action="/biblioteca"
               className="flex w-full items-center gap-3 rounded-full border border-white/15 bg-black/20 px-4 py-2.5 backdrop-blur-md transition focus-within:border-white/35 focus-within:bg-black/30 sm:max-w-sm lg:max-w-md"
             >
-              {role !== "public" ? <input type="hidden" name="role" value={role} /> : null}
               <Search className="h-4 w-4 shrink-0 text-white/60" aria-hidden="true" />
               <label htmlFor="hero-search" className="sr-only">
                 Buscar en la biblioteca

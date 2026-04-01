@@ -3,7 +3,8 @@ import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import { getVisibleDashboards } from "@/lib/mock-data";
 import { filterDashboards, getDashboardTopics } from "@/lib/mock-queries";
-import { getFirstParam, getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, isInternal, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function EstadisticasPage({
   searchParams,
@@ -11,7 +12,7 @@ export default async function EstadisticasPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const topic = getFirstParam(params.topic) ?? "";
   const territory = getFirstParam(params.territory) ?? "";
   const dashboards = getVisibleDashboards(role);
@@ -60,7 +61,6 @@ export default async function EstadisticasPage({
             action="/estadisticas"
             className="mt-8 flex flex-wrap items-end gap-3"
           >
-            {role !== "public" ? <input type="hidden" name="role" value={role} /> : null}
             <div className="flex flex-col gap-1.5">
               <label htmlFor="f-topic" className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
                 Tema

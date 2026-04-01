@@ -2,15 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, BookOpen, Download, Droplets, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { canDownloadDocument } from "@/lib/mock-data";
 import { createSupabaseService } from "@/lib/supabase/service";
-import { getViewerSessionState } from "@/lib/viewer-server";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRequestState } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
 
@@ -160,6 +160,7 @@ type SupabaseInstrumentDoc = {
 };
 
 import { DocumentTree, type DisplayDoc } from "@/components/palenke/DocumentTree";
+import { LoadingDownloadButton } from "@/components/palenke/LoadingDownloadButton";
 
 const dbInstrumentMap: Partial<Record<InstrumentoSlug, string>> = {
   reglamentos: "reglamentos",
@@ -238,12 +239,9 @@ export default async function InstrumentoPage({
   noStore();
   const { instrumento } = await params;
   const sp = await searchParams;
-  const roleFromQuery = getViewerRole(sp);
-  const sessionState = await getViewerSessionState();
-  const role = hasSupabaseServiceConfig() ? sessionState.role : roleFromQuery;
-  const isAuthenticated = hasSupabaseServiceConfig()
-    ? sessionState.isAuthenticated
-    : roleFromQuery !== "public";
+  const sessionState = await getViewerRequestState(sp);
+  const role = sessionState.role;
+  const isAuthenticated = sessionState.isAuthenticated;
 
   if (!(instrumento in instrumentos)) notFound();
   const instrumentoKey = instrumento as InstrumentoSlug;
@@ -375,14 +373,12 @@ export default async function InstrumentoPage({
                   </div>
                   {baseSupabaseDoc ? (
                     canDownloadBaseSupabaseDoc ? (
-                      <a
+                      <LoadingDownloadButton
                         href={baseSupabaseDoc.url}
+                        label="Descargar documento"
                         className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
                         style={{ background: inst.color }}
-                      >
-                        <Download className="h-4 w-4" />
-                        Descargar documento
-                      </a>
+                      />
                     ) : (
                       <Link
                         href={requestHref}

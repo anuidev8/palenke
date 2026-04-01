@@ -9,7 +9,8 @@ import {
   getEventMonths,
   listEvents,
 } from "@/lib/content";
-import { getFirstParam, type SearchParams, getViewerRole, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
 type AgendaView = "month" | "week";
 
@@ -58,7 +59,7 @@ export default async function AgendaPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const view = (getFirstParam(params.view) === "week" ? "week" : "month") as AgendaView;
   const q = getFirstParam(params.q) ?? "";
   const category = getFirstParam(params.category) ?? "";
@@ -119,7 +120,6 @@ export default async function AgendaPage({
 
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <form action="/agenda" className="surface-card mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {role !== "public" ? <input type="hidden" name="role" value={role} /> : null}
           <input type="hidden" name="view" value={view} />
 
           <label className="grid gap-2 text-sm">

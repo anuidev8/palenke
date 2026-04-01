@@ -37,7 +37,6 @@ export default async function AdminAccsPage({
         }
       >
         <form action="/admin/accs" className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          <input type="hidden" name="role" value={role} />
           <input name="q" defaultValue={getFirstParam(params.q)} placeholder="Buscar" className="input-shell" />
           <input
             name="territory"

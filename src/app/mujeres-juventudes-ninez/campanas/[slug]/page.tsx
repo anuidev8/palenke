@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { MediaPlaceholder, SiteLayout, VisibilityBadge } from "@/components/mock/ui";
 import { findCampaignBySlug } from "@/lib/mock-data";
-import { canOpenSiteVisibility, formatDateRange, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { canOpenSiteVisibility, formatDateRange, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function CampaniaDetallePage({
   params,
@@ -14,7 +15,7 @@ export default async function CampaniaDetallePage({
 }) {
   const { slug } = await params;
   const query = await searchParams;
-  const role = getViewerRole(query);
+  const role = await getViewerRoleFromRequest(query);
   const campaign = findCampaignBySlug(slug);
 
   if (!campaign || !campaign.active) {

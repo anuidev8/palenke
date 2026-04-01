@@ -29,8 +29,8 @@ interface InstrumentCardGridProps {
 }
 
 function withRole(href: string, role: string) {
-  if (role === "public") return href;
-  return `${href}?role=${role}`;
+  void role;
+  return href;
 }
 
 export function InstrumentCardGrid({ instruments, role }: InstrumentCardGridProps) {

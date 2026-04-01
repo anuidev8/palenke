@@ -33,8 +33,8 @@ interface Props {
 }
 
 function withRole(href: string, role: string) {
-  if (role === "public") return href;
-  return `${href}?role=${role}`;
+  void role;
+  return href;
 }
 
 function Card({ item, role, index }: { item: Instrument; role: string; index: number }) {

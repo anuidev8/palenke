@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  isAdminRole,
+  isInternalRole,
+  resolveViewerRoleRecord,
+} from "@/lib/auth/permissions";
 import { sendSignedUrlEmail } from "@/lib/email";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import {
@@ -119,10 +124,9 @@ export async function GET(
     .maybeSingle();
 
   const visibility = document.visibility as DocumentVisibility;
-  const role = userRecord?.role;
-  const isActive = userRecord?.active !== false;
-  const isAdmin = role === "admin" && isActive;
-  const isInternal = (role === "internal" || role === "admin") && isActive;
+  const role = resolveViewerRoleRecord(userRecord);
+  const isAdmin = isAdminRole(role);
+  const isInternal = isInternalRole(role);
 
   if (visibility === "internal" && !isInternal) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

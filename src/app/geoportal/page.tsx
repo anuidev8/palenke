@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Map, TriangleAlert } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { geoportalCopy } from "@/lib/mock-data";
-import { getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { isInternal, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function GeoportalPage({
   searchParams,
@@ -11,7 +12,7 @@ export default async function GeoportalPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
 
   if (!isInternal(role)) {
     redirect(`/login?redirect=/geoportal&message=geoportal`);

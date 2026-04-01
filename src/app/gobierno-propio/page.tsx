@@ -3,7 +3,8 @@ import { SiteLayout } from "@/components/mock/ui";
 import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboardGrid";
 import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
 import { BookPreviewLightbox } from "@/components/palenke/BookPreviewLightbox";
-import { getViewerRole, type SearchParams } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams } from "@/lib/viewer";
 
 const instruments = [
   {
@@ -85,7 +86,7 @@ export default async function GobiernoPropioPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
 
   return (
     <SiteLayout

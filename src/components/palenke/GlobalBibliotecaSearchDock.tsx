@@ -6,26 +6,18 @@ import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPane
 import type { DocumentRecord, ViewerRole } from "@/lib/mock-data";
 import { withRole } from "@/lib/viewer";
 
-function resolveRole(rawRole: string | null): ViewerRole {
-  if (rawRole === "internal" || rawRole === "admin") {
-    return rawRole;
-  }
-
-  return "public";
-}
-
 export default function GlobalBibliotecaSearchDock({
   documents,
+  role,
 }: {
   documents: DocumentRecord[];
+  role: ViewerRole;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isScrolled, setIsScrolled] = useState(false);
   const [openSignal, setOpenSignal] = useState(0);
   const isHome = pathname === "/";
-
-  const role = resolveRole(searchParams.get("role"));
   const initialQuery = searchParams.get("aiq") ?? "";
   const visibleDocuments = useMemo(() => {
     if (role === "public") {

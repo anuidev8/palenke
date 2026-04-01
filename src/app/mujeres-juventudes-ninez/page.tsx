@@ -8,7 +8,8 @@ import {
 import HeroSection from "@/components/palenke/HeroSection";
 import DocumentCard from "@/components/palenke/DocumentCard";
 import { getVisibleCampaigns, getVisibleMjnDocuments, mjnContext, mjnQuote, mjnStories } from "@/lib/mock-data";
-import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { PiezasAutorizadasSection } from "@/components/PiezasAutorizadasSection";
 
 export default async function MjnPage({
@@ -17,7 +18,7 @@ export default async function MjnPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const tab = getFirstParam(params.tab) ?? "all";
   const documents = getVisibleMjnDocuments(role).filter((document) => {
     if (tab === "litigio") {

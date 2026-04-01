@@ -12,9 +12,6 @@ export type AccessRequestRecord = {
   community: string;
   motivation: string;
   pcn_affiliation: string | null;
-  institution: string | null;
-  use_purpose: string | null;
-  data_protection: string | null;
   instrument_slug: string;
   access_level: AccessLevel;
   status: AccessRequestStatus;
@@ -60,9 +57,6 @@ const mockAccessRequests: AccessRequestRecord[] = [
     community: "CC Renacientes de la Diáspora Africana",
     motivation: "Apoyar documentación comunitaria para taller de formación interna.",
     pcn_affiliation: "Allied organization",
-    institution: "Universidad del Pacífico",
-    use_purpose: "Investigación académica y devolución comunitaria.",
-    data_protection: "Uso en equipo cerrado, sin republicación de datos sensibles.",
     instrument_slug: "planes-uso",
     access_level: "coordination",
     status: "pending",
@@ -79,9 +73,6 @@ const mockAccessRequests: AccessRequestRecord[] = [
     community: "CC Martin Luther King",
     motivation: "Consulta de reglamento para proceso organizativo local.",
     pcn_affiliation: "Yes",
-    institution: null,
-    use_purpose: null,
-    data_protection: null,
     instrument_slug: "reglamentos",
     access_level: "admin",
     status: "pending",
@@ -123,9 +114,6 @@ function normalizeAccessRequest(raw: Record<string, unknown>): AccessRequestReco
     community: String(raw.community ?? ""),
     motivation: String(raw.motivation ?? ""),
     pcn_affiliation: raw.pcn_affiliation ? String(raw.pcn_affiliation) : null,
-    institution: raw.institution ? String(raw.institution) : null,
-    use_purpose: raw.use_purpose ? String(raw.use_purpose) : null,
-    data_protection: raw.data_protection ? String(raw.data_protection) : null,
     instrument_slug: String(raw.instrument_slug ?? ""),
     access_level: String(raw.access_level) === "coordination" ? "coordination" : "admin",
     status:

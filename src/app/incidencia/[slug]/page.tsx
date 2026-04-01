@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteLayout } from "@/components/mock/ui";
 import { getInternalNewsBySlug } from "@/lib/content";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function IncidenciaDetailPage({
   params,
@@ -13,7 +14,7 @@ export default async function IncidenciaDetailPage({
 }) {
   const { slug } = await params;
   const qp = await searchParams;
-  const role = getViewerRole(qp);
+  const role = await getViewerRoleFromRequest(qp);
   const item = await getInternalNewsBySlug(slug);
 
   if (!item) {

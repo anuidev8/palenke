@@ -1,3 +1,5 @@
+import { canDownloadVisibility } from "@/lib/auth/permissions";
+
 export type ViewerRole = "public" | "internal" | "admin";
 export type Visibility = "public" | "internal" | "sensitive";
 export type StoryKind = "audio" | "video" | "testimony" | "photo";
@@ -2288,7 +2290,7 @@ export const adminQuickStats = [
   { label: "Usuarios", value: `${users.length} / ${USER_LIMIT}` },
 ];
 
-export function getVisibleDocuments(role: ViewerRole) {
+export function getVisibleDocuments(_role: ViewerRole) {
   return documents.filter((document) => {
     // Sensitive docs are never shown
     if (document.visibility === "sensitive") return false;
@@ -2299,9 +2301,7 @@ export function getVisibleDocuments(role: ViewerRole) {
 
 /** Returns true if the viewer can freely access/download this document */
 export function canDownloadDocument(role: ViewerRole, visibility: Visibility): boolean {
-  if (visibility === "sensitive") return false;
-  if (visibility === "internal") return role === "internal" || role === "admin";
-  return true;
+  return canDownloadVisibility(role, visibility);
 }
 
 export function getVisibleDashboards(role: ViewerRole) {

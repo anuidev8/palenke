@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 type LoginFormProps = {
   redirectTo: string;
@@ -10,8 +11,15 @@ type LoginFormProps = {
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!loading && user && !isSubmitting) {
+      router.push(redirectTo);
+    }
+  }, [user, loading, router, redirectTo, isSubmitting]);
 
   const supabaseReady = useMemo(() => {
     return Boolean(
@@ -50,17 +58,27 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
       if (error) {
         setErrorMessage(error.message || "No fue posible iniciar sesión.");
+        setIsSubmitting(false); // Only reset on error
         return;
       }
 
       router.push(redirectTo);
       router.refresh();
+      // Keep isSubmitting true during transition to prevent double clicks and avoid flashing the form
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error inesperado al iniciar sesión.";
       setErrorMessage(message);
-    } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (loading || (user && !isSubmitting)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-[color:var(--sand-strong)] border-t-[color:var(--forest)]"></div>
+        <p className="mt-4 text-sm font-medium text-[color:var(--forest)] animate-pulse">Verificando sesión...</p>
+      </div>
+    );
   }
 
   return (

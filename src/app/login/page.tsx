@@ -2,7 +2,8 @@ import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Callout, SiteLayout } from "@/components/mock/ui";
 import { hasSupabasePublicConfig } from "@/lib/config";
-import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function LoginPage({
   searchParams,
@@ -10,16 +11,16 @@ export default async function LoginPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const state = getFirstParam(params.state);
-  const redirectTo = getFirstParam(params.redirect) ?? "/";
+  const redirectTo = getFirstParam(params.redirect) ?? "/studio";
   const message = getFirstParam(params.message);
   const supabaseReady = hasSupabasePublicConfig();
 
   const contextualMessage =
     message === "geoportal"
       ? "Debes iniciar sesión para acceder al geoportal."
-      : redirectTo !== "/"
+      : redirectTo !== "/studio" && redirectTo !== "/"
         ? "Este contenido es solo para miembros del Palenke/PCN. Inicia sesión para continuar."
         : "";
 

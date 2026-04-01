@@ -5,12 +5,13 @@ import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPane
 import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
 import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
 import { getNormativaDocumentRecords } from "@/lib/content";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import {
   getVisibleDocuments,
   territories,
 } from "@/lib/mock-data";
 import { filterDocuments, getDocumentYears, type LibraryFilters } from "@/lib/mock-queries";
-import { getFirstParam, getMultiParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getFirstParam, getMultiParam, type SearchParams, withRole } from "@/lib/viewer";
 
 const PAGE_SIZE = 10;
 const NORMATIVA_SECTION = "Normativa vigente";
@@ -91,7 +92,7 @@ export default async function BibliotecaPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const filters = parseFilters(params);
   const initialSearchQuery = getFirstParam(params.aiq) ?? "";
   const page = Math.max(1, Number(getFirstParam(params.page) ?? "1"));
@@ -234,7 +235,6 @@ export default async function BibliotecaPage({
           action="/biblioteca"
           className="mb-6 flex flex-wrap items-end gap-3 rounded-[28px] border border-[#e8dfd3] bg-white px-5 py-4"
         >
-          {role !== "public" ? <input type="hidden" name="role" value={role} /> : null}
 
           <div className="flex min-w-[220px] flex-1 flex-col gap-1.5">
             <label htmlFor="q" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">

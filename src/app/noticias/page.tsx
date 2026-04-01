@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { getExternalEnterateNews, listEvents } from "@/lib/content";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function NoticiasPage({
   searchParams,
@@ -10,7 +11,7 @@ export default async function NoticiasPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const [externalNews, events] = await Promise.all([
     getExternalEnterateNews(6),
     listEvents({ limit: 6, upcomingOnly: false }),

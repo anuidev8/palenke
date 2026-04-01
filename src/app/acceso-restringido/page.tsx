@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, Lock } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
-import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function AccesoRestringidoPage({
   searchParams,
@@ -9,7 +10,7 @@ export default async function AccesoRestringidoPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const redirectTo = getFirstParam(params.redirect) ?? "/";
 
   return (

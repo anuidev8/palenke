@@ -148,11 +148,9 @@ function readStorageInfo(metadata: Record<string, unknown> | undefined) {
 }
 
 export function AdminVisualContentGenerator({
-  role,
   topics,
   screens,
 }: {
-  role: string;
   topics: TopicOption[];
   screens: ScreenOption[];
 }) {
@@ -244,7 +242,6 @@ export function AdminVisualContentGenerator({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          role,
           topicId,
           screenId,
           assetTypes,
@@ -301,7 +298,6 @@ export function AdminVisualContentGenerator({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          role,
           topicId,
           screenId,
           objectiveHint: objective,

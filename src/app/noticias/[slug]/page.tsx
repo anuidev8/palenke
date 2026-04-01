@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { BookOpen, BarChart2, ShieldCheck } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 import { fallbackNewsArticle, findNewsArticleBySlug } from "@/lib/newsroom";
 
 const iconMap = {
@@ -31,7 +32,7 @@ export default async function DetalleNoticiaPage({
 }) {
   const { slug } = await params;
   const qp = await searchParams;
-  const role = getViewerRole(qp);
+  const role = await getViewerRoleFromRequest(qp);
 
   const articulo = findNewsArticleBySlug(slug) ?? { ...fallbackNewsArticle, slug };
 

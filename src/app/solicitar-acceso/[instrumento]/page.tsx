@@ -3,7 +3,8 @@ import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Callout, SiteLayout } from "@/components/mock/ui";
 import { AccessRequestForm } from "@/components/palenke/AccessRequestForm";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 const instrumentRequestConfig = {
   reglamentos: {
@@ -43,7 +44,7 @@ export default async function SolicitarAccesoPage({
 }) {
   const { instrumento } = await params;
   const sp = await searchParams;
-  const role = getViewerRole(sp);
+  const role = await getViewerRoleFromRequest(sp);
 
   if (!(instrumento in instrumentRequestConfig)) {
     notFound();

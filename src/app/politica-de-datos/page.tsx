@@ -1,6 +1,7 @@
 import { SectionHeader, SiteLayout } from "@/components/mock/ui";
 import { policyItems } from "@/lib/mock-data";
-import { getViewerRole, type SearchParams } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams } from "@/lib/viewer";
 
 export default async function PoliticaDeDatosPage({
   searchParams,
@@ -8,7 +9,7 @@ export default async function PoliticaDeDatosPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
 
   return (
     <SiteLayout
@@ -37,4 +38,3 @@ export default async function PoliticaDeDatosPage({
     </SiteLayout>
   );
 }
-

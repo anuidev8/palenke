@@ -168,7 +168,6 @@ export default async function AdminDocumentosPage({
         }
       >
         <form id="filter-form" action="/admin/documentos" className="flex flex-wrap gap-3 w-full">
-          <input type="hidden" name="role" value={role} />
           <input type="hidden" name="tab" value={tab} />
           <input
             name="q"

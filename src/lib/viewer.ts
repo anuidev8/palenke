@@ -1,4 +1,10 @@
 import type { ViewerRole, Visibility } from "@/lib/mock-data";
+import {
+  canOpenVisibility,
+  isAdminRole,
+  isInternalRole,
+  normalizeViewerRole,
+} from "@/lib/auth/permissions";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -19,13 +25,7 @@ export function getMultiParam(value: string | string[] | undefined) {
 }
 
 export function getViewerRole(searchParams: SearchParams | undefined): ViewerRole {
-  const role = getFirstParam(searchParams?.role);
-
-  if (role === "internal" || role === "admin") {
-    return role;
-  }
-
-  return "public";
+  return normalizeViewerRole(getFirstParam(searchParams?.role));
 }
 
 export function getViewerName(role: ViewerRole) {
@@ -41,23 +41,15 @@ export function getViewerName(role: ViewerRole) {
 }
 
 export function isInternal(role: ViewerRole) {
-  return role === "internal" || role === "admin";
+  return isInternalRole(role);
 }
 
 export function isAdmin(role: ViewerRole) {
-  return role === "admin";
+  return isAdminRole(role);
 }
 
 export function canOpenSiteVisibility(role: ViewerRole, visibility: Visibility) {
-  if (visibility === "sensitive") {
-    return false;
-  }
-
-  if (visibility === "internal") {
-    return isInternal(role);
-  }
-
-  return true;
+  return canOpenVisibility(role, visibility);
 }
 
 type HrefValue = string | number | boolean | null | undefined;
@@ -65,10 +57,6 @@ type HrefParams = Record<string, HrefValue | HrefValue[]>;
 
 export function withRole(path: string, role: ViewerRole, extra?: HrefParams) {
   const params = new URLSearchParams();
-
-  if (role !== "public") {
-    params.set("role", role);
-  }
 
   for (const [key, rawValue] of Object.entries(extra ?? {})) {
     if (rawValue === undefined || rawValue === null || rawValue === "") {

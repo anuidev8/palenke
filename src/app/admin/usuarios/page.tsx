@@ -148,7 +148,6 @@ export default async function AdminUsuariosPage({
         }
       >
         <form action="/admin/usuarios" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <input type="hidden" name="role" value={role} />
           <input
             name="q"
             defaultValue={getFirstParam(params.q)}

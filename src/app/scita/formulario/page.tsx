@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Droplets, FileImage, Mic, MessageSquare, TreePine, Waves, Zap, HelpCircle, MapPin, X } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 const categories = [
   {
@@ -87,7 +88,7 @@ export default async function FormularioAmbientalPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const submitted = params.submitted === "1";
 
   // Pre-selected values from query (for mockup state)

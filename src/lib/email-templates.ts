@@ -6,9 +6,6 @@ type AccessRequestEmailData = {
   motivation: string;
   instrument_slug: string;
   access_level: "admin" | "coordination";
-  institution?: string | null;
-  use_purpose?: string | null;
-  data_protection?: string | null;
 };
 
 function escapeHtml(value: string) {
@@ -41,9 +38,6 @@ export function coordinatorAlertHtml(request: AccessRequestEmailData, appUrl: st
     <p><strong>Email:</strong> ${escapeHtml(request.email)}</p>
     <p><strong>Comunidad / institución:</strong> ${escapeHtml(request.community)}</p>
     <p><strong>Motivo:</strong> ${escapeHtml(request.motivation)}</p>
-    <p><strong>Afiliación institucional:</strong> ${escapeHtml(request.institution ?? "N/A")}</p>
-    <p><strong>Uso previsto:</strong> ${escapeHtml(request.use_purpose ?? "N/A")}</p>
-    <p><strong>Protección de datos:</strong> ${escapeHtml(request.data_protection ?? "N/A")}</p>
     <p><a href="${escapeHtml(appUrl)}/admin/solicitudes/${escapeHtml(request.id)}">Revisar solicitud</a></p>
   `;
 }

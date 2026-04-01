@@ -3,7 +3,8 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import { SiteLayout } from "@/components/mock/ui";
 import { formatDateTimeRange, getEventBySlug } from "@/lib/content";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function EventDetailPage({
   params,
@@ -14,7 +15,7 @@ export default async function EventDetailPage({
 }) {
   const { slug } = await params;
   const qp = await searchParams;
-  const role = getViewerRole(qp);
+  const role = await getViewerRoleFromRequest(qp);
   const event = await getEventBySlug(slug);
 
   if (!event) {

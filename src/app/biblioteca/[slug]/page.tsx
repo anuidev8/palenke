@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { Callout, DetailList, SiteLayout, VisibilityBadge } from "@/components/mock/ui";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { findDocumentBySlug } from "@/lib/mock-data";
-import { canOpenSiteVisibility, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { canOpenSiteVisibility, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function DocumentoDetallePage({
   params,
@@ -14,7 +15,7 @@ export default async function DocumentoDetallePage({
 }) {
   const { slug } = await params;
   const query = await searchParams;
-  const role = getViewerRole(query);
+  const role = await getViewerRoleFromRequest(query);
   const document = findDocumentBySlug(slug);
   const supportsSignedDownloads = hasSupabaseServiceConfig();
 

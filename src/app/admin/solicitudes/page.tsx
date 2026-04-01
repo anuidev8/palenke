@@ -77,7 +77,6 @@ export default async function AdminSolicitudesPage({
         }
       >
         <form action="/admin/solicitudes" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <input type="hidden" name="role" value={role} />
           <select name="instrument_slug" defaultValue={instrument} className="input-shell">
             <option value="">Instrumento</option>
             {options.instruments.map((value) => (

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { VideoThumbnail } from "@/components/palenke/VideoThumbnail";
-import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function MemoriaAfroterritorialPage({
   searchParams,
@@ -10,7 +11,7 @@ export default async function MemoriaAfroterritorialPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
 
   return (
     <SiteLayout

@@ -107,7 +107,6 @@ export default async function RutasMetodologicasAdminPage({
       <section className="surface-card space-y-4">
         <h2 className="font-display text-2xl text-[color:var(--forest)]">Cargar nuevo documento base</h2>
         <form action={uploadRutaMetodologica} className="grid gap-4 lg:grid-cols-2">
-          <input type="hidden" name="role" value={role} />
 
           <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Instrumento</span>

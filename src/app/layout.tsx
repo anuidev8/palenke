@@ -3,6 +3,7 @@ import { DM_Serif_Display, Source_Sans_3 } from "next/font/google";
 import { Suspense } from "react";
 import GlobalBibliotecaSearchDock from "@/components/palenke/GlobalBibliotecaSearchDock";
 import { getVisibleDocuments } from "@/lib/mock-data";
+import { AuthProvider } from "@/lib/auth/AuthContext";
 import "./globals.css";
 
 const sourceSans3 = Source_Sans_3({
@@ -34,10 +35,12 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${sourceSans3.variable} ${dmSerifDisplay.variable} antialiased`}>
-        {children}
-        <Suspense fallback={null}>
-         
-        </Suspense>
+        <AuthProvider>
+          {children}
+          <Suspense fallback={null}>
+           
+          </Suspense>
+        </AuthProvider>
       </body>
     </html>
   );

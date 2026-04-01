@@ -278,7 +278,7 @@ function FileCard({
           <div className="flex flex-col gap-2">
             {showApprovalMessage ? (
               <p className="rounded-xl border border-[#f2d5cf] bg-[#fff4f1] px-4 py-3 text-sm font-medium text-[#8a3b2f]">
-                Se requiere aprobación para acceder a este contenido.
+                Este contenido requiere una verificación adicional para proteger información sensible del territorio.
               </p>
             ) : null}
             {onOpenRequestModal && (

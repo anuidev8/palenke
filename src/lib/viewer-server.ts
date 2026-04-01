@@ -1,18 +1,23 @@
+import { cache } from "react";
 import type { ViewerRole } from "@/lib/mock-data";
+import { resolveViewerRoleRecord } from "@/lib/auth/permissions";
 import { hasSupabasePublicConfig, hasSupabaseServiceConfig } from "@/lib/config";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
+import { getViewerRole, type SearchParams } from "@/lib/viewer";
 
 export type ViewerSessionState = {
   role: ViewerRole;
   isAuthenticated: boolean;
+  isActive: boolean;
 };
 
-export async function getViewerSessionState(): Promise<ViewerSessionState> {
+export const getViewerSessionState = cache(async (): Promise<ViewerSessionState> => {
   if (!hasSupabasePublicConfig()) {
     return {
       role: "public",
       isAuthenticated: false,
+      isActive: false,
     };
   }
 
@@ -26,6 +31,7 @@ export async function getViewerSessionState(): Promise<ViewerSessionState> {
       return {
         role: "public",
         isAuthenticated: false,
+        isActive: false,
       };
     }
 
@@ -48,34 +54,42 @@ export async function getViewerSessionState(): Promise<ViewerSessionState> {
       data = roleLookup.data as { role?: string | null; active?: boolean | null } | null;
     }
 
-    if (!data || data.active === false) {
-      return {
-        role: "public",
-        isAuthenticated: true,
-      };
-    }
-
-    if (data.role === "admin" || data.role === "internal" || data.role === "public") {
-      return {
-        role: data.role,
-        isAuthenticated: true,
-      };
-    }
-
     return {
-      role: "public",
+      role: resolveViewerRoleRecord(data),
       isAuthenticated: true,
+      isActive: data?.active !== false,
     };
   } catch (error) {
     console.error("Failed to resolve viewer session state:", error);
     return {
       role: "public",
       isAuthenticated: false,
+      isActive: false,
     };
   }
+});
+
+export async function getViewerRequestState(
+  searchParams?: SearchParams,
+): Promise<ViewerSessionState> {
+  if (!hasSupabasePublicConfig()) {
+    const role = getViewerRole(searchParams);
+    return {
+      role,
+      isAuthenticated: role !== "public",
+      isActive: role !== "public",
+    };
+  }
+
+  return getViewerSessionState();
 }
 
 export async function getViewerRoleFromSession(): Promise<ViewerRole> {
   const sessionState = await getViewerSessionState();
+  return sessionState.role;
+}
+
+export async function getViewerRoleFromRequest(searchParams?: SearchParams): Promise<ViewerRole> {
+  const sessionState = await getViewerRequestState(searchParams);
   return sessionState.role;
 }

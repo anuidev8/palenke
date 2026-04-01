@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowRight, ExternalLink, Layers } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { ScitaLayerToggles } from "@/components/palenke/ScitaLayerToggles";
-import { getViewerRole, isInternal, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { isInternal, type SearchParams, withRole } from "@/lib/viewer";
 
 const capas = [
   {
@@ -69,7 +70,7 @@ export default async function ScitaPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
 
   return (
     <SiteLayout

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Callout, Field, SiteLayout, TextInput } from "@/components/mock/ui";
-import { getFirstParam, getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRoleFromRequest } from "@/lib/viewer-server";
+import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function RecuperarContrasenaPage({
   searchParams,
@@ -8,7 +9,7 @@ export default async function RecuperarContrasenaPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = getViewerRole(params);
+  const role = await getViewerRoleFromRequest(params);
   const state = getFirstParam(params.state);
 
   return (
@@ -42,4 +43,3 @@ export default async function RecuperarContrasenaPage({
     </SiteLayout>
   );
 }
-

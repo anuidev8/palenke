@@ -161,21 +161,6 @@ export default async function AdminSolicitudDetailPage({
         </div>
       </section>
 
-      {request.access_level === "coordination" ? (
-        <section className="grid gap-3 rounded-3xl border border-[#f0d8b2] bg-[#fff8ee] p-6">
-          <h3 className="font-display text-xl text-[color:var(--forest)]">Campos adicionales de coordinación</h3>
-          <p>
-            <strong>Afiliación institucional:</strong> {request.institution || "No reportada"}
-          </p>
-          <p>
-            <strong>Uso previsto:</strong> {request.use_purpose || "No reportado"}
-          </p>
-          <p>
-            <strong>Protección de datos:</strong> {request.data_protection || "No reportada"}
-          </p>
-        </section>
-      ) : null}
-
       <section className="grid gap-6 lg:grid-cols-2">
         <form action={approveAction} className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">Aprobar solicitud</h3>

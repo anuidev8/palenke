@@ -38,7 +38,6 @@ export default async function AdminDashboardsPage({
         }
       >
         <form action="/admin/dashboards" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <input type="hidden" name="role" value={role} />
           <input name="q" defaultValue={getFirstParam(params.q)} placeholder="Buscar" className="input-shell" />
           <select name="topic" defaultValue={topic} className="input-shell">
             <option value="">Tema</option>
