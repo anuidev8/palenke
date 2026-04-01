@@ -3,9 +3,17 @@ import { hasSupabasePublicConfig, hasSupabaseServiceConfig } from "@/lib/config"
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
 
-export async function getViewerRoleFromSession(): Promise<ViewerRole> {
+export type ViewerSessionState = {
+  role: ViewerRole;
+  isAuthenticated: boolean;
+};
+
+export async function getViewerSessionState(): Promise<ViewerSessionState> {
   if (!hasSupabasePublicConfig()) {
-    return "public";
+    return {
+      role: "public",
+      isAuthenticated: false,
+    };
   }
 
   try {
@@ -15,7 +23,10 @@ export async function getViewerRoleFromSession(): Promise<ViewerRole> {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return "public";
+      return {
+        role: "public",
+        isAuthenticated: false,
+      };
     }
 
     let data: { role?: string | null; active?: boolean | null } | null = null;
@@ -38,16 +49,33 @@ export async function getViewerRoleFromSession(): Promise<ViewerRole> {
     }
 
     if (!data || data.active === false) {
-      return "public";
+      return {
+        role: "public",
+        isAuthenticated: true,
+      };
     }
 
     if (data.role === "admin" || data.role === "internal" || data.role === "public") {
-      return data.role;
+      return {
+        role: data.role,
+        isAuthenticated: true,
+      };
     }
 
-    return "public";
+    return {
+      role: "public",
+      isAuthenticated: true,
+    };
   } catch (error) {
-    console.error("Failed to resolve viewer role from session:", error);
-    return "public";
+    console.error("Failed to resolve viewer session state:", error);
+    return {
+      role: "public",
+      isAuthenticated: false,
+    };
   }
+}
+
+export async function getViewerRoleFromSession(): Promise<ViewerRole> {
+  const sessionState = await getViewerSessionState();
+  return sessionState.role;
 }

@@ -9,7 +9,7 @@ import { SiteLayout } from "@/components/mock/ui";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { canDownloadDocument } from "@/lib/mock-data";
 import { createSupabaseService } from "@/lib/supabase/service";
-import { getViewerRoleFromSession } from "@/lib/viewer-server";
+import { getViewerSessionState } from "@/lib/viewer-server";
 import { getViewerRole, type SearchParams, withRole } from "@/lib/viewer";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
@@ -239,8 +239,11 @@ export default async function InstrumentoPage({
   const { instrumento } = await params;
   const sp = await searchParams;
   const roleFromQuery = getViewerRole(sp);
-  const roleFromSession = await getViewerRoleFromSession();
-  const role = hasSupabaseServiceConfig() ? roleFromSession : roleFromQuery;
+  const sessionState = await getViewerSessionState();
+  const role = hasSupabaseServiceConfig() ? sessionState.role : roleFromQuery;
+  const isAuthenticated = hasSupabaseServiceConfig()
+    ? sessionState.isAuthenticated
+    : roleFromQuery !== "public";
 
   if (!(instrumento in instrumentos)) notFound();
   const instrumentoKey = instrumento as InstrumentoSlug;
@@ -448,6 +451,7 @@ export default async function InstrumentoPage({
           <DocumentTree 
             docs={displayDocs} 
             role={role} 
+            isAuthenticated={isAuthenticated}
             color={inst.color} 
             instrumento={instrumento}
             instrumentTitle={inst.title}

@@ -109,11 +109,11 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  if (visibility === "sensitive" && !isAdmin) {
+  if (visibility === "sensitive" && !isInternal) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  if (!isAdmin && (visibility === "internal" || visibility === "sensitive")) {
+  if (!isAdmin && visibility === "sensitive") {
     const requesterEmail = user.email ?? userRecord?.email ?? "";
     const { data: approvedRequest } = await supabase
       .from("access_requests")

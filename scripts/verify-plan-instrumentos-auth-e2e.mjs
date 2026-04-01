@@ -129,48 +129,20 @@ async function ensureRole({
   }
 }
 
-async function ensureApprovedAccessRequest({
+async function deleteAccessRequests({
   serviceClient,
   email,
   instrumentSlug,
 }) {
-  const { data: existing, error: queryError } = await serviceClient
+  const { error } = await serviceClient
     .from("access_requests")
-    .select("id")
+    .delete()
     .eq("email", email)
-    .eq("instrument_slug", instrumentSlug)
-    .eq("status", "approved")
-    .limit(1)
-    .maybeSingle();
+    .eq("instrument_slug", instrumentSlug);
 
-  if (queryError) {
-    throw queryError;
+  if (error) {
+    throw error;
   }
-  if (existing?.id) {
-    return existing.id;
-  }
-
-  const { data: inserted, error: insertError } = await serviceClient
-    .from("access_requests")
-    .insert({
-      full_name: "QA Plan Instrumentos Internal",
-      national_id: "900100200",
-      email,
-      community: "QA Community",
-      motivation: "Validacion E2E signed-url internal document.",
-      instrument_slug: instrumentSlug,
-      access_level: "admin",
-      status: "approved",
-      reviewer_notes: "Aprobada para validacion tecnica.",
-      reviewed_at: new Date().toISOString(),
-    })
-    .select("id")
-    .single();
-
-  if (insertError || !inserted?.id) {
-    throw insertError ?? new Error("Unable to create approved access_request row.");
-  }
-  return inserted.id;
 }
 
 async function signInAndBuildCookieHeader({
@@ -279,10 +251,10 @@ async function runHttpChecks({
     },
   );
   const internalText = await internalResponse.text();
-  ensureOkResponse(internalResponse.status, [200], "internal_approved_request", internalText);
+  ensureOkResponse(internalResponse.status, [200], "internal_direct_access", internalText);
   const internalJson = JSON.parse(internalText);
   if (!internalJson.url || typeof internalJson.url !== "string") {
-    throw new Error("internal_approved_request: missing signed url payload.");
+    throw new Error("internal_direct_access: missing signed url payload.");
   }
 
   const internalSensitiveResponse = await fetch(
@@ -313,7 +285,7 @@ async function runHttpChecks({
 
   return {
     unauth_internal: unauthResponse.status,
-    internal_approved_request: internalResponse.status,
+    internal_direct_access: internalResponse.status,
     internal_sensitive_forbidden: internalSensitiveResponse.status,
     admin_sensitive_delivery: adminSensitiveResponse.status,
   };
@@ -360,10 +332,15 @@ async function main() {
     role: "admin",
   });
 
-  await ensureApprovedAccessRequest({
+  await deleteAccessRequests({
     serviceClient,
     email: internalEmail,
     instrumentSlug: "reglamentos",
+  });
+  await deleteAccessRequests({
+    serviceClient,
+    email: internalEmail,
+    instrumentSlug: "planes-uso",
   });
 
   const { internalId, sensitiveId } = await getSampleDocumentIds(serviceClient);
