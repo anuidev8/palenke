@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { sendSignedUrlEmail } from "@/lib/email";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import {
+  getEffectiveDocumentSource,
+  isMissingPreferredSourceColumnError,
+} from "@/lib/document-source";
 import { findDocumentById } from "@/lib/mock-data";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
@@ -31,11 +35,24 @@ export async function GET(
   }
 
   const supabase = createSupabaseService();
-  const { data: document, error: documentError } = await supabase
+  let { data: document, error: documentError } = await supabase
     .from("documents")
-    .select("id, instrument, visibility, storage_bucket, storage_path, external_url")
+    .select("id, instrument, visibility, preferred_source, storage_bucket, storage_path, external_url")
     .eq("id", id)
     .maybeSingle();
+
+  if (documentError && isMissingPreferredSourceColumnError(documentError)) {
+    const fallbackResult = await supabase
+      .from("documents")
+      .select("id, instrument, visibility, storage_bucket, storage_path, external_url")
+      .eq("id", id)
+      .maybeSingle();
+
+    document = fallbackResult.data
+      ? { ...fallbackResult.data, preferred_source: null }
+      : fallbackResult.data;
+    documentError = fallbackResult.error;
+  }
 
   if (documentError && isMissingTableError(documentError)) {
     const mockDocument = findDocumentById(id);
@@ -62,7 +79,9 @@ export async function GET(
     return NextResponse.json({ error: "Document not found." }, { status: 404 });
   }
 
-  if (!document.storage_bucket && !document.storage_path && document.external_url) {
+  const effectiveSource = getEffectiveDocumentSource(document);
+
+  if (effectiveSource === "external" && document.external_url) {
     if (wantsRedirect) {
       return NextResponse.redirect(document.external_url);
     }

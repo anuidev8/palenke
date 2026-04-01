@@ -1,6 +1,10 @@
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import {
+  getEffectiveDocumentSource,
+  isMissingPreferredSourceColumnError,
+} from "@/lib/document-source";
 import type { DocumentRecord, Visibility, ViewerRole } from "@/lib/mock-data";
-import { canDownloadDocument, getVisibleDocuments } from "@/lib/mock-data";
+import { canDownloadDocument } from "@/lib/mock-data";
 import { pcnNewsArticles } from "@/lib/newsroom";
 import { createSupabaseService } from "@/lib/supabase/service";
 
@@ -68,6 +72,7 @@ type ContentDocumentRow = {
   territory: string | null;
   department: string | null;
   municipality: string | null;
+  preferred_source: "storage" | "external" | null;
   created_at: string;
 };
 
@@ -311,6 +316,16 @@ function inferDocumentType(row: ContentDocumentRow) {
 }
 
 function resolveDocumentUrl(row: ContentDocumentRow) {
+  const effectiveSource = getEffectiveDocumentSource(row);
+
+  if (effectiveSource === "external" && row.external_url) {
+    return {
+      action: "external" as const,
+      url: row.external_url,
+      fileLabel: row.instrument === "normativa-vigente" ? "Ver reglamento" : row.source_label ?? "Abrir fuente",
+    };
+  }
+
   if (row.storage_path?.startsWith("/")) {
     return {
       action: "file" as const,
@@ -319,7 +334,7 @@ function resolveDocumentUrl(row: ContentDocumentRow) {
     };
   }
 
-  if (row.storage_bucket || row.storage_path) {
+  if (effectiveSource === "storage" && (row.storage_bucket || row.storage_path)) {
     return {
       action: "file" as const,
       url: `/api/documents/${row.id}/signed-url?mode=redirect`,
@@ -530,12 +545,27 @@ export async function getNormativaDocumentRecords() {
 
   try {
     const supabase = createSupabaseService();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("documents")
       .select(
-        "id,title,instrument,council,visibility,storage_bucket,storage_path,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,created_at",
+        "id,title,instrument,council,visibility,storage_bucket,storage_path,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,preferred_source,created_at",
       )
       .eq("instrument", "normativa-vigente");
+
+    if (error && isMissingPreferredSourceColumnError(error)) {
+      const fallbackResult = await supabase
+        .from("documents")
+        .select(
+          "id,title,instrument,council,visibility,storage_bucket,storage_path,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,created_at",
+        )
+        .eq("instrument", "normativa-vigente");
+
+      data = (fallbackResult.data ?? []).map((row) => ({
+        ...row,
+        preferred_source: null,
+      }));
+      error = fallbackResult.error;
+    }
 
     if (error && isMissingTableError(error)) {
       console.error("Normativa vigente requires the documents migration to be applied.");

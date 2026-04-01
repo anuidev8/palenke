@@ -3,6 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import {
+  getEffectiveDocumentSource,
+  isDocumentSourcePreference,
+  isMissingPreferredSourceColumnError,
+  isStaticPublicDocumentPath,
+  normalizeStoragePath,
+} from "@/lib/document-source";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -96,6 +103,9 @@ export async function updateDocumentAction(id: string, formData: FormData) {
     const territory = asOptionalText(formData, "territory");
     const department = asOptionalText(formData, "department");
     const municipality = asOptionalText(formData, "municipality");
+    const preferredSourceRaw = asOptionalText(formData, "preferred_source");
+    const storageBucketRaw = asOptionalText(formData, "storage_bucket");
+    const storagePathRaw = asText(formData, "storage_path");
     const priorityOrderRaw = asText(formData, "priority_order");
     const featured = formData.get("featured") === "on";
     const file = getOptionalDocumentFile(formData);
@@ -113,11 +123,59 @@ export async function updateDocumentAction(id: string, formData: FormData) {
     if (Number.isNaN(priorityOrder)) {
       throw new Error("La prioridad debe ser numérica.");
     }
+    if (preferredSourceRaw && !isDocumentSourcePreference(preferredSourceRaw)) {
+      throw new Error("La fuente principal es inválida.");
+    }
+
+    if (!storagePathRaw && !externalUrl) {
+      throw new Error("Debes indicar una ruta de archivo o un enlace externo.");
+    }
+
+    const isStaticPublicPath = isStaticPublicDocumentPath(storagePathRaw);
+    const storagePath = storagePathRaw
+      ? isStaticPublicPath
+        ? storagePathRaw
+        : normalizeStoragePath(storagePathRaw.replace(/^\/+/, ""))
+      : null;
+    const storageBucket = !storagePath
+      ? null
+      : isStaticPublicPath
+        ? null
+        : storageBucketRaw;
+    const preferredSource =
+      preferredSourceRaw ??
+      getEffectiveDocumentSource({
+        storage_bucket: storageBucket,
+        storage_path: storagePath,
+        external_url: externalUrl,
+      });
+
+    if (preferredSource === "storage" && !storagePath) {
+      throw new Error("Si seleccionas archivo Storage debes indicar una ruta.");
+    }
+
+    if (preferredSource === "external" && !externalUrl) {
+      throw new Error("Si seleccionas enlace externo debes indicar la URL oficial.");
+    }
+
+    if (file && !storagePath) {
+      throw new Error("Si vas a subir un archivo debes indicar una ruta de storage.");
+    }
+
+    if (storagePath && !isStaticPublicPath && !storageBucket) {
+      throw new Error("Para rutas de Storage debes indicar un bucket.");
+    }
+
+    if (storagePath && isStaticPublicPath && file) {
+      throw new Error(
+        "No puedes subir archivo cuando la ruta es pública local (/docs/...). Usa una ruta de bucket o deja el archivo vacío.",
+      );
+    }
 
     const supabase = createSupabaseService();
     const { data: existing, error: existingError } = await supabase
       .from("documents")
-      .select("id, instrument, storage_bucket, storage_path")
+      .select("id, instrument")
       .eq("id", id)
       .maybeSingle();
 
@@ -126,10 +184,7 @@ export async function updateDocumentAction(id: string, formData: FormData) {
     }
 
     if (file) {
-      const storageBucket = existing.storage_bucket;
-      const storagePath = existing.storage_path;
-
-      if (!storageBucket || !storagePath || storagePath.startsWith("/")) {
+      if (!storageBucket || !storagePath || isStaticPublicDocumentPath(storagePath)) {
         throw new Error(
           "Este documento no tiene ruta editable en Supabase Storage. Usa la carga específica de rutas metodológicas para documentos base públicos.",
         );
@@ -148,7 +203,7 @@ export async function updateDocumentAction(id: string, formData: FormData) {
       }
     }
 
-    const { error: updateError } = await supabase
+    let { error: updateError } = await supabase
       .from("documents")
       .update({
         title,
@@ -165,8 +220,37 @@ export async function updateDocumentAction(id: string, formData: FormData) {
         territory,
         department,
         municipality,
+        preferred_source: preferredSource,
+        storage_bucket: storageBucket,
+        storage_path: storagePath,
       })
       .eq("id", id);
+
+    if (updateError && isMissingPreferredSourceColumnError(updateError)) {
+      const fallbackUpdate = await supabase
+        .from("documents")
+        .update({
+          title,
+          instrument,
+          visibility,
+          council,
+          summary,
+          published_on: publishedOn,
+          external_url: externalUrl,
+          document_type: documentType,
+          priority_order: priorityOrder,
+          featured,
+          source_label: sourceLabel,
+          territory,
+          department,
+          municipality,
+          storage_bucket: storageBucket,
+          storage_path: storagePath,
+        })
+        .eq("id", id);
+
+      updateError = fallbackUpdate.error;
+    }
 
     if (updateError) {
       throw new Error(`No se pudo actualizar el documento: ${updateError.message}`);

@@ -130,6 +130,23 @@ export default async function NuevoDocumentoPage({
             <input name="source_label" className="input-shell" placeholder="Descargar PDF, Función Pública..." />
           </label>
 
+          <fieldset className="grid gap-3 text-sm md:col-span-2">
+            <legend className="font-semibold text-[color:var(--forest)]">Fuente principal</legend>
+            <div className="flex flex-wrap gap-3">
+              <label className="inline-flex items-center gap-2 rounded-2xl border border-[#e8dfd3] bg-white px-4 py-3">
+                <input type="radio" name="preferred_source" value="storage" defaultChecked />
+                <span>PDF / archivo en Storage</span>
+              </label>
+              <label className="inline-flex items-center gap-2 rounded-2xl border border-[#e8dfd3] bg-white px-4 py-3">
+                <input type="radio" name="preferred_source" value="external" />
+                <span>Enlace externo oficial</span>
+              </label>
+            </div>
+            <span className="text-xs text-[color:var(--muted)]">
+              La opción elegida define qué abre la biblioteca cuando guardes tanto archivo como URL externa.
+            </span>
+          </fieldset>
+
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Enlace externo oficial</span>
             <input

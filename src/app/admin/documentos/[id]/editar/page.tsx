@@ -5,6 +5,10 @@ import { AdminLayout, Callout } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import {
+  getEffectiveDocumentSource,
+  isMissingPreferredSourceColumnError,
+} from "@/lib/document-source";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { updateDocumentAction } from "./actions";
 
@@ -24,6 +28,7 @@ type EditableDocument = {
   department: string | null;
   municipality: string | null;
   visibility: "public" | "internal" | "sensitive";
+  preferred_source: "storage" | "external" | null;
   storage_bucket: string | null;
   storage_path: string | null;
   created_at: string;
@@ -69,11 +74,24 @@ export default async function EditarDocumentoPage({
   }
 
   const supabase = createSupabaseService();
-  const { data, error: fetchError } = await supabase
+  let { data, error: fetchError } = await supabase
     .from("documents")
-    .select("id,title,instrument,council,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,visibility,storage_bucket,storage_path,created_at")
+    .select("id,title,instrument,council,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,visibility,preferred_source,storage_bucket,storage_path,created_at")
     .eq("id", id)
     .maybeSingle();
+
+  if (fetchError && isMissingPreferredSourceColumnError(fetchError)) {
+    const fallbackResult = await supabase
+      .from("documents")
+      .select("id,title,instrument,council,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,visibility,storage_bucket,storage_path,created_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    data = fallbackResult.data
+      ? { ...fallbackResult.data, preferred_source: null }
+      : fallbackResult.data;
+    fetchError = fallbackResult.error;
+  }
 
   if (fetchError) {
     return (
@@ -96,10 +114,7 @@ export default async function EditarDocumentoPage({
   }
   const tab = requestedTab === "normativa" || document.instrument === "normativa-vigente" ? "normativa" : "instrumentos";
   const isNormativa = document.instrument === "normativa-vigente";
-
-  const canReplaceStorageFile = Boolean(
-    document.storage_bucket && document.storage_path && !document.storage_path.startsWith("/"),
-  );
+  const effectiveSource = getEffectiveDocumentSource(document) ?? "storage";
   const formAction = updateDocumentAction.bind(null, document.id);
 
   return (
@@ -107,7 +122,7 @@ export default async function EditarDocumentoPage({
       role={role}
       active="documentos"
       title="Editar documento"
-      intro="Edita metadata, prioridad, enlace oficial y reemplaza el archivo cuando exista ruta en Supabase Storage."
+      intro="Edita metadata, prioridad y la fuente principal del documento. Puedes conservar bucket/path y enlace externo al mismo tiempo, y decidir cuál usa la app."
     >
       <div className="mb-4 flex flex-wrap gap-3">
         <Link href={withRole("/admin/documentos", role, { tab })} className="button-secondary">
@@ -231,6 +246,33 @@ export default async function EditarDocumentoPage({
             />
           </label>
 
+          <fieldset className="grid gap-3 text-sm md:col-span-2">
+            <legend className="font-semibold text-[color:var(--forest)]">Fuente principal</legend>
+            <div className="flex flex-wrap gap-3">
+              <label className="inline-flex items-center gap-2 rounded-2xl border border-[#e8dfd3] bg-white px-4 py-3">
+                <input
+                  type="radio"
+                  name="preferred_source"
+                  value="storage"
+                  defaultChecked={effectiveSource === "storage"}
+                />
+                <span>PDF / archivo en Storage</span>
+              </label>
+              <label className="inline-flex items-center gap-2 rounded-2xl border border-[#e8dfd3] bg-white px-4 py-3">
+                <input
+                  type="radio"
+                  name="preferred_source"
+                  value="external"
+                  defaultChecked={effectiveSource === "external"}
+                />
+                <span>Enlace externo oficial</span>
+              </label>
+            </div>
+            <span className="text-xs text-[color:var(--muted)]">
+              La opción elegida define qué abre la biblioteca cuando el documento tenga tanto archivo como URL externa.
+            </span>
+          </fieldset>
+
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Enlace externo oficial</span>
             <input
@@ -268,31 +310,42 @@ export default async function EditarDocumentoPage({
             />
           </label>
 
-          <div className="grid gap-2 text-sm">
+          <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Bucket</span>
-            <input readOnly value={document.storage_bucket ?? "—"} className="input-shell bg-[#f8f5f2]" />
-          </div>
+            <select
+              name="storage_bucket"
+              defaultValue={document.storage_bucket ?? ""}
+              className="input-shell"
+            >
+              <option value="docs-internal">docs-internal</option>
+              <option value="docs-sensitive">docs-sensitive</option>
+              <option value="docs-public">docs-public</option>
+              <option value="">(sin bucket para ruta pública local)</option>
+            </select>
+          </label>
 
-          <div className="grid gap-2 text-sm">
+          <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Ruta storage</span>
-            <input readOnly value={document.storage_path ?? "—"} className="input-shell bg-[#f8f5f2]" />
-          </div>
+            <input
+              name="storage_path"
+              defaultValue={document.storage_path ?? ""}
+              className="input-shell"
+              placeholder="reglamentos/cc-x/archivo.pdf  ó  /docs/archivo.pdf"
+            />
+          </label>
 
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">
-              Reemplazar archivo (opcional)
+              Reemplazar / subir archivo (opcional)
             </span>
             <input
               name="file"
               type="file"
               accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               className="input-shell"
-              disabled={!canReplaceStorageFile}
             />
             <span className="text-xs text-[color:var(--muted)]">
-              {canReplaceStorageFile
-                ? "Si cargas un archivo, se reemplaza el actual en la misma ruta (máx. 20 MB)."
-                : "Este documento no tiene una ruta editable en Supabase Storage desde este formulario."}
+              Si cargas un archivo, se sube con `upsert` al bucket y la ruta indicados arriba (máx. 20 MB). No se permiten cargas cuando la ruta sea local `/docs/...`.
             </span>
           </label>
 

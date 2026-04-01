@@ -148,7 +148,7 @@ export function SiteLayout({
   transparentHeaderAtTop,
 }: SiteLayoutProps) {
   return (
-    <div className="min-h-screen bg-[color:var(--page)] text-[color:var(--forest)]">
+    <div className="min-h-screen bg-[color:var(--page)] pt-[84px] text-[color:var(--forest)]">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-[color:var(--forest)] focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-[color:var(--sand)]"

@@ -3,6 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import {
+  getEffectiveDocumentSource,
+  isDocumentSourcePreference,
+  isMissingPreferredSourceColumnError,
+  isStaticPublicDocumentPath,
+  normalizeStoragePath,
+} from "@/lib/document-source";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -27,14 +34,6 @@ async function assertAdmin() {
   if (!isAdmin(role)) {
     throw new Error("Unauthorized");
   }
-}
-
-function normalizeStoragePath(storagePath: string) {
-  return storagePath
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
 }
 
 function getOptionalDocumentFile(formData: FormData) {
@@ -105,6 +104,7 @@ export async function createDocumentAction(formData: FormData) {
     const territory = asOptionalText(formData, "territory");
     const department = asOptionalText(formData, "department");
     const municipality = asOptionalText(formData, "municipality");
+    const preferredSourceRaw = asOptionalText(formData, "preferred_source");
     const priorityOrderRaw = asText(formData, "priority_order");
     const featured = formData.get("featured") === "on";
     const storageBucketRaw = asOptionalText(formData, "storage_bucket");
@@ -121,6 +121,9 @@ export async function createDocumentAction(formData: FormData) {
     if (!isValidVisibility(visibility)) {
       throw new Error("La visibilidad es inválida.");
     }
+    if (preferredSourceRaw && !isDocumentSourcePreference(preferredSourceRaw)) {
+      throw new Error("La fuente principal es inválida.");
+    }
     if (!storagePathRaw && !externalUrl) {
       throw new Error("Debes indicar una ruta de archivo o un enlace externo.");
     }
@@ -128,7 +131,7 @@ export async function createDocumentAction(formData: FormData) {
       throw new Error("La prioridad debe ser numérica.");
     }
 
-    const isStaticPublicPath = storagePathRaw.startsWith("/");
+    const isStaticPublicPath = isStaticPublicDocumentPath(storagePathRaw);
     const storagePath = storagePathRaw
       ? isStaticPublicPath
         ? storagePathRaw
@@ -139,9 +142,24 @@ export async function createDocumentAction(formData: FormData) {
       : isStaticPublicPath
         ? null
         : storageBucketRaw;
+    const preferredSource =
+      preferredSourceRaw ??
+      getEffectiveDocumentSource({
+        storage_bucket: storageBucket,
+        storage_path: storagePath,
+        external_url: externalUrl,
+      });
 
     if (file && !storagePath) {
       throw new Error("Si vas a subir un archivo debes indicar una ruta de storage.");
+    }
+
+    if (preferredSource === "storage" && !storagePath) {
+      throw new Error("Si seleccionas archivo Storage debes indicar una ruta.");
+    }
+
+    if (preferredSource === "external" && !externalUrl) {
+      throw new Error("Si seleccionas enlace externo debes indicar la URL oficial.");
     }
 
     if (storagePath && !isStaticPublicPath && !storageBucket) {
@@ -170,7 +188,7 @@ export async function createDocumentAction(formData: FormData) {
       }
     }
 
-    const { data: inserted, error: insertError } = await supabase
+    let { data: inserted, error: insertError } = await supabase
       .from("documents")
       .insert({
         title,
@@ -186,12 +204,41 @@ export async function createDocumentAction(formData: FormData) {
         territory,
         department,
         municipality,
+        preferred_source: preferredSource,
         visibility,
         storage_bucket: storageBucket,
         storage_path: storagePath,
       })
       .select("id")
       .single();
+
+    if (insertError && isMissingPreferredSourceColumnError(insertError)) {
+      const fallbackInsert = await supabase
+        .from("documents")
+        .insert({
+          title,
+          instrument,
+          council,
+          summary,
+          published_on: publishedOn,
+          external_url: externalUrl,
+          document_type: documentType,
+          priority_order: priorityOrder,
+          featured,
+          source_label: sourceLabel,
+          territory,
+          department,
+          municipality,
+          visibility,
+          storage_bucket: storageBucket,
+          storage_path: storagePath,
+        })
+        .select("id")
+        .single();
+
+      inserted = fallbackInsert.data;
+      insertError = fallbackInsert.error;
+    }
 
     if (insertError || !inserted?.id) {
       throw new Error(`No se pudo crear el documento: ${insertError?.message ?? "insert failed"}`);
