@@ -148,7 +148,7 @@ export function SiteLayout({
   transparentHeaderAtTop,
 }: SiteLayoutProps) {
   return (
-    <div className="min-h-screen bg-[color:var(--page)] pt-[84px] text-[color:var(--forest)]">
+    <div className={`min-h-screen bg-[color:var(--page)] text-[color:var(--forest)] ${transparentHeaderAtTop ? '' : 'pt-[84px]'}`}>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-[color:var(--forest)] focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-[color:var(--sand)]"
@@ -157,12 +157,14 @@ export function SiteLayout({
       </a>
       <SiteHeader role={role} simplified={simplifiedHeader} transparentAtTop={transparentHeaderAtTop} />
       {/* PCN 4-colour brand stripe */}
-      <div aria-hidden="true" className="flex h-1.5 w-full">
-        <span className="flex-1 bg-[#1a1a1a]" />
-        <span className="flex-1 bg-[#2e7d32]" />
-        <span className="flex-1 bg-[#d32f2f]" />
-        <span className="flex-1 bg-[#fbc02d]" />
-      </div>
+      {!transparentHeaderAtTop && (
+        <div aria-hidden="true" className="flex h-1.5 w-full">
+          <span className="flex-1 bg-[#1a1a1a]" />
+          <span className="flex-1 bg-[#2e7d32]" />
+          <span className="flex-1 bg-[#d32f2f]" />
+          <span className="flex-1 bg-[#fbc02d]" />
+        </div>
+      )}
       {banner ? <div className="border-b border-[color:var(--border-soft)] bg-[color:var(--sand-strong)]">{banner}</div> : null}
       {breadcrumbs?.length ? (
         <div className="border-b border-[color:var(--border-soft)] bg-[color:rgb(255_250_240_/_0.7)]">
