@@ -216,6 +216,50 @@ function stripHtml(html: string) {
     .trim();
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function firstNonEmptyString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+function extractFirstContentImage(html: string) {
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match?.[1] ? String(match[1]) : null;
+}
+
+function resolveExternalNewsImageUrl(item: Record<string, unknown>) {
+  const embedded = asRecord(item._embedded);
+  const mediaEntry = Array.isArray(embedded?.["wp:featuredmedia"])
+    ? asRecord(embedded?.["wp:featuredmedia"]?.[0])
+    : null;
+  const mediaDetails = asRecord(mediaEntry?.media_details);
+  const mediaSizes = asRecord(mediaDetails?.sizes);
+  const yoastHeadJson = asRecord(item.yoast_head_json);
+  const yoastImage = Array.isArray(yoastHeadJson?.og_image)
+    ? asRecord(yoastHeadJson?.og_image?.[0])
+    : null;
+  const content = asRecord(item.content);
+
+  return firstNonEmptyString(
+    mediaEntry?.source_url,
+    asRecord(mediaSizes?.["et-pb-post-main-image-fullwidth"])?.source_url,
+    asRecord(mediaSizes?.["et-pb-post-main-image"])?.source_url,
+    asRecord(mediaSizes?.large)?.source_url,
+    asRecord(mediaSizes?.full)?.source_url,
+    yoastImage?.url,
+    extractFirstContentImage(String(content?.rendered ?? "")),
+  );
+}
+
 function formatSpanishDate(value: string, options?: Intl.DateTimeFormatOptions) {
   return new Intl.DateTimeFormat("es-CO", {
     day: "2-digit",
@@ -415,17 +459,13 @@ export async function getExternalEnterateNews(limit = 4): Promise<ExternalNewsIt
 
     const payload = (await response.json()) as Array<Record<string, unknown>>;
     return payload.slice(0, limit).map((item) => {
-      const embedded = item._embedded as { "wp:featuredmedia"?: Array<Record<string, unknown>> } | undefined;
-      const media = embedded?.["wp:featuredmedia"]?.[0];
-      const sourceUrl = media?.source_url ? String(media.source_url) : null;
-
       return {
         id: Number(item.id),
         slug: String(item.slug),
         title: stripHtml(String((item.title as { rendered?: string })?.rendered ?? "")),
         excerpt: stripHtml(String((item.excerpt as { rendered?: string })?.rendered ?? "")),
         url: String(item.link ?? ""),
-        imageUrl: sourceUrl,
+        imageUrl: resolveExternalNewsImageUrl(item),
         publishedAt: String(item.date ?? new Date().toISOString()),
         sourceLabel: "Renacientes / PCN",
       };

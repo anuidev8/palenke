@@ -55,7 +55,7 @@ export default async function NoticiasPage({
                     className="flex h-[160px] items-end rounded-[20px] bg-cover bg-center p-4"
                     style={{
                       backgroundImage: item.imageUrl
-                        ? `linear-gradient(180deg, rgba(26,26,26,0.1), rgba(26,26,26,0.7)), url(${item.imageUrl})`
+                        ? `linear-gradient(180deg, rgba(26,26,26,0.1), rgba(26,26,26,0.7)), url("${item.imageUrl}")`
                         : "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
                     }}
                   >
