@@ -20,6 +20,9 @@ type EditableDocument = {
   priority_order: number | null;
   featured: boolean | null;
   source_label: string | null;
+  territory: string | null;
+  department: string | null;
+  municipality: string | null;
   visibility: "public" | "internal" | "sensitive";
   storage_bucket: string | null;
   storage_path: string | null;
@@ -48,6 +51,7 @@ export default async function EditarDocumentoPage({
   const { role, searchParams: qs } = await requireAdmin(searchParams);
   const notice = getFirstParam(qs.notice);
   const error = getFirstParam(qs.error);
+  const requestedTab = getFirstParam(qs.tab);
 
   if (!hasSupabaseServiceConfig()) {
     return (
@@ -67,7 +71,7 @@ export default async function EditarDocumentoPage({
   const supabase = createSupabaseService();
   const { data, error: fetchError } = await supabase
     .from("documents")
-    .select("id,title,instrument,council,summary,published_on,external_url,document_type,priority_order,featured,source_label,visibility,storage_bucket,storage_path,created_at")
+    .select("id,title,instrument,council,summary,published_on,external_url,document_type,priority_order,featured,source_label,territory,department,municipality,visibility,storage_bucket,storage_path,created_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -90,6 +94,8 @@ export default async function EditarDocumentoPage({
   if (!document) {
     notFound();
   }
+  const tab = requestedTab === "normativa" || document.instrument === "normativa-vigente" ? "normativa" : "instrumentos";
+  const isNormativa = document.instrument === "normativa-vigente";
 
   const canReplaceStorageFile = Boolean(
     document.storage_bucket && document.storage_path && !document.storage_path.startsWith("/"),
@@ -104,7 +110,7 @@ export default async function EditarDocumentoPage({
       intro="Edita metadata, prioridad, enlace oficial y reemplaza el archivo cuando exista ruta en Supabase Storage."
     >
       <div className="mb-4 flex flex-wrap gap-3">
-        <Link href={withRole("/admin/documentos", role)} className="button-secondary">
+        <Link href={withRole("/admin/documentos", role, { tab })} className="button-secondary">
           Volver a documentos
         </Link>
       </div>
@@ -123,6 +129,7 @@ export default async function EditarDocumentoPage({
 
       <section className="surface-card space-y-5">
         <form action={formAction} className="grid gap-5 md:grid-cols-2">
+          <input type="hidden" name="tab" value={tab} />
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Título</span>
             <input
@@ -134,16 +141,26 @@ export default async function EditarDocumentoPage({
             />
           </label>
 
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Instrumento</span>
-            <select name="instrument" required defaultValue={document.instrument} className="input-shell">
-              {[...new Set([document.instrument, ...INSTRUMENT_OPTIONS])].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
+          {isNormativa ? (
+            <>
+              <input type="hidden" name="instrument" value="normativa-vigente" />
+              <div className="grid gap-2 text-sm">
+                <span className="font-semibold text-[color:var(--forest)]">Sección</span>
+                <input readOnly value="normativa-vigente" className="input-shell bg-[#f8f5f2]" />
+              </div>
+            </>
+          ) : (
+            <label className="grid gap-2 text-sm">
+              <span className="font-semibold text-[color:var(--forest)]">Instrumento</span>
+              <select name="instrument" required defaultValue={document.instrument} className="input-shell">
+                {[...new Set([document.instrument, ...INSTRUMENT_OPTIONS.filter((value) => value !== "normativa-vigente")])].map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Visibilidad</span>
@@ -224,6 +241,33 @@ export default async function EditarDocumentoPage({
             />
           </label>
 
+          <label className="grid gap-2 text-sm">
+            <span className="font-semibold text-[color:var(--forest)]">Territorio</span>
+            <input
+              name="territory"
+              className="input-shell"
+              defaultValue={document.territory ?? ""}
+            />
+          </label>
+
+          <label className="grid gap-2 text-sm">
+            <span className="font-semibold text-[color:var(--forest)]">Departamento / Estado</span>
+            <input
+              name="department"
+              className="input-shell"
+              defaultValue={document.department ?? ""}
+            />
+          </label>
+
+          <label className="grid gap-2 text-sm md:col-span-2">
+            <span className="font-semibold text-[color:var(--forest)]">Municipio / Ciudad</span>
+            <input
+              name="municipality"
+              className="input-shell"
+              defaultValue={document.municipality ?? ""}
+            />
+          </label>
+
           <div className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Bucket</span>
             <input readOnly value={document.storage_bucket ?? "—"} className="input-shell bg-[#f8f5f2]" />
@@ -263,7 +307,7 @@ export default async function EditarDocumentoPage({
           </label>
 
           <div className="md:col-span-2 flex justify-end gap-3">
-            <Link href={withRole("/admin/documentos", role)} className="button-ghost">
+            <Link href={withRole("/admin/documentos", role, { tab })} className="button-ghost">
               Cancelar
             </Link>
             <button type="submit" className="button-primary">

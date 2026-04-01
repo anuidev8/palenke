@@ -72,6 +72,18 @@ function getFileContentType(file: File) {
   return "application/pdf";
 }
 
+function rethrowIfRedirectError(error: unknown) {
+  if (
+    error &&
+    typeof error === "object" &&
+    "digest" in error &&
+    typeof error.digest === "string" &&
+    error.digest.startsWith("NEXT_REDIRECT")
+  ) {
+    throw error;
+  }
+}
+
 export async function createDocumentAction(formData: FormData) {
   await assertAdmin();
 
@@ -80,6 +92,7 @@ export async function createDocumentAction(formData: FormData) {
   }
 
   try {
+    const tab = asText(formData, "tab") === "normativa" ? "normativa" : "instrumentos";
     const title = asText(formData, "title");
     const instrument = asText(formData, "instrument");
     const visibility = asText(formData, "visibility");
@@ -89,6 +102,9 @@ export async function createDocumentAction(formData: FormData) {
     const externalUrl = asOptionalText(formData, "external_url");
     const documentType = asOptionalText(formData, "document_type");
     const sourceLabel = asOptionalText(formData, "source_label");
+    const territory = asOptionalText(formData, "territory");
+    const department = asOptionalText(formData, "department");
+    const municipality = asOptionalText(formData, "municipality");
     const priorityOrderRaw = asText(formData, "priority_order");
     const featured = formData.get("featured") === "on";
     const storageBucketRaw = asOptionalText(formData, "storage_bucket");
@@ -167,6 +183,9 @@ export async function createDocumentAction(formData: FormData) {
         priority_order: priorityOrder,
         featured,
         source_label: sourceLabel,
+        territory,
+        department,
+        municipality,
         visibility,
         storage_bucket: storageBucket,
         storage_path: storagePath,
@@ -184,9 +203,11 @@ export async function createDocumentAction(formData: FormData) {
     revalidatePath(`/gobierno-propio/${instrument}`);
     revalidatePath("/biblioteca");
 
-    redirect(`/admin/documentos/${inserted.id}/editar?notice=saved`);
+    redirect(`/admin/documentos/${inserted.id}/editar?tab=${tab}&notice=saved`);
   } catch (error) {
+    rethrowIfRedirectError(error);
     const message = error instanceof Error ? error.message : "Error al crear documento.";
-    redirect(`/admin/documentos/nuevo?error=${encodeURIComponent(message)}`);
+    const tab = asText(formData, "tab") === "normativa" ? "normativa" : "instrumentos";
+    redirect(`/admin/documentos/nuevo?tab=${tab}&error=${encodeURIComponent(message)}`);
   }
 }

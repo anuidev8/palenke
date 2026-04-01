@@ -3,6 +3,10 @@ import { AdminLayout, Callout, StatusPill, TableCard, Toolbar } from "@/componen
 import { requireAdmin } from "@/lib/admin-access";
 import {
   countPendingAccessRequests,
+  formatAccessLevelLabel,
+  formatAccessRequestStatusLabel,
+  formatInstrumentLabel,
+  getAccessRequestFilterOptionsWithMeta,
   listAccessRequestsWithMeta,
   type AccessLevel,
   type AccessRequestsDataMode,
@@ -47,13 +51,14 @@ export default async function AdminSolicitudesPage({
   const accessLevel = (getFirstParam(params.access_level) ?? "") as AccessLevel | "";
   const status = (getFirstParam(params.status) ?? "") as AccessRequestStatus | "";
 
-  const [{ requests, mode }, pendingCount] = await Promise.all([
+  const [{ requests, mode }, pendingCount, { options }] = await Promise.all([
     listAccessRequestsWithMeta({
       instrument_slug: instrument || undefined,
       access_level: accessLevel || undefined,
       status: status || undefined,
     }),
     countPendingAccessRequests(),
+    getAccessRequestFilterOptionsWithMeta(),
   ]);
 
   return (
@@ -75,25 +80,29 @@ export default async function AdminSolicitudesPage({
           <input type="hidden" name="role" value={role} />
           <select name="instrument_slug" defaultValue={instrument} className="input-shell">
             <option value="">Instrumento</option>
-            <option value="reglamentos">Reglamentos</option>
-            <option value="planes-uso">Planes de uso</option>
-            <option value="litigio">Litigio</option>
-            <option value="conservacion">Conservación</option>
-            <option value="etnodesarrollo">Etnodesarrollo</option>
-            <option value="proteccion-hidrica">Protección hídrica</option>
+            {options.instruments.map((value) => (
+              <option key={value} value={value}>
+                {formatInstrumentLabel(value)}
+              </option>
+            ))}
           </select>
 
           <select name="access_level" defaultValue={accessLevel} className="input-shell">
             <option value="">Nivel</option>
-            <option value="admin">Admin</option>
-            <option value="coordination">Coordinación</option>
+            {options.accessLevels.map((value) => (
+              <option key={value} value={value}>
+                {formatAccessLevelLabel(value)}
+              </option>
+            ))}
           </select>
 
           <select name="status" defaultValue={status} className="input-shell">
             <option value="">Estado</option>
-            <option value="pending">Pendiente</option>
-            <option value="approved">Aprobada</option>
-            <option value="rejected">Rechazada</option>
+            {options.statuses.map((value) => (
+              <option key={value} value={value}>
+                {formatAccessRequestStatusLabel(value)}
+              </option>
+            ))}
           </select>
 
           <button type="submit" className="button-secondary">
@@ -136,21 +145,15 @@ export default async function AdminSolicitudesPage({
           <span key="id">{request.national_id}</span>,
           <span key="email">{request.email}</span>,
           <span key="instrument" className="chip">
-            {request.instrument_slug}
+            {formatInstrumentLabel(request.instrument_slug)}
           </span>,
           <span key="level" className="chip">
-            {request.access_level === "coordination" ? "Coordinación" : "Admin"}
+            {formatAccessLevelLabel(request.access_level)}
           </span>,
           <span key="date">{formatDate(request.created_at)}</span>,
           <StatusPill
             key="status"
-            label={
-              request.status === "pending"
-                ? "Pendiente"
-                : request.status === "approved"
-                  ? "Aprobada"
-                  : "Rechazada"
-            }
+            label={formatAccessRequestStatusLabel(request.status)}
             tone={
               request.status === "pending"
                 ? "warning"

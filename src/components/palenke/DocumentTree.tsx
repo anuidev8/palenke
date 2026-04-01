@@ -173,7 +173,7 @@ function FolderCard({ node, color, onClick }: { node: TreeNode; color: string; o
   );
 }
 
-function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; color: string }) {
+function FileCard({ doc, role, color, onOpenRequestModal, instrumento }: { doc: DisplayDoc; role: ViewerRole; color: string; onOpenRequestModal?: () => void; instrumento?: string }) {
   const hasAccess = canDownloadDocument(role, doc.visibility);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -259,13 +259,23 @@ function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; col
       
       <div className="p-4 border-t border-[#e8dfd3] bg-[#fcfaf7]">
         {!hasAccess ? (
-          <a
-            href="/login?redirect=/gobierno-propio&message=internal"
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#7a756e] transition hover:bg-[#f8f5f2]"
-          >
-            <Lock className="h-4 w-4" aria-hidden="true" />
-            Acceso restringido
-          </a>
+          <div className="flex flex-col gap-2">
+            {onOpenRequestModal && (
+              <button
+                onClick={onOpenRequestModal}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] px-4 py-3 text-sm font-bold text-white transition hover:bg-black"
+              >
+                <Lock className="h-4 w-4" aria-hidden="true" />
+                Solicitar acceso
+              </button>
+            )}
+            <a
+              href={`/login?redirect=/gobierno-propio/${instrumento || ''}`}
+              className={`flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2] ${!onOpenRequestModal ? 'mt-0' : ''}`}
+            >
+              Ya tengo cuenta
+            </a>
+          </div>
         ) : (
           <>
             {doc.action === "file" ? (
@@ -320,9 +330,12 @@ function FileCard({ doc, role, color }: { doc: DisplayDoc; role: ViewerRole; col
   );
 }
 
-export function DocumentTree({ docs, role, color }: { docs: DisplayDoc[]; role: ViewerRole; color: string }) {
+import { AccessRequestModal } from "./AccessRequestModal";
+
+export function DocumentTree({ docs, role, color, instrumento, instrumentTitle, accessLevel }: { docs: DisplayDoc[]; role: ViewerRole; color: string; instrumento?: string; instrumentTitle?: string; accessLevel?: "admin" | "coordination" }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tree = useMemo(() => buildTree(docs), [docs]);
 
@@ -473,6 +486,8 @@ export function DocumentTree({ docs, role, color }: { docs: DisplayDoc[]; role: 
                     doc={item.doc} 
                     role={role} 
                     color={color} 
+                    onOpenRequestModal={instrumentTitle && accessLevel && instrumento ? () => setIsModalOpen(true) : undefined}
+                    instrumento={instrumento}
                   />
                 );
               }
@@ -480,6 +495,16 @@ export function DocumentTree({ docs, role, color }: { docs: DisplayDoc[]; role: 
             })}
           </AnimatePresence>
         </motion.div>
+      )}
+
+      {instrumento && instrumentTitle && accessLevel && (
+        <AccessRequestModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          instrumentSlug={instrumento}
+          instrumentTitle={instrumentTitle}
+          accessLevel={accessLevel}
+        />
       )}
     </div>
   );

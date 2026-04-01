@@ -7,6 +7,8 @@ import { createSupabaseService } from "@/lib/supabase/service";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { FileText, Folder, Lock, CheckCircle2, AlertCircle } from "lucide-react";
 
+type AdminTab = "instrumentos" | "normativa";
+
 export default async function AdminDocumentosPage({
   searchParams,
 }: {
@@ -16,7 +18,9 @@ export default async function AdminDocumentosPage({
   const { role, searchParams: params } = await requireAdmin(searchParams);
   const query = (getFirstParam(params.q) ?? "").toLowerCase();
   const visibility = getFirstParam(params.visibility) ?? "";
-  const instrument = getFirstParam(params.instrument) ?? "";
+  const requestedTab = getFirstParam(params.tab);
+  const tab: AdminTab = requestedTab === "normativa" ? "normativa" : "instrumentos";
+  const instrument = tab === "normativa" ? "normativa-vigente" : getFirstParam(params.instrument) ?? "";
 
   let documents = [];
   let dbError = false;
@@ -38,6 +42,8 @@ export default async function AdminDocumentosPage({
       }
       if (instrument) {
         dbQuery = dbQuery.eq("instrument", instrument);
+      } else if (tab === "instrumentos") {
+        dbQuery = dbQuery.neq("instrument", "normativa-vigente");
       }
 
       const { data, error } = await dbQuery;
@@ -54,8 +60,20 @@ export default async function AdminDocumentosPage({
     }
   }
 
+  if (tab === "normativa") {
+    documents = [...documents].sort((a, b) => {
+      const orderDiff = Number(a.priority_order ?? 0) - Number(b.priority_order ?? 0);
+      if (orderDiff !== 0) return orderDiff;
+      const aTime = new Date(a.published_on ?? a.created_at).getTime();
+      const bTime = new Date(b.published_on ?? b.created_at).getTime();
+      return bTime - aTime;
+    });
+  }
+
   // Deduplicate instruments for filter
-  const uniqueInstruments = [...new Set(documents.map(d => d.instrument))].filter(Boolean).sort();
+  const uniqueInstruments = [...new Set(documents.map((d) => d.instrument))]
+    .filter((value): value is string => Boolean(value) && value !== "normativa-vigente")
+    .sort();
   const requiredNorms = [
     "Ley 70 de 1993",
     "Decreto 1745 de 1995",
@@ -74,9 +92,32 @@ export default async function AdminDocumentosPage({
     <AdminLayout
       role={role}
       active="documentos"
-      title="Gestión de Documentos"
-      intro="Administra todos los archivos de la plataforma. Controla la visibilidad, organiza por instrumentos y gestiona las descargas directas."
+      title="Gestión de Biblioteca"
+      intro="Administra la Biblioteca en dos frentes: instrumentos/documentos internos y normativa vigente pública. Se mantiene el CRUD actual, pero cada grupo se gestiona por separado."
     >
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href={withRole("/admin/documentos", role, { tab: "instrumentos" })}
+          className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            tab === "instrumentos"
+              ? "bg-[#1a1a1a] text-white"
+              : "border border-[#e8dfd3] bg-white text-[#1a1a1a] hover:bg-[#f8f5f2]"
+          }`}
+        >
+          Instrumentos
+        </Link>
+        <Link
+          href={withRole("/admin/documentos", role, { tab: "normativa" })}
+          className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            tab === "normativa"
+              ? "bg-[#1a1a1a] text-white"
+              : "border border-[#e8dfd3] bg-white text-[#1a1a1a] hover:bg-[#f8f5f2]"
+          }`}
+        >
+          Normativa vigente
+        </Link>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl border border-[#e8dfd3] shadow-sm flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[#e3f2fd] flex items-center justify-center text-[#1565c0]">
@@ -114,34 +155,39 @@ export default async function AdminDocumentosPage({
       <Toolbar
         actions={
           <div className="flex gap-3">
-            <Link href={withRole("/admin/documentos/nuevo", role)} className="inline-flex items-center gap-2 rounded-xl bg-[#1a1a1a] px-4 py-2 text-sm font-bold text-white transition hover:bg-black">
-              + Nuevo documento
+            <Link href={withRole("/admin/documentos/nuevo", role, { tab })} className="inline-flex items-center gap-2 rounded-xl bg-[#1a1a1a] px-4 py-2 text-sm font-bold text-white transition hover:bg-black">
+              {tab === "normativa" ? "+ Nueva norma vigente" : "+ Nuevo documento"}
             </Link>
-            <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="inline-flex items-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]">
-              <FileText className="w-4 h-4" />
-              Rutas metodológicas
-            </Link>
+            {tab === "instrumentos" ? (
+              <Link href={withRole("/admin/documentos/rutas-metodologicas", role)} className="inline-flex items-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]">
+                <FileText className="w-4 h-4" />
+                Rutas metodológicas
+              </Link>
+            ) : null}
           </div>
         }
       >
         <form id="filter-form" action="/admin/documentos" className="flex flex-wrap gap-3 w-full">
           <input type="hidden" name="role" value={role} />
+          <input type="hidden" name="tab" value={tab} />
           <input
             name="q"
             defaultValue={query}
             placeholder="Buscar por título..."
             className="flex-1 min-w-[200px] px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
           />
-          <select 
-            name="instrument" 
-            defaultValue={instrument} 
-            className="px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
-          >
-            <option value="">Todos los instrumentos</option>
-            {uniqueInstruments.map((inst) => (
-              <option key={inst} value={inst}>{inst}</option>
-            ))}
-          </select>
+          {tab === "instrumentos" ? (
+            <select 
+              name="instrument" 
+              defaultValue={instrument} 
+              className="px-4 py-2 bg-white border border-[#e8dfd3] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/20"
+            >
+              <option value="">Todos los instrumentos</option>
+              {uniqueInstruments.map((inst) => (
+                <option key={inst} value={inst}>{inst}</option>
+              ))}
+            </select>
+          ) : null}
           <select 
             name="visibility" 
             defaultValue={visibility} 
@@ -159,7 +205,7 @@ export default async function AdminDocumentosPage({
   
       </Toolbar>
 
-      {!dbError && missingNorms.length > 0 ? (
+      {!dbError && tab === "normativa" && missingNorms.length > 0 ? (
         <Callout tone="warning" title="Normativa priorizada incompleta">
           <p>
             Faltan documentos clave frente al listado priorizado de normativa vigente: {missingNorms.join(", ")}.
@@ -201,8 +247,8 @@ export default async function AdminDocumentosPage({
                       <div className="flex items-start gap-3">
                         <FileText className="w-5 h-5 text-[#d1ccc5] mt-0.5 group-hover:text-[#4a4540] transition-colors" />
                         <div>
-                          <Link
-                            href={withRole(`/admin/documentos/${doc.id}/editar`, role)}
+                            <Link
+                            href={withRole(`/admin/documentos/${doc.id}/editar`, role, { tab })}
                             className="font-bold text-[#1a1a1a] text-base line-clamp-2 underline decoration-transparent hover:decoration-current"
                           >
                             {doc.title}
@@ -228,7 +274,7 @@ export default async function AdminDocumentosPage({
                     </td>
                     <td className="px-6 py-4">
                       <Link
-                        href={withRole(`/admin/documentos/${doc.id}/editar`, role)}
+                        href={withRole(`/admin/documentos/${doc.id}/editar`, role, { tab })}
                         className="inline-flex items-center rounded-lg border border-[#e8dfd3] px-3 py-1.5 text-xs font-bold text-[#1a1a1a] hover:bg-[#f8f5f2]"
                       >
                         Editar

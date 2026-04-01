@@ -21,6 +21,12 @@ export default async function NuevoDocumentoPage({
 }) {
   const { role, searchParams: qs } = await requireAdmin(searchParams);
   const error = getFirstParam(qs.error);
+  const requestedTab = getFirstParam(qs.tab);
+  const tab = requestedTab === "normativa" ? "normativa" : "instrumentos";
+  const isNormativa = tab === "normativa";
+  const instrumentOptions = isNormativa
+    ? ["normativa-vigente"]
+    : INSTRUMENT_OPTIONS.filter((value) => value !== "normativa-vigente");
 
   return (
     <AdminLayout
@@ -30,7 +36,7 @@ export default async function NuevoDocumentoPage({
       intro="Crea un documento real en `public.documents`, con soporte para archivo subido, ruta local pública o enlace externo oficial."
     >
       <div className="mb-4 flex flex-wrap gap-3">
-        <Link href={withRole("/admin/documentos", role)} className="button-secondary">
+        <Link href={withRole("/admin/documentos", role, { tab })} className="button-secondary">
           Volver a documentos
         </Link>
       </div>
@@ -43,28 +49,39 @@ export default async function NuevoDocumentoPage({
 
       <section className="surface-card space-y-5">
         <form action={createDocumentAction} className="grid gap-5 md:grid-cols-2">
+          <input type="hidden" name="tab" value={tab} />
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Título</span>
             <input name="title" required className="input-shell" placeholder="Título del documento" />
           </label>
 
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Instrumento</span>
-            <select name="instrument" required defaultValue="" className="input-shell">
-              <option value="" disabled>
-                Selecciona
-              </option>
-              {INSTRUMENT_OPTIONS.map((value) => (
-                <option key={value} value={value}>
-                  {value}
+          {isNormativa ? (
+            <>
+              <input type="hidden" name="instrument" value="normativa-vigente" />
+              <div className="grid gap-2 text-sm">
+                <span className="font-semibold text-[color:var(--forest)]">Sección</span>
+                <input readOnly value="normativa-vigente" className="input-shell bg-[#f8f5f2]" />
+              </div>
+            </>
+          ) : (
+            <label className="grid gap-2 text-sm">
+              <span className="font-semibold text-[color:var(--forest)]">Instrumento</span>
+              <select name="instrument" required defaultValue="" className="input-shell">
+                <option value="" disabled>
+                  Selecciona
                 </option>
-              ))}
-            </select>
-          </label>
+                {instrumentOptions.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Visibilidad</span>
-            <select name="visibility" required defaultValue="internal" className="input-shell">
+            <select name="visibility" required defaultValue={isNormativa ? "public" : "internal"} className="input-shell">
               <option value="public">public</option>
               <option value="internal">internal</option>
               <option value="sensitive">sensitive</option>
@@ -123,6 +140,21 @@ export default async function NuevoDocumentoPage({
           </label>
 
           <label className="grid gap-2 text-sm">
+            <span className="font-semibold text-[color:var(--forest)]">Territorio</span>
+            <input name="territory" className="input-shell" placeholder="Nacional, Internacional..." />
+          </label>
+
+          <label className="grid gap-2 text-sm">
+            <span className="font-semibold text-[color:var(--forest)]">Departamento / Estado</span>
+            <input name="department" className="input-shell" placeholder="Bogotá D.C., Quebec..." />
+          </label>
+
+          <label className="grid gap-2 text-sm md:col-span-2">
+            <span className="font-semibold text-[color:var(--forest)]">Municipio / Ciudad</span>
+            <input name="municipality" className="input-shell" placeholder="Bogotá, Montreal..." />
+          </label>
+
+          <label className="grid gap-2 text-sm">
             <span className="font-semibold text-[color:var(--forest)]">Bucket</span>
             <select name="storage_bucket" defaultValue="docs-internal" className="input-shell">
               <option value="docs-internal">docs-internal</option>
@@ -156,11 +188,11 @@ export default async function NuevoDocumentoPage({
           </label>
 
           <div className="md:col-span-2 flex justify-end gap-3">
-            <Link href={withRole("/admin/documentos", role)} className="button-ghost">
+            <Link href={withRole("/admin/documentos", role, { tab })} className="button-ghost">
               Cancelar
             </Link>
             <button type="submit" className="button-primary">
-              Crear documento
+              {isNormativa ? "Crear norma vigente" : "Crear documento"}
             </button>
           </div>
         </form>

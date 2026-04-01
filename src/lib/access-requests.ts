@@ -36,6 +36,21 @@ export type AccessRequestsDataMode =
   | "mock_missing_table"
   | "mock_query_error";
 
+export type AccessRequestFilterOptions = {
+  instruments: string[];
+  accessLevels: AccessLevel[];
+  statuses: AccessRequestStatus[];
+};
+
+const INSTRUMENT_LABELS: Record<string, string> = {
+  reglamentos: "Reglamentos",
+  "planes-uso": "Planes de uso",
+  litigio: "Litigio",
+  conservacion: "Conservación",
+  etnodesarrollo: "Etnodesarrollo",
+  "proteccion-hidrica": "Protección hídrica",
+};
+
 const mockAccessRequests: AccessRequestRecord[] = [
   {
     id: "mock-req-001",
@@ -130,6 +145,79 @@ function getMockAccessRequests(filters: AccessRequestFilters = {}) {
   return applyFilters(mockAccessRequests, filters).toSorted((a, b) =>
     a.created_at < b.created_at ? 1 : -1,
   );
+}
+
+function toSortedUnique<T extends string>(values: T[]) {
+  return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function getFilterOptions(records: AccessRequestRecord[]): AccessRequestFilterOptions {
+  const instruments = toSortedUnique(records.map((record) => record.instrument_slug));
+  const accessLevels = toSortedUnique(records.map((record) => record.access_level)) as AccessLevel[];
+  const statuses = toSortedUnique(records.map((record) => record.status)) as AccessRequestStatus[];
+
+  return {
+    instruments,
+    accessLevels,
+    statuses,
+  };
+}
+
+export function formatInstrumentLabel(instrumentSlug: string) {
+  return INSTRUMENT_LABELS[instrumentSlug] ?? instrumentSlug;
+}
+
+export function formatAccessLevelLabel(accessLevel: AccessLevel) {
+  return accessLevel === "coordination" ? "Coordinación" : "Admin";
+}
+
+export function formatAccessRequestStatusLabel(status: AccessRequestStatus) {
+  return status === "pending" ? "Pendiente" : status === "approved" ? "Aprobada" : "Rechazada";
+}
+
+export async function getAccessRequestFilterOptionsWithMeta() {
+  if (!hasSupabaseServiceConfig()) {
+    return {
+      options: getFilterOptions(mockAccessRequests),
+      mode: "mock_missing_service_config" as const,
+    };
+  }
+
+  const supabase = createSupabaseService();
+  const { data, error } = await supabase
+    .from("access_requests")
+    .select("instrument_slug, access_level, status");
+
+  if (error || !data) {
+    if (isMissingTableError(error)) {
+      return {
+        options: getFilterOptions(mockAccessRequests),
+        mode: "mock_missing_table" as const,
+      };
+    }
+    return {
+      options: getFilterOptions(mockAccessRequests),
+      mode: "mock_query_error" as const,
+    };
+  }
+
+  const records = (data as Array<Record<string, unknown>>).map((raw, index) =>
+    normalizeAccessRequest({
+      id: `filter-${index}`,
+      full_name: "",
+      national_id: "",
+      email: "",
+      community: "",
+      motivation: "",
+      created_at: "",
+      ...raw,
+    }),
+  );
+
+  return {
+    options: getFilterOptions(records),
+    mode: "supabase" as const,
+  };
 }
 
 export async function listAccessRequestsWithMeta(filters: AccessRequestFilters = {}) {

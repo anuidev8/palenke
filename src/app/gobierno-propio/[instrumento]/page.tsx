@@ -6,8 +6,6 @@ import { ArrowLeft, BookOpen, Download, Droplets, FileText, Gavel, Leaf, Scale, 
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
-import { AdminGatedUI } from "@/components/palenke/AdminGatedUI";
-import { CoordinationGatedUI } from "@/components/palenke/CoordinationGatedUI";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { canDownloadDocument } from "@/lib/mock-data";
 import { createSupabaseService } from "@/lib/supabase/service";
@@ -422,41 +420,45 @@ export default async function InstrumentoPage({
         </div>
       </section>
 
-      {/* ── Documentos restringidos / Biblioteca ── */}
+      {/* ── Documentos / Biblioteca ── */}
       <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          
-          {isPublic ? (
-            /* Gated UI for Public Users */
-            accessLevel === "coordination" ? (
-              <CoordinationGatedUI instrumento={instrumento} role={role} requestHref={requestHref} />
-            ) : (
-              <AdminGatedUI instrumento={instrumento} role={role} requestHref={requestHref} />
-            )
-          ) : (
-            /* Unlocked UI for Logged-in Users */
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
             <div>
-              <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e3f2fd] text-[#1565c0] mb-4">
-                    <Lock className="w-3.5 h-3.5" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Acceso verificado</span>
-                  </div>
-                  <h2 className="font-display text-3xl text-[#1a1a1a]">Documentos recientes</h2>
-                  <p className="mt-2 text-[#4a4540] text-lg">Mostrando documentos internos relacionados a este instrumento.</p>
+              {isPublic ? (
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-[#b45309] mb-4 border border-orange-200">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    {accessLevel === "coordination" ? "Validación de coordinación" : "Validación administrativa"}
+                  </span>
                 </div>
-              </div>
-
-              <DocumentTree docs={displayDocs} role={role} color={inst.color} />
-
-              {dbMode === "query-error" ? (
-                <p className="mt-4 text-sm text-[#9c5d00]">
-                  No se pudo consultar la base de datos para este instrumento.
-                </p>
-              ) : null}
+              ) : (
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e3f2fd] text-[#1565c0] mb-4">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Acceso verificado</span>
+                </div>
+              )}
+              <h2 className="font-display text-3xl text-[#1a1a1a]">Archivo de documentos</h2>
+              <p className="mt-2 text-[#4a4540] text-lg">
+                Explora los instrumentos y herramientas de gobierno propio de los Consejos Comunitarios.
+              </p>
             </div>
-          )}
+          </div>
 
+          <DocumentTree 
+            docs={displayDocs} 
+            role={role} 
+            color={inst.color} 
+            instrumento={instrumento}
+            instrumentTitle={inst.title}
+            accessLevel={accessLevel}
+          />
+
+          {dbMode === "query-error" ? (
+            <p className="mt-4 text-sm text-[#9c5d00]">
+              No se pudo consultar la base de datos para este instrumento.
+            </p>
+          ) : null}
         </div>
       </section>
 
