@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { sendAdminNotification, sendCoordinatorAlert } from "@/lib/email";
-import { hasSupabaseServiceConfig } from "@/lib/config";
+import { config, hasN8nEmailWebhookConfig, hasSupabaseServiceConfig } from "@/lib/config";
 import { AccessRequestSchema } from "@/lib/schemas/access-request";
 import { createSupabaseService } from "@/lib/supabase/service";
 
 const PLANES_USO_SLUG = "planes-uso";
-const ACCESS_REQUEST_WEBHOOK_URL =
-  "https://n8n-production-bbef9.up.railway.app/webhook/21f21a8b-f0e4-4f77-b15e-71a71746fa17";
 
 function isMissingTableError(error: unknown) {
   if (!error || typeof error !== "object") return false;
@@ -63,8 +61,13 @@ async function sendUserWebhookIfNeeded(input: {
     messages: buildUserWebhookMessage(input),
   };
 
+  if (!hasN8nEmailWebhookConfig()) {
+    console.error("Access request webhook skipped: missing N8N_EMAIL_WEBHOOK_URL");
+    return;
+  }
+
   try {
-    const response = await fetch(ACCESS_REQUEST_WEBHOOK_URL, {
+    const response = await fetch(config.n8nEmailWebhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

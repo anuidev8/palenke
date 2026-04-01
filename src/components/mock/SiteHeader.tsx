@@ -111,7 +111,38 @@ export function SiteHeader({
           </span>
         </Link>
 
-        {simplified ? null : (
+        {simplified ? (
+          <div className="flex items-center gap-2">
+            {loading ? (
+              <div className="h-9 w-24 animate-pulse rounded-full bg-[color:var(--sand-strong)]" />
+            ) : user ? (
+              <>
+                <Link
+                  href="/mis-solicitudes"
+                  className="hidden items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--forest)] transition-colors hover:bg-[color:var(--sand-strong)] sm:inline-flex"
+                >
+                  <FolderClock className="h-4 w-4" />
+                  <span>Mis solicitudes</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="inline-flex items-center gap-2 rounded-full border border-[color:rgb(248_213_213_/_0.6)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--danger)] transition-colors hover:bg-[color:rgb(248_213_213_/_0.25)]"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Cerrar sesión</span>
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex items-center rounded-full border border-[color:var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--forest)] transition-colors hover:bg-[color:var(--sand-strong)]"
+              >
+                Iniciar sesión
+              </Link>
+            )}
+          </div>
+        ) : (
           <>
             {/* Desktop navigation */}
             <nav
@@ -183,73 +214,86 @@ export function SiteHeader({
             </div>
 
             {/* Mobile menu */}
-            <details className="group lg:hidden">
-              <summary className="list-none rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-medium text-[#1a1a1a]">
-                Menú
-              </summary>
-              <div className="absolute left-4 right-4 top-[79px] z-50 rounded-3xl border border-[#e8dfd3] bg-white p-4 shadow-[var(--shadow-card)]">
-                <div className="grid gap-1">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={withRole(item.href, effectiveRole)}
-                      className="rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-                {loading ? (
-                  <div className="mt-4 border-t border-[#e8dfd3] pt-4">
-                    <div className="h-10 w-full animate-pulse rounded-2xl bg-[color:var(--sand-strong)]" />
+            <div className="flex items-center gap-2 lg:hidden">
+              {loading ? null : user ? (
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:rgb(248_213_213_/_0.6)] bg-white text-[color:var(--danger)] transition-colors hover:bg-[color:rgb(248_213_213_/_0.25)]"
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              ) : null}
+              <details className="group">
+                <summary className="list-none rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-sm font-medium text-[#1a1a1a]">
+                  Menú
+                </summary>
+                <div className="absolute left-4 right-4 top-[79px] z-50 rounded-3xl border border-[#e8dfd3] bg-white p-4 shadow-[var(--shadow-card)]">
+                  <div className="grid gap-1">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={withRole(item.href, effectiveRole)}
+                        className="rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                   </div>
-                ) : user ? (
-                  <div className="mt-4 border-t border-[#e8dfd3] pt-4 grid gap-1">
-                    <div className="px-4 py-2 mb-2 bg-[color:var(--sand-strong)] rounded-xl">
-                      <p className="text-sm font-semibold text-[color:var(--forest)] truncate">{userDisplayName}</p>
-                      <p className="text-xs text-[color:var(--muted)] truncate">{user.email}</p>
-                      <p className="mt-1 text-xs text-[color:var(--muted)]">{getRoleLabel(viewerRole)}</p>
+                  {loading ? (
+                    <div className="mt-4 border-t border-[#e8dfd3] pt-4">
+                      <div className="h-10 w-full animate-pulse rounded-2xl bg-[color:var(--sand-strong)]" />
                     </div>
-                    <Link
-                      href="/studio"
-                      className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Mi Estudio
-                    </Link>
-                    <Link
-                      href="/mis-solicitudes"
-                      className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
-                    >
-                      <FolderClock className="h-4 w-4" />
-                      Mis solicitudes
-                    </Link>
-                    <button
-                      onClick={() => signOut()}
-                      className="flex w-full items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[color:var(--danger)] hover:bg-[color:rgb(248_213_213_/_0.25)] text-left mt-2"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Cerrar sesión
-                    </button>
-                  </div>
-                ) : isInternal(effectiveRole) ? (
-                  <div className="mt-4 border-t border-[#e8dfd3] pt-4">
-                    <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
-                      Rol: {getRoleLabel(effectiveRole)}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="mt-4 border-t border-[#e8dfd3] pt-4">
-                    <Link
-                      href="/login"
-                      className="block rounded-2xl bg-[color:var(--forest)] px-4 py-3 text-center text-sm font-medium text-[color:var(--sand)]"
-                    >
-                      Iniciar sesión
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </details>
+                  ) : user ? (
+                    <div className="mt-4 grid gap-1 border-t border-[#e8dfd3] pt-4">
+                      <div className="mb-2 rounded-xl bg-[color:var(--sand-strong)] px-4 py-2">
+                        <p className="truncate text-sm font-semibold text-[color:var(--forest)]">{userDisplayName}</p>
+                        <p className="truncate text-xs text-[color:var(--muted)]">{user.email}</p>
+                        <p className="mt-1 text-xs text-[color:var(--muted)]">{getRoleLabel(viewerRole)}</p>
+                      </div>
+                      <Link
+                        href="/studio"
+                        className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Mi Estudio
+                      </Link>
+                      <Link
+                        href="/mis-solicitudes"
+                        className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
+                      >
+                        <FolderClock className="h-4 w-4" />
+                        Mis solicitudes
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => signOut()}
+                        className="mt-2 flex w-full items-center gap-2 rounded-2xl px-4 py-3 text-left text-sm font-medium text-[color:var(--danger)] hover:bg-[color:rgb(248_213_213_/_0.25)]"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  ) : isInternal(effectiveRole) ? (
+                    <div className="mt-4 border-t border-[#e8dfd3] pt-4">
+                      <span className="rounded-full bg-[#fff3cd] px-3 py-1.5 text-xs font-semibold text-[#1a1a1a]">
+                        Rol: {getRoleLabel(effectiveRole)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-4 border-t border-[#e8dfd3] pt-4">
+                      <Link
+                        href="/login"
+                        className="block rounded-2xl bg-[color:var(--forest)] px-4 py-3 text-center text-sm font-medium text-[color:var(--sand)]"
+                      >
+                        Iniciar sesión
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </details>
+            </div>
           </>
         )}
       </div>

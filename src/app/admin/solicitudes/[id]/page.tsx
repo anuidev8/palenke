@@ -46,6 +46,8 @@ export default async function AdminSolicitudDetailPage({
   const { role, searchParams: query } = await requireAdmin(searchParams);
   const { request, mode } = await getAccessRequestByIdWithMeta(id);
   const error = getFirstParam(query.error);
+  const errorReason = getFirstParam(query.reason);
+  const errorDetail = getFirstParam(query.detail);
   const notice = getFirstParam(query.notice);
 
   if (!request) {
@@ -120,7 +122,12 @@ export default async function AdminSolicitudDetailPage({
 
       {error === "document-email-failed" ? (
         <Callout tone="danger" title="No se pudo enviar el correo">
-          <p>Revisa la configuración de Resend y vuelve a intentarlo.</p>
+          <p>
+            {errorReason === "missing-email-config"
+              ? "Falta configurar el canal de correo del servidor."
+              : "El canal de correo rechazó el envío o devolvió un error."}
+          </p>
+          {errorDetail ? <p className="break-words text-xs">{errorDetail}</p> : null}
         </Callout>
       ) : null}
 
@@ -184,20 +191,26 @@ export default async function AdminSolicitudDetailPage({
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <form action={approveAction} className="surface-card grid gap-4">
+        <form action={approveAction} autoComplete="off" className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">Aprobar solicitud</h3>
           <label className="grid gap-2">
             <span className="text-sm font-semibold text-[color:var(--forest)]">
               Notas de aprobación (opcional)
             </span>
-            <textarea name="notes" className="textarea-shell" rows={4} />
+            <textarea
+              name="approval_notes"
+              className="textarea-shell"
+              rows={4}
+              autoComplete="off"
+              spellCheck={false}
+            />
           </label>
           <button type="submit" className="button-primary justify-center">
             Aprobar
           </button>
         </form>
 
-        <form action={emailDocumentAction} className="surface-card grid gap-4">
+        <form action={emailDocumentAction} autoComplete="off" className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">
             Enviar documento por correo
           </h3>
@@ -210,13 +223,20 @@ export default async function AdminSolicitudDetailPage({
           </button>
         </form>
 
-        <form action={rejectAction} className="surface-card grid gap-4">
+        <form action={rejectAction} autoComplete="off" className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">Rechazar solicitud</h3>
           <label className="grid gap-2">
             <span className="text-sm font-semibold text-[color:var(--forest)]">
               Razón del rechazo<span className="ml-1 text-[color:var(--danger)]">*</span>
             </span>
-            <textarea name="reason" className="textarea-shell" rows={4} required />
+            <textarea
+              name="rejection_reason"
+              className="textarea-shell"
+              rows={4}
+              required
+              autoComplete="off"
+              spellCheck={false}
+            />
           </label>
           <button type="submit" className="button-secondary justify-center">
             Rechazar

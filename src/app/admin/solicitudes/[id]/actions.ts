@@ -221,7 +221,7 @@ export async function approveRequest(id: string, formData: FormData) {
     redirect(`/admin/solicitudes/${id}?notice=missing-config`);
   }
   try {
-    const notes = asText(formData, "notes");
+    const notes = asText(formData, "approval_notes");
     const request = await markRequestStatus(id, "approved", notes);
 
     await provisionDocumentGrant({
@@ -249,7 +249,7 @@ export async function rejectRequest(id: string, formData: FormData) {
     redirect(`/admin/solicitudes/${id}?notice=missing-config`);
   }
 
-  const reason = asText(formData, "reason");
+  const reason = asText(formData, "rejection_reason");
   if (!reason) {
     redirect(`/admin/solicitudes/${id}?error=missing-reason`);
   }
@@ -296,7 +296,12 @@ export async function emailRequestedDocument(id: string) {
     );
 
     if (!emailResult.sent) {
-      redirect(`/admin/solicitudes/${id}?error=document-email-failed`);
+      const reason =
+        emailResult.reason === "missing_n8n_config" || emailResult.reason === "missing_email_config"
+          ? "missing-email-config"
+          : "send-failed";
+      const detail = encodeURIComponent(emailResult.detail ?? "");
+      redirect(`/admin/solicitudes/${id}?error=document-email-failed&reason=${reason}&detail=${detail}`);
     }
 
     revalidatePath("/admin/solicitudes");

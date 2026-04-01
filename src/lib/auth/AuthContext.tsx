@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { type AuthChangeEvent, User, Session } from "@supabase/supabase-js";
 import type { ViewerRole } from "@/lib/mock-data";
 import { resolveViewerRoleRecord } from "@/lib/auth/permissions";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
@@ -38,6 +38,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
+    if (!supabaseConfigured) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const supabase = createSupabaseBrowser();
+    const shouldRefreshRoute = new Set(["SIGNED_IN", "SIGNED_OUT", "TOKEN_REFRESHED", "USER_UPDATED"]);
+
     async function syncProfile(nextSession: Session | null) {
       if (!nextSession?.user) {
         if (isMounted) {
@@ -47,58 +56,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const supabase = createSupabaseBrowser();
-      const { data } = await supabase
-        .from("users")
-        .select("role, active")
-        .eq("id", nextSession.user.id)
-        .maybeSingle();
+      try {
+        const { data } = await supabase
+          .from("users")
+          .select("role, active")
+          .eq("id", nextSession.user.id)
+          .maybeSingle();
 
+        if (!isMounted) {
+          return;
+        }
+
+        const role = resolveViewerRoleRecord(
+          data as { role?: string | null; active?: boolean | null } | null,
+        );
+        setViewerRole(role);
+        setIsActive(data?.active !== false);
+      } catch {
+        if (isMounted) {
+          setViewerRole("public");
+          setIsActive(false);
+        }
+      }
+    }
+
+    async function syncAuthState(nextSession: Session | null) {
       if (!isMounted) {
         return;
       }
 
-      const role = resolveViewerRoleRecord(
-        data as { role?: string | null; active?: boolean | null } | null,
-      );
-      setViewerRole(role);
-      setIsActive(data?.active !== false);
-    }
+      setLoading(true);
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      await syncProfile(nextSession);
 
-    if (!supabaseConfigured) {
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    const supabase = createSupabaseBrowser();
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) {
-        return;
-      }
-
-      setSession(session);
-      setUser(session?.user ?? null);
-      await syncProfile(session);
       if (isMounted) {
         setLoading(false);
       }
-    });
+    }
+
+    void (async () => {
+      const result = await supabase.auth.getSession();
+      await syncAuthState(result.data.session);
+    })();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      void syncProfile(session);
-      
-      if (_event === "SIGNED_OUT") {
-        setViewerRole("public");
-        setIsActive(false);
-        router.refresh();
-        router.push("/");
-      }
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+      void syncAuthState(session).then(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        if (event === "SIGNED_OUT") {
+          router.replace("/");
+        }
+
+        if (shouldRefreshRoute.has(event)) {
+          router.refresh();
+        }
+      });
     });
 
     return () => {

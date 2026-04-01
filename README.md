@@ -23,7 +23,7 @@ Implementado de extremo a extremo y documentado en `docs/plan_instrumentos_*.md`
 | Pieza | Descripción |
 |--------|-------------|
 | **Solicitudes de acceso** | Formulario en `/solicitar-acceso/[instrumento]` → `POST /api/access-requests` (validación Zod) → tabla `public.access_requests`. |
-| **Correo (opcional)** | **Resend**: notificación a admin o coordinación al crear solicitud; aprobación, rechazo y enlace firmado cuando aplica. Sin `RESEND_API_KEY` el flujo de DB sigue; el envío queda en modo degradado. |
+| **Correo (opcional)** | **n8n** vía `N8N_EMAIL_WEBHOOK_URL`: notificación a admin o coordinación al crear solicitud; aprobación, rechazo y enlace firmado cuando aplica. Sin esa variable el flujo de DB sigue; el envío queda en modo degradado. |
 | **Revisión admin** | `/admin/solicitudes`, detalle `/admin/solicitudes/[id]`: aprobar / rechazar vía server actions (`approveRequest` / `rejectRequest`). |
 | **Aprobación `admin`** | Invitación / aprovisionamiento en Auth y fila `role: internal` en `public.users`. |
 | **Aprobación `coordination`** | Entrega por correo de URL firmada al material **sensible** del instrumento cuando hay archivo en Storage. |
@@ -60,7 +60,7 @@ Implementado de extremo a extremo y documentado en `docs/plan_instrumentos_*.md`
 - Tailwind CSS v4
 - Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
 - Zod
-- Resend (correo opcional)
+- n8n webhook (correo opcional)
 - `@google/genai` (contenido visual admin opcional)
 
 ## Requisitos
@@ -82,7 +82,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=""
 SUPABASE_SERVICE_ROLE_KEY=""
 
 # Opcionales para correo (sin ellos, persistencia y acciones admin siguen; envío degradado)
-RESEND_API_KEY=""
+N8N_EMAIL_WEBHOOK_URL=""
 ADMIN_EMAIL="admin@palenke.org"
 COORDINATOR_EMAIL="coordinacion@palenke.org"
 

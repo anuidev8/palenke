@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -10,16 +9,22 @@ type LoginFormProps = {
 };
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
-  const router = useRouter();
   const { user, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const safeRedirectTo = useMemo(() => {
+    if (!redirectTo.startsWith("/")) {
+      return "/studio";
+    }
+
+    return redirectTo;
+  }, [redirectTo]);
 
   useEffect(() => {
-    if (!loading && user && !isSubmitting) {
-      router.push(redirectTo);
+    if (!loading && user) {
+      window.location.replace(safeRedirectTo);
     }
-  }, [user, loading, router, redirectTo, isSubmitting]);
+  }, [user, loading, safeRedirectTo]);
 
   const supabaseReady = useMemo(() => {
     return Boolean(
@@ -51,20 +56,20 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     setIsSubmitting(true);
     try {
       const supabase = createSupabaseBrowser();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         setErrorMessage(error.message || "No fue posible iniciar sesión.");
-        setIsSubmitting(false); // Only reset on error
+        setIsSubmitting(false);
         return;
       }
 
-      router.push(redirectTo);
-      router.refresh();
-      // Keep isSubmitting true during transition to prevent double clicks and avoid flashing the form
+      if (data.session) {
+        window.location.replace(safeRedirectTo);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error inesperado al iniciar sesión.";
       setErrorMessage(message);
@@ -72,11 +77,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     }
   }
 
-  if (loading || (user && !isSubmitting)) {
+  if (loading || user) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
         <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-[color:var(--sand-strong)] border-t-[color:var(--forest)]"></div>
-        <p className="mt-4 text-sm font-medium text-[color:var(--forest)] animate-pulse">Verificando sesión...</p>
+        <p className="mt-4 text-sm font-medium text-[color:var(--forest)] animate-pulse">
+          {user ? "Ingreso correcto. Redirigiendo..." : "Verificando sesión..."}
+        </p>
       </div>
     );
   }

@@ -1,5 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
+
 export function createSupabaseBrowser() {
   // Use static NEXT_PUBLIC_* access in client bundles.
   // Dynamic env-key access can fail in browser runtime even when values are present.
@@ -16,5 +18,9 @@ export function createSupabaseBrowser() {
     );
   }
 
-  return createBrowserClient(supabaseUrl, publishableKey);
+  if (!browserClient) {
+    browserClient = createBrowserClient(supabaseUrl, publishableKey);
+  }
+
+  return browserClient;
 }
