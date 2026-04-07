@@ -308,11 +308,11 @@ export default async function HomePage({
               {
                 color: "#2e7d32",
                 lightBg: "#d8f3dc",
-                tag: "Memoria Afroterritorial",
+                tag: "Gobierno propio",
                 title: "Áreas de conservación bioculturales",
                 description:
                   "Territorios colectivos con enfoque de pueblo negro: cartografía, acuerdos comunitarios y estrategias de conservación biocultural.",
-                href: "/memoria-afroterritorial",
+                href: "/gobierno-propio",
                 cta: "Explorar áreas",
               },
               {

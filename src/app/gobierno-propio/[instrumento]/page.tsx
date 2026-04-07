@@ -189,10 +189,21 @@ function formatDocTerritory(doc: SupabaseInstrumentDoc) {
 }
 
 function formatDocYear(doc: SupabaseInstrumentDoc) {
-  const referenceDate = doc.published_on ?? doc.created_at;
-  const parsedYear = new Date(referenceDate).getFullYear();
+  const yearPattern = /^(\d{4})/;
+
+  if (doc.published_on) {
+    const match = doc.published_on.match(yearPattern);
+    if (match) return match[1];
+  }
+
+  if (doc.created_at) {
+    const match = doc.created_at.match(yearPattern);
+    if (match) return match[1];
+  }
+
+  const parsedYear = new Date(doc.created_at).getUTCFullYear();
   if (Number.isNaN(parsedYear)) {
-    return String(new Date(doc.created_at).getFullYear());
+    return String(new Date().getUTCFullYear());
   }
   return String(parsedYear);
 }
