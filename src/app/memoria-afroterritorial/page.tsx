@@ -100,9 +100,10 @@ export default async function MemoriaAfroterritorialPage({
             </ul>
           </div>
 
-          {/* Right — Imagen representativa */}
-          <div
-            className="relative min-h-[320px] overflow-hidden rounded-[28px] lg:min-h-[400px]"
+          {/* Right — Imagen representativa (enlace a Biblioteca · Memoria viva) */}
+          <Link
+            href={withRole("/biblioteca", role, { section: "Memoria viva del territorio" })}
+            className="relative block min-h-[320px] overflow-hidden rounded-[28px] outline-none ring-offset-2 ring-offset-[#F7F5F0] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[#2e7d32] lg:min-h-[400px]"
             style={{
               background:
                 "radial-gradient(ellipse at 20% 80%, rgba(46,125,50,0.4), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 90% 90%, rgba(211,47,47,0.3), transparent 60%), linear-gradient(150deg, #1f1d1b 0%, #292420 60%, #171513 100%)",
@@ -143,7 +144,7 @@ export default async function MemoriaAfroterritorialPage({
                 Conocimiento histórico, jurídico, cultural y ancestral
               </p>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
@@ -165,7 +166,7 @@ export default async function MemoriaAfroterritorialPage({
               relacionado con los derechos del Pueblo Negro, afrocolombiano, raizal y palenquero.
             </p>
             <Link
-              href={withRole("/biblioteca?section=Normativa+vigente", role)}
+              href={withRole("/biblioteca", role, { section: "Normativa vigente" })}
               className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-[#2e7d32] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1b5e20]"
             >
               Explorar normativa vigente
@@ -246,8 +247,9 @@ export default async function MemoriaAfroterritorialPage({
           </div>
 
           {/* Right — Memoria viva del territorio CTA card */}
-          <div
-            className="relative flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[28px] p-8"
+          <Link
+            href={withRole("/biblioteca", role, { section: "Memoria viva del territorio" })}
+            className="relative flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[28px] p-8 outline-none ring-offset-2 ring-offset-[#FAFAF7] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-white/60"
             style={{
               background:
                 "radial-gradient(ellipse at 80% 80%, rgba(211,47,47,0.35), transparent 60%), radial-gradient(ellipse at 20% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.4), transparent 60%), linear-gradient(150deg, #1c1a19 0%, #26211e 60%, #1a1614 100%)",
@@ -274,14 +276,11 @@ export default async function MemoriaAfroterritorialPage({
               Producción académica, cultural y comunitaria — saberes ancestrales, investigaciones
               propias y expresiones artísticas del Pacífico.
             </p>
-            <Link
-              href={withRole("/biblioteca?section=Memoria+viva+del+territorio", role)}
-              className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
-            >
+            <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white">
               Explorar memoria viva
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
+            </span>
+          </Link>
         </div>
       </section>
 

@@ -157,6 +157,10 @@ type SupabaseInstrumentDoc = {
   council: string | null;
   visibility: DocumentVisibility;
   storage_path: string | null;
+  published_on: string | null;
+  territory: string | null;
+  department: string | null;
+  municipality: string | null;
   created_at: string;
 };
 
@@ -177,6 +181,22 @@ function isMissingTableError(error: unknown) {
   return maybeCode === "PGRST205" || maybeMessage.includes("schema cache");
 }
 
+function formatDocTerritory(doc: SupabaseInstrumentDoc) {
+  if (doc.municipality && doc.department) {
+    return `Municipio de ${doc.municipality}, Departamento del ${doc.department}`;
+  }
+  return doc.territory ?? doc.council ?? "Consejo comunitario";
+}
+
+function formatDocYear(doc: SupabaseInstrumentDoc) {
+  const referenceDate = doc.published_on ?? doc.created_at;
+  const parsedYear = new Date(referenceDate).getFullYear();
+  if (Number.isNaN(parsedYear)) {
+    return String(new Date(doc.created_at).getFullYear());
+  }
+  return String(parsedYear);
+}
+
 async function listSupabaseInstrumentDocs(instrumento: InstrumentoSlug) {
   const mapped = dbInstrumentMap[instrumento];
   if (!mapped) {
@@ -190,8 +210,11 @@ async function listSupabaseInstrumentDocs(instrumento: InstrumentoSlug) {
   const supabase = createSupabaseService();
   const { data, error } = await supabase
     .from("documents")
-    .select("id,title,instrument,council,visibility,storage_path,created_at")
+    .select(
+      "id,title,instrument,council,visibility,storage_path,published_on,territory,department,municipality,created_at",
+    )
     .eq("instrument", mapped)
+    .order("published_on", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
   if (error && isMissingTableError(error)) {
@@ -215,8 +238,8 @@ function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): 
     title: doc.title,
     section,
     type: "Documento",
-    territory: doc.council ?? "Consejo comunitario",
-    year: String(new Date(doc.created_at).getFullYear()),
+    territory: formatDocTerritory(doc),
+    year: formatDocYear(doc),
     visibility: doc.visibility,
     action: "file",
     fileLabel: "Descargar",

@@ -78,13 +78,19 @@ type ContentDocumentRow = {
 
 const EXTERNAL_NEWS_CATEGORY_ID = 27;
 const EXTERNAL_NEWS_REVALIDATE_SECONDS = 60 * 15;
+const externalNewsFallbackImages = [
+  "/assets/hero-cards/incidencia.png",
+  "/assets/hero-cards/memoria-afroterritorial.png",
+  "/assets/hero-cards/scita.png",
+  "/assets/hero-cards/gobierno-propio.png",
+];
 const externalNewsFallback: ExternalNewsItem[] = pcnNewsArticles.slice(0, 4).map((article, index) => ({
   id: index + 1,
   slug: article.slug,
   title: article.titulo,
   excerpt: article.resumen,
   url: `https://renacientes.net/comunicados/${article.slug}/`,
-  imageUrl: null,
+  imageUrl: externalNewsFallbackImages[index % externalNewsFallbackImages.length],
   publishedAt: `2026-03-${String(28 - index).padStart(2, "0")}T10:00:00-05:00`,
   sourceLabel: "Renacientes / PCN",
 }));
@@ -236,6 +242,30 @@ function extractFirstContentImage(html: string) {
   return match?.[1] ? String(match[1]) : null;
 }
 
+function normalizeExternalImageUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  const raw = value.trim();
+  if (!raw) return null;
+
+  const withProtocol = raw.startsWith("//") ? `https:${raw}` : raw;
+  const candidate = replaceEntities(withProtocol);
+
+  try {
+    const normalized = new URL(candidate, "https://renacientes.net");
+    return normalized.toString();
+  } catch {
+    return null;
+  }
+}
+
+function extractOgImageFromYoastHead(yoastHead: unknown) {
+  if (typeof yoastHead !== "string" || !yoastHead) return null;
+  const match = yoastHead.match(
+    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+  );
+  return match?.[1] ? String(match[1]) : null;
+}
+
 function resolveExternalNewsImageUrl(item: Record<string, unknown>) {
   const embedded = asRecord(item._embedded);
   const mediaEntry = Array.isArray(embedded?.["wp:featuredmedia"])
@@ -248,16 +278,91 @@ function resolveExternalNewsImageUrl(item: Record<string, unknown>) {
     ? asRecord(yoastHeadJson?.og_image?.[0])
     : null;
   const content = asRecord(item.content);
-
-  return firstNonEmptyString(
+  const imageCandidate = firstNonEmptyString(
     mediaEntry?.source_url,
     asRecord(mediaSizes?.["et-pb-post-main-image-fullwidth"])?.source_url,
     asRecord(mediaSizes?.["et-pb-post-main-image"])?.source_url,
     asRecord(mediaSizes?.large)?.source_url,
     asRecord(mediaSizes?.full)?.source_url,
     yoastImage?.url,
+    extractOgImageFromYoastHead(item.yoast_head),
     extractFirstContentImage(String(content?.rendered ?? "")),
   );
+
+  return normalizeExternalImageUrl(imageCandidate);
+}
+
+function resolveExternalNewsTitle(item: Record<string, unknown>) {
+  const title = stripHtml(String((item.title as { rendered?: string })?.rendered ?? ""));
+  if (title) return title;
+
+  const yoastHeadJson = asRecord(item.yoast_head_json);
+  const yoastTitle = replaceEntities(String(yoastHeadJson?.title ?? ""))
+    .replace(/\s+/g, " ")
+    .trim();
+  const yoastPrefix = yoastTitle
+    .replace(/^[\s\-–—:]+/, "")
+    .split(/\s[-–—]\s/)[0]
+    ?.trim();
+  if (
+    yoastPrefix &&
+    !/^proceso de comunidades negras en colombia$/i.test(yoastPrefix)
+  ) {
+    return yoastPrefix;
+  }
+
+  const slug = typeof item.slug === "string" ? item.slug.trim() : "";
+  if (!slug) return "Sin título";
+  return slug
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/(^\w|\s\w)/g, (match) => match.toUpperCase());
+}
+
+async function fetchExternalMediaImageMap(mediaIds: number[]) {
+  if (!mediaIds.length) return new Map<number, string>();
+
+  try {
+    const response = await fetch(
+      `https://renacientes.net/wp-json/wp/v2/media?include=${mediaIds.join(",")}&per_page=${Math.min(
+        mediaIds.length,
+        100,
+      )}`,
+      {
+        next: { revalidate: EXTERNAL_NEWS_REVALIDATE_SECONDS },
+      },
+    );
+    if (!response.ok) return new Map<number, string>();
+
+    const rows = (await response.json()) as Array<Record<string, unknown>>;
+    const imageByMediaId = new Map<number, string>();
+
+    for (const row of rows) {
+      const id = Number(row.id);
+      if (!Number.isFinite(id)) continue;
+
+      const details = asRecord(row.media_details);
+      const sizes = asRecord(details?.sizes);
+      const image = normalizeExternalImageUrl(
+        firstNonEmptyString(
+          row.source_url,
+          asRecord(sizes?.["et-pb-post-main-image-fullwidth"])?.source_url,
+          asRecord(sizes?.["et-pb-post-main-image"])?.source_url,
+          asRecord(sizes?.large)?.source_url,
+          asRecord(sizes?.full)?.source_url,
+        ),
+      );
+
+      if (image) {
+        imageByMediaId.set(id, image);
+      }
+    }
+
+    return imageByMediaId;
+  } catch {
+    return new Map<number, string>();
+  }
 }
 
 function formatSpanishDate(value: string, options?: Intl.DateTimeFormatOptions) {
@@ -458,18 +563,43 @@ export async function getExternalEnterateNews(limit = 4): Promise<ExternalNewsIt
     }
 
     const payload = (await response.json()) as Array<Record<string, unknown>>;
-    return payload.slice(0, limit).map((item) => {
+    const sliced = payload.slice(0, limit);
+    const mapped = sliced.map((item) => {
+      const featuredMediaId = Number(item.featured_media);
       return {
         id: Number(item.id),
         slug: String(item.slug),
-        title: stripHtml(String((item.title as { rendered?: string })?.rendered ?? "")),
+        title: resolveExternalNewsTitle(item),
         excerpt: stripHtml(String((item.excerpt as { rendered?: string })?.rendered ?? "")),
         url: String(item.link ?? ""),
         imageUrl: resolveExternalNewsImageUrl(item),
+        featuredMediaId: Number.isFinite(featuredMediaId) && featuredMediaId > 0 ? featuredMediaId : null,
         publishedAt: String(item.date ?? new Date().toISOString()),
         sourceLabel: "Renacientes / PCN",
       };
     });
+
+    const unresolvedMediaIds = Array.from(
+      new Set(
+        mapped
+          .filter((item) => !item.imageUrl && item.featuredMediaId !== null)
+          .map((item) => item.featuredMediaId as number),
+      ),
+    );
+
+    const mediaImageMap = await fetchExternalMediaImageMap(unresolvedMediaIds);
+    return mapped.map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      excerpt: item.excerpt,
+      url: item.url,
+      imageUrl:
+        item.imageUrl ??
+        (item.featuredMediaId !== null ? mediaImageMap.get(item.featuredMediaId) ?? null : null),
+      publishedAt: item.publishedAt,
+      sourceLabel: item.sourceLabel,
+    }));
   } catch (error) {
     console.error("Failed to fetch external Renacientes news:", error);
     return externalNewsFallback.slice(0, limit);
