@@ -92,7 +92,7 @@ export function ScitaWorkspace({
 
   const rootCls = isMorph
     ? "flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#f8f5f2] lg:flex-row"
-    : "flex min-h-[calc(100vh-4rem)] flex-col bg-transparent lg:flex-row";
+    : "flex min-h-[calc(100svh-4rem)] flex-col bg-transparent lg:flex-row";
 
   const sidebarHeaderCls = `border-b px-6 py-8 sm:px-8 sm:py-10 ${
     onDarkSurface ? "border-white/10" : "border-[#e8dfd3]"
@@ -104,7 +104,7 @@ export function ScitaWorkspace({
       "relative flex min-h-0 flex-1 flex-col bg-[#1a1a1a] p-2 sm:p-4 lg:h-full lg:min-h-0 lg:w-full"
     : isMorph ?
       "relative flex min-h-0 flex-1 flex-col bg-[#1a1a1a] p-4 sm:p-6 lg:h-full lg:min-h-0 lg:w-[60%] xl:w-[65%]"
-    : "relative flex min-h-[800px] w-full flex-col bg-transparent p-4 sm:p-6 lg:min-h-0 lg:w-[60%] xl:w-[65%]";
+    : "relative flex min-h-[560px] w-full flex-col bg-transparent p-4 sm:min-h-[680px] sm:p-6 lg:min-h-0 lg:w-[60%] xl:w-[65%]";
 
   const renderSidebarInner = () => {
     /** Vista página (superficie oscura): alineado al mock lateral — solo módulos + alerta + SIG. */
@@ -306,7 +306,7 @@ export function ScitaWorkspace({
 
   const sidebarPage = (
     <div
-      className={`flex w-full flex-col border-r lg:w-[40%] xl:w-[35%] ${
+      className={`flex w-full flex-col lg:border-r lg:w-[40%] xl:w-[35%] ${
         onDarkSurface ? "border-white/10 bg-black/20 backdrop-blur-md" : "border-[#e8dfd3] bg-transparent"
       }`}
     >

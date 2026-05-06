@@ -6,7 +6,7 @@
  * 2) Workspace en bloque separado (fuera del hero).
  */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ScitaDashboardHero } from "@/components/palenke/ScitaDashboardHero";
 import { SCITA_TERRITORIAL_SURFACE_CLASS, ScitaMarketingBackdrop } from "@/components/palenke/scitaMarketingHero";
@@ -21,7 +21,19 @@ type ScitaPageContentProps = {
 
 export function ScitaPageContent({ fieldReportHref, geoportalHref, showGeoportal }: ScitaPageContentProps) {
   const [activeModuleId, setActiveModuleId] = useState<ScitaModuleId>("titulacion");
+  const [workspaceEntered, setWorkspaceEntered] = useState(false);
   const workspaceSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const resetAtTop = () => {
+      if (window.scrollY <= 24) {
+        setWorkspaceEntered(false);
+      }
+    };
+
+    window.addEventListener("scroll", resetAtTop, { passive: true });
+    return () => window.removeEventListener("scroll", resetAtTop);
+  }, []);
 
   return (
     <>
@@ -35,9 +47,10 @@ export function ScitaPageContent({ fieldReportHref, geoportalHref, showGeoportal
         </div>
         <motion.div
           className="relative z-10 mx-auto w-full max-w-[1920px] overflow-visible"
-          initial={{ opacity: 0, y: 36, scale: 0.985 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: false, amount: 0.7 }}
+          initial={false}
+          animate={workspaceEntered ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 36, scale: 0.985 }}
+          onViewportEnter={() => setWorkspaceEntered(true)}
+          viewport={{ amount: 0.7 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <ScitaWorkspace
