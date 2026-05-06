@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plataforma Palenke - Documentacion Tecnica MVP</title>
+    <style>
+      :root {
+        --bg: #f4f1ea;
+        --paper: #ffffff;
+        --ink: #1a1a1a;
+        --muted: #5f5a52;
+        --green: #2e7d32;
+        --red: #d32f2f;
+        --yellow: #fbc02d;
+        --border: #ddd6cb;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 32px;
+        font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at top right, #fff7db 0%, var(--bg) 50%, #ece8df 100%);
+        line-height: 1.5;
+      }
+
+      .doc {
+        max-width: 980px;
+        margin: 0 auto;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 40px 48px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      }
+
+      h1, h2, h3 {
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      h1 {
+        font-size: 34px;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-top: 30px;
+        margin-bottom: 12px;
+        border-left: 6px solid var(--green);
+        padding-left: 10px;
+      }
+
+      h3 {
+        font-size: 18px;
+        margin-top: 18px;
+        margin-bottom: 8px;
+      }
+
+      p, li {
+        font-size: 15px;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+
+      .ribbon {
+        height: 8px;
+        border-radius: 999px;
+        margin: 16px 0 24px;
+        background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 50%, var(--red) 100%);
+      }
+
+      ul, ol {
+        margin: 8px 0 0 20px;
+        padding: 0;
+      }
+
+      li { margin-bottom: 6px; }
+
+      .two-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        background: #fcfbf9;
+      }
+
+      .tag {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        background: #edf6ff;
+        color: #0f4d81;
+        margin-bottom: 8px;
+      }
+
+      code {
+        background: #f3efe8;
+        border: 1px solid #e4dbcf;
+        border-radius: 6px;
+        padding: 1px 6px;
+      }
+
+      @media print {
+        body {
+          padding: 0;
+          background: #fff;
+        }
+
+        .doc {
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          max-width: none;
+          padding: 22mm 16mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="doc">
+      <h1>Plataforma Palenke - Documentacion Tecnica MVP</h1>
+      <p class="meta">Version 1.0 | Fecha: 2026-05-04 | Estado: Base tecnica para MVP (Fase 1)</p>
+      <div class="ribbon"></div>
+
+      <h2>1) Objetivo</h2>
+      <p>
+        Este documento describe como funciona la plataforma Palenke en su estado MVP:
+        arquitectura real, modulos principales, reglas de seguridad territorial digital,
+        flujo documental restringido y operacion base.
+      </p>
+
+      <h2>2) Resumen de la plataforma</h2>
+      <ul>
+        <li>Infraestructura digital para gestion de informacion territorial y gobernanza.</li>
+        <li>Control de acceso por rol y por nivel de sensibilidad.</li>
+        <li>Conexion entre biblioteca, memoria, estadisticas y geoportal.</li>
+        <li>Soporte a operacion editorial y administrativa en un mismo portal.</li>
+      </ul>
+
+      <h2>3) Arquitectura MVP</h2>
+      <div class="two-cols">
+        <section class="card">
+          <span class="tag">Stack</span>
+          <ul>
+            <li>Next.js App Router + React + TypeScript</li>
+            <li>Tailwind CSS v4</li>
+            <li>Supabase (Auth, Postgres, Storage)</li>
+            <li>Zod para validacion</li>
+            <li>Power BI embebido + geoportal externo + n8n opcional</li>
+          </ul>
+        </section>
+        <section class="card">
+          <span class="tag">Componentes</span>
+          <ul>
+            <li>Rutas web: <code>src/app/*</code></li>
+            <li>APIs: acceso y signed URLs</li>
+            <li>Middleware admin: <code>src/middleware.ts</code></li>
+            <li>DB para usuarios, documentos y solicitudes</li>
+            <li>Buckets privados: internos y sensibles</li>
+          </ul>
+        </section>
+      </div>
+
+      <h2>4) Modulos MVP</h2>
+      <ol>
+        <li>Inicio (<code>/</code>)</li>
+        <li>Biblioteca (<code>/biblioteca</code>)</li>
+        <li>Gobierno propio (<code>/gobierno-propio</code>)</li>
+        <li>MJN (<code>/mujeres-juventudes-ninez</code>)</li>
+        <li>Estadisticas (<code>/estadisticas</code>)</li>
+        <li>SCITA (<code>/scita</code>)</li>
+        <li>Geoportal interno (<code>/geoportal</code>)</li>
+        <li>Admin (<code>/admin/*</code>)</li>
+      </ol>
+
+      <h2>5) Seguridad territorial digital</h2>
+      <div class="two-cols">
+        <section class="card">
+          <h3>Roles</h3>
+          <ul>
+            <li><code>public</code>: contenido abierto</li>
+            <li><code>internal</code>: contenido interno autenticado</li>
+            <li><code>admin</code>: gestion y aprobaciones</li>
+          </ul>
+        </section>
+        <section class="card">
+          <h3>Visibilidad</h3>
+          <ul>
+            <li><code>public</code>: sin login</li>
+            <li><code>internal</code>: requiere sesion</li>
+            <li><code>sensitive</code>: no expuesto en frontend publico</li>
+          </ul>
+        </section>
+      </div>
+
+      <h2>6) Flujo de acceso documental</h2>
+      <ol>
+        <li>Solicitud en <code>/solicitar-acceso/[instrumento]</code>.</li>
+        <li>Persistencia en <code>public.access_requests</code>.</li>
+        <li>Revision admin en <code>/admin/solicitudes</code>.</li>
+        <li>Aprobacion/rechazo por server actions.</li>
+        <li>Entrega controlada por signed URL temporal.</li>
+      </ol>
+
+      <h2>7) Operacion e infraestructura</h2>
+      <h3>Variables de entorno clave</h3>
+      <ul>
+        <li><code>NEXT_PUBLIC_SUPABASE_URL</code></li>
+        <li><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY</code></li>
+        <li><code>SUPABASE_SERVICE_ROLE_KEY</code></li>
+        <li><code>NEXT_PUBLIC_APP_URL</code></li>
+        <li><code>N8N_EMAIL_WEBHOOK_URL</code> (opcional)</li>
+      </ul>
+
+      <h3>Buckets privados</h3>
+      <ul>
+        <li><code>docs-internal</code></li>
+        <li><code>docs-sensitive</code></li>
+      </ul>
+
+      <h3>Comandos operativos</h3>
+      <ul>
+        <li><code>npm run sync:plan-instrumentos-storage</code></li>
+        <li><code>npm run sync:plan-instrumentos-storage:verify</code></li>
+        <li><code>npm run sync:plan-instrumentos-storage:verify-db</code></li>
+        <li><code>npm run verify:plan-instrumentos-auth-e2e</code></li>
+        <li><code>npm run verify:plan-instrumentos-admin-actions-e2e</code></li>
+      </ul>
+
+      <h2>8) MVP vs Fase 2</h2>
+      <div class="two-cols">
+        <section class="card">
+          <span class="tag">MVP</span>
+          <ul>
+            <li>Portal modular por estado</li>
+            <li>Visibilidad por nivel</li>
+            <li>Power BI por embed URL</li>
+            <li>Acceso geoportal por rol</li>
+            <li>CRUD base documental</li>
+          </ul>
+        </section>
+        <section class="card">
+          <span class="tag">Fase 2</span>
+          <ul>
+            <li>Taxonomias profundas</li>
+            <li>Flujo editorial completo</li>
+            <li>Modulo ACC extendido</li>
+            <li>Incidencia politica ampliada</li>
+            <li>Auditoria y versionado</li>
+          </ul>
+        </section>
+      </div>
+
+      <h2>9) Referencias</h2>
+      <ul>
+        <li><code>README.md</code></li>
+        <li><code>docs/plan-modulos-fase1-index.md</code></li>
+        <li><code>docs/plan_instrumentos_phase4_runbook.md</code></li>
+        <li><code>docs/plan_instrumentos_progress.md</code></li>
+        <li><code>src/app/mockups/sat-palenke/page.tsx</code></li>
+      </ul>
+    </main>
+  </body>
+</html>

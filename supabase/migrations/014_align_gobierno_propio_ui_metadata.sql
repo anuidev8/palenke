@@ -43,7 +43,7 @@ with target_updates (
     (
       'reglamentos/cc-mayor-de-capitania/reglamento-interno-capitania.pdf',
       'CC Mayor de Capitanía',
-      'Municipio de Capitanía, Departamento del Cauca',
+      'Municipio de Páez, Departamento del Cauca',
       date '2023-01-01',
       timestamptz '2023-01-01 00:00:00+00'
     ),

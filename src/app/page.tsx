@@ -403,15 +403,26 @@ export default async function HomePage({
                   className="surface-card flex flex-col gap-4"
                   style={{ borderTopColor: "#2e7d32", borderTopWidth: "3px" }}
                 >
-                  <div
-                    className="flex h-[140px] items-end rounded-[20px] bg-cover bg-center p-4"
-                    style={{
-                      backgroundImage: n.imageUrl
-                        ? `linear-gradient(180deg, rgba(26,26,26,0.1), rgba(26,26,26,0.7)), url("${n.imageUrl}")`
-                        : "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
-                    }}
-                  >
-                    <span className="rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white">
+                  <div className="relative flex h-[140px] items-end overflow-hidden rounded-[20px] p-4">
+                    {n.imageUrl ? (
+                      <Image
+                        src={n.imageUrl}
+                        alt={`Imagen de portada: ${n.title}`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 40vw"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
+                        }}
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/20 to-[#1a1a1a]/70" />
+                    <span className="relative z-10 rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white">
                       Fuente externa
                     </span>
                   </div>

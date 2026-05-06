@@ -34,7 +34,7 @@ with target_updates (
     ),
     (
       'reglamentos/cc-mayor-de-capitania/ACTAS-DE-ACTUALIZACION/acta-validacion-cc-capitania.pdf',
-      'Municipio de Capitanía, Departamento del Cauca',
+      'Municipio de Páez, Departamento del Cauca',
       date '2023-01-01',
       timestamptz '2023-01-01 00:00:00+00'
     ),

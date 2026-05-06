@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
@@ -51,16 +52,27 @@ export default async function NoticiasPage({
                   className="surface-card flex flex-col gap-4 overflow-hidden"
                   style={{ borderTopColor: "#2e7d32", borderTopWidth: "3px" }}
                 >
-                  <div
-                    className="flex h-[160px] items-end rounded-[20px] bg-cover bg-center p-4"
-                    style={{
-                      backgroundImage: item.imageUrl
-                        ? `linear-gradient(180deg, rgba(26,26,26,0.1), rgba(26,26,26,0.7)), url("${item.imageUrl}")`
-                        : "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
-                    }}
-                  >
+                  <div className="relative flex h-[160px] items-end overflow-hidden rounded-[20px] p-4">
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={`Imagen de portada: ${item.title}`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 40vw"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, rgba(46,125,50,0.92), rgba(21,101,192,0.75))",
+                        }}
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/20 to-[#1a1a1a]/70" />
                     <span
-                      className="rounded-full px-3 py-1 text-xs font-semibold text-white"
+                      className="relative z-10 rounded-full px-3 py-1 text-xs font-semibold text-white"
                       style={{ background: "rgba(0,0,0,0.3)" }}
                     >
                       Fuente externa
