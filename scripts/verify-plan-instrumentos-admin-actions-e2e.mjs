@@ -263,9 +263,9 @@ function extractActionForms(html) {
     const body = match[2];
     const lowerBody = body.toLowerCase();
 
-    const type = lowerBody.includes('name="reason"')
+    const type = lowerBody.includes('name="rejection_reason"')
       ? "reject"
-      : lowerBody.includes('name="notes"')
+      : lowerBody.includes('name="approval_notes"')
         ? "approve"
         : null;
 
@@ -367,16 +367,14 @@ async function fetchDetailPage({
   }
 
   const forms = extractActionForms(html);
-  const approveForm = forms.find((item) => item.type === "approve");
   const rejectForm = forms.find((item) => item.type === "reject");
 
-  if (!approveForm || !rejectForm) {
-    throw new Error(`Could not extract approve/reject forms from ${detailUrl}. forms_found=${forms.length}`);
+  if (!rejectForm) {
+    throw new Error(`Could not extract reject form from ${detailUrl}. forms_found=${forms.length}`);
   }
 
   return {
     detailUrl,
-    approveForm,
     rejectForm,
   };
 }
@@ -419,31 +417,9 @@ async function assertRequestStatus(serviceClient, {
 async function runChecks({
   serviceClient,
   adminCookieHeader,
-  approveRequestId,
   rejectRequestId,
 }) {
-  const approveNote = "Aprobada por QA E2E automatizado";
   const rejectReason = "Rechazo QA E2E automatizado";
-
-  const approvePage = await fetchDetailPage({
-    requestId: approveRequestId,
-    cookieHeader: adminCookieHeader,
-  });
-  const approveResult = await submitForm({
-    form: approvePage.approveForm,
-    pageUrl: approvePage.detailUrl,
-    cookieHeader: adminCookieHeader,
-    extraFields: {
-      notes: approveNote,
-    },
-  });
-
-  await assertRequestStatus(serviceClient, {
-    requestId: approveRequestId,
-    expectedStatus: "approved",
-    expectedNote: approveNote,
-    responseDebug: approveResult,
-  });
 
   const rejectPage = await fetchDetailPage({
     requestId: rejectRequestId,
@@ -454,7 +430,7 @@ async function runChecks({
     pageUrl: rejectPage.detailUrl,
     cookieHeader: adminCookieHeader,
     extraFields: {
-      reason: rejectReason,
+      rejection_reason: rejectReason,
     },
   });
 
@@ -466,12 +442,6 @@ async function runChecks({
   });
 
   return {
-    approve: {
-      requestId: approveRequestId,
-      status: approveResult.status,
-      location: approveResult.location,
-      bodySample: approveResult.status === 200 ? approveResult.bodySample : undefined,
-    },
     reject: {
       requestId: rejectRequestId,
       status: rejectResult.status,
@@ -510,14 +480,6 @@ async function main() {
 
   const reglamentoDoc = await getSampleDocumentByInstrument(serviceClient, "reglamentos");
 
-  const approveRequestId = await createPendingRequest(serviceClient, {
-    email: `qa.plan.instrumentos.request.approve+${stamp}@example.org`,
-    instrumentSlug: "reglamentos",
-    documentId: reglamentoDoc.id,
-    documentTitle: reglamentoDoc.title,
-    accessLevel: "admin",
-    motivation: "Validar flujo approve por Server Action.",
-  });
   const rejectRequestId = await createPendingRequest(serviceClient, {
     email: `qa.plan.instrumentos.request.reject+${stamp}@example.org`,
     instrumentSlug: "reglamentos",
@@ -545,7 +507,6 @@ async function main() {
     const result = await runChecks({
       serviceClient,
       adminCookieHeader,
-      approveRequestId,
       rejectRequestId,
     });
 

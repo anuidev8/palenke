@@ -7,7 +7,7 @@ import {
   type AccessRequestsDataMode,
 } from "@/lib/access-requests";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
-import { approveRequest, emailRequestedDocument, rejectRequest } from "./actions";
+import { emailRequestedDocument, rejectRequest } from "./actions";
 
 function formatDate(date: string | null) {
   if (!date) return "—";
@@ -54,7 +54,6 @@ export default async function AdminSolicitudDetailPage({
     notFound();
   }
 
-  const approveAction = approveRequest.bind(null, request.id);
   const emailDocumentAction = emailRequestedDocument.bind(null, request.id);
   const rejectAction = rejectRequest.bind(null, request.id);
 
@@ -63,7 +62,7 @@ export default async function AdminSolicitudDetailPage({
       role={role}
       active="solicitudes"
       title="Revisión de solicitud"
-      intro="Valida la información enviada por la persona solicitante y decide aprobación o rechazo."
+      intro="Valida la información enviada por la persona solicitante y gestiona el envío del documento o el rechazo."
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href={withRole("/admin/solicitudes", role)} className="button-ghost">
@@ -190,26 +189,7 @@ export default async function AdminSolicitudDetailPage({
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        <form action={approveAction} autoComplete="off" className="surface-card grid gap-4">
-          <h3 className="font-display text-xl text-[color:var(--forest)]">Aprobar solicitud</h3>
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[color:var(--forest)]">
-              Notas de aprobación (opcional)
-            </span>
-            <textarea
-              name="approval_notes"
-              className="textarea-shell"
-              rows={4}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </label>
-          <button type="submit" className="button-primary justify-center">
-            Aprobar
-          </button>
-        </form>
-
+      <section className="grid gap-6 lg:grid-cols-2">
         <form action={emailDocumentAction} autoComplete="off" className="surface-card grid gap-4">
           <h3 className="font-display text-xl text-[color:var(--forest)]">
             Enviar documento por correo

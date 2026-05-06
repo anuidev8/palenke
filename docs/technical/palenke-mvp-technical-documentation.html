@@ -162,9 +162,9 @@
           <ul>
             <li>Next.js App Router + React + TypeScript</li>
             <li>Tailwind CSS v4</li>
-            <li>Supabase (Auth, Postgres, Storage)</li>
+            <li>Supabase (Auth, Postgres, Storage) como backend principal del MVP</li>
             <li>Zod para validacion</li>
-            <li>Power BI embebido + geoportal externo + n8n opcional</li>
+            <li>Power BI embebido</li>
           </ul>
         </section>
         <section class="card">
@@ -175,6 +175,44 @@
             <li>Middleware admin: <code>src/middleware.ts</code></li>
             <li>DB para usuarios, documentos y solicitudes</li>
             <li>Buckets privados: internos y sensibles</li>
+          </ul>
+        </section>
+      </div>
+
+      <h3>Detalle de base de datos: Supabase (Auth, Postgres, Storage)</h3>
+      <div class="two-cols">
+        <section class="card">
+          <h4>Auth</h4>
+          <ul>
+            <li>Gestiona autenticacion y sesiones de usuarios internos/admin.</li>
+            <li>Permite control por rol para acceso a modulos y acciones.</li>
+            <li>Se integra con middleware y rutas protegidas del portal.</li>
+          </ul>
+        </section>
+        <section class="card">
+          <h4>Postgres</h4>
+          <ul>
+            <li>Base transaccional para usuarios, documentos y solicitudes.</li>
+            <li>Tablas clave del MVP: catalogo documental y <code>access_requests</code>.</li>
+            <li>Soporta trazabilidad operativa de aprobaciones y rechazos.</li>
+          </ul>
+        </section>
+      </div>
+      <div class="two-cols">
+        <section class="card">
+          <h4>Storage</h4>
+          <ul>
+            <li>Resguarda archivos por nivel de sensibilidad.</li>
+            <li>Buckets privados para contenido interno y sensible.</li>
+            <li>Entrega segura mediante signed URLs temporales.</li>
+          </ul>
+        </section>
+        <section class="card">
+          <h4>Relacion entre capas</h4>
+          <ul>
+            <li>Auth identifica al usuario y su perfil de acceso.</li>
+            <li>Postgres registra metadatos, permisos y solicitudes.</li>
+            <li>Storage conserva archivos; el acceso se habilita desde reglas de aplicacion.</li>
           </ul>
         </section>
       </div>
@@ -190,6 +228,38 @@
         <li>Geoportal interno (<code>/geoportal</code>)</li>
         <li>Admin (<code>/admin/*</code>)</li>
       </ol>
+      <h3>Modulos priorizados (resumen funcional)</h3>
+      <div class="two-cols">
+        <section class="card">
+          <h4>Memoria Afroterritorial</h4>
+          <p>Archivo historico y cultural comunitario para preservar memoria, identidad y continuidad organizativa.</p>
+          <ul>
+            <li>Centraliza documentos y piezas de memoria en la biblioteca del portal.</li>
+            <li>Organiza acceso por niveles de visibilidad (publico, interno, sensible).</li>
+            <li>Permite consulta controlada con trazabilidad de solicitudes.</li>
+          </ul>
+        </section>
+        <section class="card">
+          <h4>Gobierno Propio</h4>
+          <p>Instrumentos de proteccion y autonomia para la toma de decision comunitaria.</p>
+          <ul>
+            <li>Publica y resguarda mandatos, lineamientos y documentos normativos.</li>
+            <li>Conecta el flujo de solicitud/aprobacion para acceso a instrumentos sensibles.</li>
+            <li>Soporta gestion administrativa mediante rutas protegidas y rol admin.</li>
+          </ul>
+        </section>
+      </div>
+      <div class="two-cols">
+        <section class="card">
+          <h4>SCITA</h4>
+          <p>Sistema Comunitario de Informacion Territorial y Ambiental para lectura y seguimiento del territorio.</p>
+          <ul>
+            <li>Integra tableros de analitica territorial con Power BI embebido.</li>
+            <li>Presenta informacion espacial y ambiental en una experiencia unificada del portal.</li>
+            <li>Sirve como base de monitoreo para incidencia y gestion comunitaria.</li>
+          </ul>
+        </section>
+      </div>
 
       <h2>5) Seguridad territorial digital</h2>
       <div class="two-cols">
@@ -227,22 +297,12 @@
         <li><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY</code></li>
         <li><code>SUPABASE_SERVICE_ROLE_KEY</code></li>
         <li><code>NEXT_PUBLIC_APP_URL</code></li>
-        <li><code>N8N_EMAIL_WEBHOOK_URL</code> (opcional)</li>
       </ul>
 
       <h3>Buckets privados</h3>
       <ul>
         <li><code>docs-internal</code></li>
         <li><code>docs-sensitive</code></li>
-      </ul>
-
-      <h3>Comandos operativos</h3>
-      <ul>
-        <li><code>npm run sync:plan-instrumentos-storage</code></li>
-        <li><code>npm run sync:plan-instrumentos-storage:verify</code></li>
-        <li><code>npm run sync:plan-instrumentos-storage:verify-db</code></li>
-        <li><code>npm run verify:plan-instrumentos-auth-e2e</code></li>
-        <li><code>npm run verify:plan-instrumentos-admin-actions-e2e</code></li>
       </ul>
 
       <h2>8) MVP vs Fase 2</h2>
@@ -271,6 +331,8 @@
 
       <h2>9) Referencias</h2>
       <ul>
+        <li>Repositorio GitHub: <a href="https://github.com/anuidev8/palenke" target="_blank" rel="noopener noreferrer">https://github.com/anuidev8/palenke</a></li>
+        <li>Proyecto desplegado y alojado en Vercel.</li>
         <li><code>README.md</code></li>
         <li><code>docs/plan-modulos-fase1-index.md</code></li>
         <li><code>docs/plan_instrumentos_phase4_runbook.md</code></li>

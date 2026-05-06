@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-interface Layer {
+export interface ScitaLayer {
   id: string;
   label: string;
   abbr: string;
@@ -13,10 +13,11 @@ interface Layer {
 }
 
 interface ScitaLayerTogglesProps {
-  initialLayers: Layer[];
+  initialLayers: ScitaLayer[];
+  variant?: "light" | "dark";
 }
 
-export function ScitaLayerToggles({ initialLayers }: ScitaLayerTogglesProps) {
+export function ScitaLayerToggles({ initialLayers, variant = "light" }: ScitaLayerTogglesProps) {
   const [layers, setLayers] = useState(initialLayers);
 
   function toggle(id: string) {
@@ -40,9 +41,11 @@ export function ScitaLayerToggles({ initialLayers }: ScitaLayerTogglesProps) {
               : "0 4px 16px -4px rgba(0,0,0,0.10)",
           }}
           onClick={() => toggle(capa.id)}
-          className="flex cursor-pointer items-center gap-4 rounded-[20px] border bg-white px-4 py-4 transition-colors"
+          className={`flex cursor-pointer items-center gap-4 rounded-[20px] border px-4 py-4 transition-colors ${
+            variant === "dark" ? "bg-[#1a1a1a]/80 backdrop-blur-sm" : "bg-white"
+          }`}
           style={{
-            borderColor: capa.active ? capa.color : "#e8dfd3",
+            borderColor: capa.active ? capa.color : variant === "dark" ? "rgba(255,255,255,0.1)" : "#e8dfd3",
             borderLeftWidth: capa.active ? "3px" : "1px",
           }}
           role="switch"
@@ -50,7 +53,6 @@ export function ScitaLayerToggles({ initialLayers }: ScitaLayerTogglesProps) {
           tabIndex={0}
           onKeyDown={(e) => (e.key === " " || e.key === "Enter") && toggle(capa.id)}
         >
-          {/* Abbr badge */}
           <div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold"
             style={{ background: capa.lightBg, color: capa.color }}
@@ -58,22 +60,22 @@ export function ScitaLayerToggles({ initialLayers }: ScitaLayerTogglesProps) {
             {capa.abbr.slice(0, 3)}
           </div>
 
-          {/* Label */}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-[#1a1a1a]">{capa.label}</p>
+            <p className={`truncate text-sm font-semibold ${variant === "dark" ? "text-white" : "text-[#1a1a1a]"}`}>
+              {capa.label}
+            </p>
             <motion.p
               className="mt-0.5 text-xs"
-              animate={{ color: capa.active ? capa.color : "#7a756e" }}
+              animate={{ color: capa.active ? capa.color : variant === "dark" ? "#a3a3a3" : "#7a756e" }}
               transition={{ duration: 0.2 }}
             >
               {capa.active ? "Activa" : "Disponible"}
             </motion.p>
           </div>
 
-          {/* Toggle pill — spring snap */}
           <div
             className="relative h-5 w-9 rounded-full transition-colors duration-200"
-            style={{ background: capa.active ? capa.color : "#e8dfd3" }}
+            style={{ background: capa.active ? capa.color : variant === "dark" ? "rgba(255,255,255,0.1)" : "#e8dfd3" }}
             aria-hidden="true"
           >
             <motion.div

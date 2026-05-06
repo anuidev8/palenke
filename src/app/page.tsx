@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Search } from "lucide-react";
+import { PageIntroOverlay } from "@/components/global/PageIntroOverlay";
 import { Callout, PageBanner, SiteLayout } from "@/components/mock/ui";
 import {
   homeIntro,
@@ -39,19 +40,33 @@ export default async function HomePage({
   ]);
 
   return (
-    <SiteLayout
-      role={role}
-      transparentHeaderAtTop={true}
-      banner={
-        notice === "admin-denied" ? (
-          <PageBanner>
-            <Callout tone="warning" title="Acceso denegado">
-              <p>El panel administrativo está reservado para cuentas con rol Admin.</p>
-            </Callout>
-          </PageBanner>
-        ) : null
-      }
+    <PageIntroOverlay
+      sessionStorageKey="palenke-home-intro-seen"
+      title="Palenke"
+      subtitle="Pensamiento y Territorio"
+      revealDurationSec={3}
+      titleSinkDurationSec={0.65}
+      overlayFadeDurationSec={0.85}
+      backdropFadeInSec={0.45}
+      overlayClassName="overflow-hidden bg-[#141210] before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:bg-[radial-gradient(ellipse_100%_70%_at_0%_15%,rgba(211,47,47,0.38),transparent_52%),radial-gradient(ellipse_90%_60%_at_100%_10%,rgba(251,192,45,0.28),transparent_48%),radial-gradient(ellipse_110%_85%_at_50%_100%,rgba(46,125,50,0.35),transparent_55%)]"
+      subtitleClassName="mt-6 max-w-md text-xs font-semibold uppercase tracking-[0.28em] text-[#fbc02d]/80 sm:text-sm"
+      accentLineClassName="mt-8 h-1 w-[min(14rem,55vw)] rounded-full bg-[linear-gradient(90deg,#2e7d32_0%,#2e7d32_33.33%,#fbc02d_33.33%,#fbc02d_66.66%,#d32f2f_66.66%,#d32f2f_100%)] shadow-[0_0_24px_rgba(251,192,45,0.25)]"
+      dotGridBackgroundImage="radial-gradient(rgba(211,47,47,0.1) 1px, transparent 1px), radial-gradient(rgba(251,192,45,0.09) 1px, transparent 1px), radial-gradient(rgba(46,125,50,0.1) 1px, transparent 1px)"
+      dotGridOpacity={0.22}
     >
+      <SiteLayout
+        role={role}
+        transparentHeaderAtTop={true}
+        banner={
+          notice === "admin-denied" ? (
+            <PageBanner>
+              <Callout tone="warning" title="Acceso denegado">
+                <p>El panel administrativo está reservado para cuentas con rol Admin.</p>
+              </Callout>
+            </PageBanner>
+          ) : null
+        }
+      >
       {/* ── Hero ── */}
       <section className="relative overflow-hidden bg-[#1a2a1a]">
         {/* Main Background Image/Video */}
@@ -514,6 +529,7 @@ export default async function HomePage({
           <p className="mt-4 text-sm text-white/50">— Mayoras y jóvenes del Palenque Alto Cauca, PCN</p>
         </div>
       </section>
-    </SiteLayout>
+      </SiteLayout>
+    </PageIntroOverlay>
   );
 }
