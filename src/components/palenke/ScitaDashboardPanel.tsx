@@ -43,9 +43,9 @@ const DASHBOARDS: DashboardConfig[] = [
       "Cruce sugerido: relacionar instrumentos con conflictos de uso del suelo, presión extractiva y alertas territoriales.",
       "Uso político: preparar reuniones con autoridades, asambleas y mesas interinstitucionales con evidencia consolidada.",
     ],
-    iframeTitle: "I_Instrumentos de Gobierno Propio",
+    iframeTitle: "P_Instrumentos de Gobierno Propio",
     embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiZTNmNmZjMzAtMTJhOS00YTEzLTljYTAtYjIxNGY0YjRhZGY4IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
+      "https://app.powerbi.com/view?r=eyJrIjoiZjljZDMxZjMtMjNhNS00ZGMzLTgwMTYtY2E5YzM4ZGNhNjE5IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
     embedWidth: DEFAULT_EMBED_WIDTH,
     embedHeight: DEFAULT_EMBED_HEIGHT,
     footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
@@ -85,9 +85,9 @@ const DASHBOARDS: DashboardConfig[] = [
       "Cruce sugerido: comparar avance de titulación con presión territorial y conflictividad local.",
       "Uso estratégico: sustentar acciones de incidencia, seguimiento legal y priorización de casos urgentes.",
     ],
-    iframeTitle: "I_Titulación Colectiva De Comunidades Negras",
+    iframeTitle: "P_Titulación Colectiva De Comunidades Negras",
     embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiZGQ5NTRjNmEtMjlhYi00YzAyLWFiZDgtMWZkZTE4MDFjNDcxIiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
+      "https://app.powerbi.com/view?r=eyJrIjoiZjZlYzMzZDctNDcwMy00Zjc5LTg1ZjUtODRjYTYzZGZkZGE4IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
     embedWidth: DEFAULT_EMBED_WIDTH,
     embedHeight: DEFAULT_EMBED_HEIGHT,
     footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
