@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { SiteLayout } from "@/components/mock/ui";
 import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboardGrid";
 import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
-import { BookPreviewLightbox } from "@/components/palenke/BookPreviewLightbox";
+import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams } from "@/lib/viewer";
 
@@ -72,12 +71,6 @@ const instruments = [
     imageUrl: "/assets/placeholders/proteccion-hidrica.png",
     fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
   },
-];
-
-const EN_ALIANZA = [
-  { name: "RRI", src: "/brands/RRI.png" },
-  { name: "TTF", src: "/brands/TTF.png" },
-  { name: "ILC", src: "/brands/ILC.png" },
 ];
 
 export default async function GobiernoPropioPage({
@@ -178,85 +171,7 @@ export default async function GobiernoPropioPage({
         </div>
       </section>
 
-      {/* ── Aliados ── */}
-      <section className="border-t border-[#e8dfd3] bg-[#FDFBF7] px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a6f63]">
-              Red de orientación y apoyo
-            </p>
-            <h2 className="mt-3 font-display text-3xl text-[#1a1a1a] sm:text-4xl">
-              Construcción colectiva del Gobierno Propio
-            </h2>
-            <p className="mt-3 text-base leading-relaxed text-[#4a4540]">
-              Visibilizamos la organización orientadora y las alianzas que fortalecen este proceso comunitario.
-            </p>
-          </div>
-
-          <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
-            {/* Card 1: Orientado por */}
-            <article className="flex flex-col overflow-hidden rounded-2xl border border-[#c8e6c9] bg-[#E8F5E9] p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#2E7D32]">
-                Orientado por
-              </h3>
-              <p className="mt-2 text-sm font-medium text-[#3f5343]">
-                Proceso de Comunidades Negras (PCN)
-              </p>
-
-              <div className="mt-6 flex flex-1 flex-col items-center">
-                <div className="w-full max-w-[320px] rounded-xl border border-[#d6e6d6] bg-white p-3 shadow-sm">
-                  <div className="relative aspect-[9/4] overflow-hidden rounded-lg border border-[#efefef] bg-[#f8f5f0]">
-                    <Image
-                      src="/assets/logo.svg"
-                      alt="Logo de Proceso de Comunidades Negras (PCN)"
-                      fill
-                      sizes="(max-width: 640px) 280px, 320px"
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6 flex w-full max-w-md flex-col">
-                  <h4 className="text-xl font-semibold leading-tight text-[#1a1a1a]">Proceso de Comunidades Negras (PCN)</h4>
-                  <div className="mt-5 h-px w-full bg-gradient-to-r from-[#2e7d32]/40 to-transparent" />
-                  <div className="mt-4">
-                    <BookPreviewLightbox
-                      src="/assets/logo.svg"
-                      alt="Logo de Proceso de Comunidades Negras (PCN)"
-                    />
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            {/* Card 2: En alianza con */}
-            <article className="flex flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white p-8 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-              <h3 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-[#1565C0]">
-                En alianza con
-              </h3>
-              <p className="mt-2 text-center text-sm text-[#4a4540]">
-                Organizaciones aliadas que acompañan el fortalecimiento del proceso territorial.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-                {EN_ALIANZA.map((brand) => (
-                  <div
-                    key={brand.name}
-                    className="group flex h-24 w-36 items-center justify-center rounded-xl border border-[#ececec] bg-[#fcfcfc] px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d8d8d8] hover:bg-white"
-                  >
-                    <Image
-                      src={brand.src}
-                      alt={`Logo de ${brand.name}`}
-                      width={120}
-                      height={70}
-                      className="max-h-full w-auto object-contain opacity-90 transition-all duration-300 group-hover:opacity-100"
-                    />
-                  </div>
-                ))}
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
+      <OrientationNetworkSection />
     </SiteLayout>
   );
 }

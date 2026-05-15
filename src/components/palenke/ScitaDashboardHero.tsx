@@ -170,7 +170,7 @@ export function ScitaDashboardHero({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Sistema Comunitario de Información Territorial
+            Sistema Comunitario de Información Territorial y Ambiental
           </motion.p>
         </motion.div>
       </motion.div>

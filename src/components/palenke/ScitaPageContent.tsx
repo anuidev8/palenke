@@ -12,6 +12,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ScitaDashboardHero } from "@/components/palenke/ScitaDashboardHero";
 import { ScitaDashboardPanel } from "@/components/palenke/ScitaDashboardPanel";
+import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import {
   SCITA_RUNWAY_SCROLL_CLASS,
   SCITA_TERRITORIAL_SURFACE_CLASS,
@@ -75,6 +76,8 @@ export function ScitaPageContent() {
       <div className="relative z-10 mx-auto w-full max-w-[2240px] pb-10 sm:px-4 sm:pb-12 lg:px-5 lg:pb-16 xl:px-8">
         <ScitaDashboardPanel />
       </div>
+
+      <OrientationNetworkSection variant="dark" introVariant="title-only" className="relative z-10" />
     </section>
   );
 }

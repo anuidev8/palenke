@@ -3,18 +3,22 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Expand, X } from "lucide-react";
+import { ArrowUpRight, Expand, X } from "lucide-react";
 
 type BookPreviewLightboxProps = {
   src: string;
   alt: string;
   label?: string;
+  buttonClassName?: string;
+  icon?: "expand" | "arrow";
 };
 
 export function BookPreviewLightbox({
   src,
   alt,
   label = "Ver vista previa",
+  buttonClassName,
+  icon = "expand",
 }: BookPreviewLightboxProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,10 +40,17 @@ export function BookPreviewLightbox({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-[#1b5e20] underline-offset-4 transition hover:underline"
+        className={
+          buttonClassName ??
+          "inline-flex items-center gap-2 text-sm font-semibold text-[#1b5e20] underline-offset-4 transition hover:underline"
+        }
       >
         {label}
-        <Expand className="h-3.5 w-3.5" aria-hidden="true" />
+        {icon === "arrow" ? (
+          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+        ) : (
+          <Expand className="h-3.5 w-3.5" aria-hidden="true" />
+        )}
       </button>
 
       <AnimatePresence>
