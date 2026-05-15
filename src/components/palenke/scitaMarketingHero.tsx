@@ -1,3 +1,12 @@
+import {
+  Globe,
+  MapPin,
+  ShieldAlert,
+  Trees,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
 /** Fondo territorial compartido: lo aplica el padre (p. ej. ScitaPageContent, ScitaDashboardHero). */
 export const SCITA_TERRITORIAL_SURFACE_CLASS =
   "border-b border-emerald-950/50 bg-gradient-to-b from-[#070f0c] via-[#0c1a12] to-[#0a1610]";
@@ -16,6 +25,29 @@ export function getScitaMarketingBullets() {
     "Articular información para incidencia política a nivel nacional e internacional.",
   ];
 }
+
+type ScitaPillar = {
+  copy: string;
+  icon: LucideIcon;
+};
+
+function getScitaMarketingPillars(): ScitaPillar[] {
+  return [
+    { copy: "Generar información territorial propia para la toma de decisiones.", icon: MapPin },
+    { copy: "Monitorear ecosistemas, cobertura boscosa y dinámicas territoriales.", icon: Trees },
+    { copy: "Identificar amenazas ambientales y territoriales desde el campo.", icon: ShieldAlert },
+    { copy: "Fortalecer el control comunitario del territorio con soberanía de información.", icon: Users },
+    { copy: "Articular información para incidencia política a nivel nacional e internacional.", icon: Globe },
+  ];
+}
+
+/** Vídeo de portada del hero SCITA (Cloudinary). */
+export const SCITA_HERO_VIDEO_SRC =
+  "https://res.cloudinary.com/dnmjmjdsj/video/upload/v1778803146/image/Generated_Video_May_14_2026_-_6_57PM_xz8vo5.mp4";
+
+/** Imagen de portada compartida con el panel SCITA (tablero). */
+export const SCITA_MARKETING_BANNER_SRC =
+  "/assets/scita/ChatGPT Image May 14, 2026 at 04_23_53 PM.png";
 
 /** Fondo decorativo (sin pointer-events). */
 export function ScitaMarketingBackdrop() {
@@ -58,289 +90,69 @@ export function ScitaMarketingBackdrop() {
   );
 }
 
-function GraphicPanel({ filterSvgId }: { filterSvgId: string }) {
-  return (
-    <div
-      className="relative min-h-[380px] overflow-hidden rounded-[32px] border border-white/15 bg-black/20 shadow-2xl shadow-black/40 backdrop-blur-[2px] sm:min-h-[440px] lg:min-h-[min(58vh,720px)] xl:min-h-[min(62vh,780px)]"
-      style={{
-        background:
-          "radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.5), transparent 55%), radial-gradient(ellipse at 75% 25%, rgba(21,101,192,0.32), transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(251,192,45,0.1), transparent 70%), linear-gradient(155deg, rgba(13,31,20,0.92) 0%, rgba(21,42,31,0.88) 45%, rgba(15,39,40,0.9) 100%)",
-      }}
-    >
-      <div
-        className="absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.9) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.9) 1px, transparent 1px)
-                `,
-          backgroundSize: "56px 56px",
-        }}
-        aria-hidden
-      />
-
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden>
-        <defs>
-          <filter id={filterSvgId}>
-            <feGaussianBlur stdDeviation="18" />
-          </filter>
-        </defs>
-        <circle cx="120" cy="280" r="90" fill="#2e7d32" opacity="0.22" filter={`url(#${filterSvgId})`} />
-        <circle cx="480" cy="100" r="110" fill="#1565c0" opacity="0.18" filter={`url(#${filterSvgId})`} />
-        <circle cx="400" cy="300" r="70" fill="#fbc02d" opacity="0.14" filter={`url(#${filterSvgId})`} />
-
-        <polygon
-          points="80,100 180,70 220,160 140,200 60,170"
-          fill="#2e7d32"
-          opacity="0.35"
-          stroke="white"
-          strokeWidth="0.5"
-          strokeOpacity="0.3"
-        />
-        <polygon
-          points="260,120 400,95 440,210 320,250 240,200"
-          fill="#1565c0"
-          opacity="0.3"
-          stroke="white"
-          strokeWidth="0.5"
-          strokeOpacity="0.25"
-        />
-        <polygon
-          points="320,240 500,220 540,340 380,360 300,300"
-          fill="#2e7d32"
-          opacity="0.25"
-          stroke="white"
-          strokeWidth="0.5"
-          strokeOpacity="0.2"
-        />
-        <polygon
-          points="140,220 240,200 270,290 190,320 110,280"
-          fill="#f57f17"
-          opacity="0.2"
-          stroke="white"
-          strokeWidth="0.5"
-          strokeOpacity="0.2"
-        />
-        <polygon
-          points="430,238 500,226 526,278 470,306 416,278"
-          fill="#d32f2f"
-          opacity="0.28"
-          stroke="#fecaca"
-          strokeWidth="0.8"
-          strokeOpacity="0.55"
-        />
-
-        <path
-          d="M40,360 Q140,280 220,200 Q320,120 420,140 Q500,155 580,90"
-          stroke="white"
-          strokeWidth="1.2"
-          fill="none"
-          opacity="0.35"
-          strokeDasharray="6 10"
-        />
-        <path d="M0,250 Q100,230 200,245 Q300,260 400,235 Q500,210 600,240" stroke="white" strokeWidth="0.8" fill="none" opacity="0.25" />
-        <path
-          d="M120,308 Q190,248 258,216 Q326,186 406,194 Q476,200 548,158"
-          stroke="rgba(255,255,255,0.52)"
-          strokeWidth="2.2"
-          fill="none"
-          strokeDasharray="10 14"
-        >
-          <animate attributeName="stroke-dashoffset" from="0" to="-140" dur="8s" repeatCount="indefinite" />
-        </path>
-
-        <g>
-          <circle cx="200" cy="200" r="5" fill="white" opacity="0.95" />
-          <rect x="212" y="188" width="118" height="26" rx="13" fill="white" opacity="0.92" />
-          <text x="222" y="205" fill="#1a1a1a" fontSize="11" fontWeight="700">
-            CC Alto San Juan
-          </text>
-        </g>
-        <g>
-          <circle cx="380" cy="150" r="5" fill="white" opacity="0.95" />
-          <rect x="392" y="138" width="100" height="26" rx="13" fill="white" opacity="0.92" />
-          <text x="402" y="155" fill="#1a1a1a" fontSize="11" fontWeight="700">
-            Cuenca Atrato
-          </text>
-        </g>
-      </svg>
-
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div
-          className="absolute left-[14%] top-[28%] rounded-full border border-white/30 bg-white/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#1a1a1a] shadow-lg shadow-black/20"
-          style={{ animation: "scita-float-a 6.2s ease-in-out infinite" }}
-        >
-          Información propia
-        </div>
-        <div
-          className="absolute right-[14%] top-[22%] rounded-full border border-[#bbf7d0]/40 bg-[#1b5e20]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#dcfce7] shadow-lg shadow-black/25"
-          style={{ animation: "scita-float-b 5.6s ease-in-out infinite 0.4s" }}
-        >
-          Monitoreo ecosistemas
-        </div>
-        <div
-          className="absolute left-[18%] bottom-[24%] rounded-full border border-[#fecaca]/50 bg-[#7f1d1d]/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#fee2e2] shadow-lg shadow-black/30"
-          style={{ animation: "scita-float-c 5.1s ease-in-out infinite 0.2s" }}
-        >
-          Amenaza detectada
-        </div>
-        <div
-          className="absolute right-[20%] bottom-[26%] rounded-full border border-[#86efac]/45 bg-[#14532d]/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#dcfce7] shadow-lg shadow-black/25"
-          style={{ animation: "scita-float-a 5.9s ease-in-out infinite 0.7s" }}
-        >
-          Control comunitario
-        </div>
-        <div
-          className="absolute left-[42%] bottom-[14%] rounded-full border border-[#93c5fd]/50 bg-[#1e3a8a]/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#dbeafe] shadow-lg shadow-black/25"
-          style={{ animation: "scita-float-b 6.4s ease-in-out infinite 0.1s" }}
-        >
-          Incidencia nacional
-        </div>
-
-        <div
-          className="absolute left-[31%] top-[48%] h-3 w-3 rounded-full bg-[#4ade80] shadow-[0_0_0_6px_rgba(74,222,128,0.24)]"
-          style={{ animation: "scita-beacon 2.1s ease-in-out infinite" }}
-        />
-        <div
-          className="absolute right-[30%] top-[40%] h-3 w-3 rounded-full bg-[#60a5fa] shadow-[0_0_0_6px_rgba(96,165,250,0.22)]"
-          style={{ animation: "scita-beacon 1.9s ease-in-out infinite 0.5s" }}
-        />
-        <div
-          className="absolute right-[18%] bottom-[31%] h-3 w-3 rounded-full bg-[#ef4444] shadow-[0_0_0_6px_rgba(239,68,68,0.22)]"
-          style={{ animation: "scita-beacon 1.6s ease-in-out infinite 0.2s" }}
-        />
-      </div>
-
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-8 text-center sm:p-10">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-sm sm:h-[4.5rem] sm:w-[4.5rem]">
-          <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-white/90 sm:h-7 sm:w-7" aria-hidden>
-            <path
-              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              fill="currentColor"
-              fillOpacity="0.15"
-            />
-          </svg>
-        </div>
-        <p className="max-w-[16rem] text-xs font-semibold uppercase leading-snug tracking-[0.2em] text-white/85 sm:text-[13px]">
-          ¿Qué es el SCITA?
-        </p>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-5 right-5 rounded-lg bg-black/55 px-2.5 py-1.5 text-[11px] font-semibold tabular-nums text-white/80 backdrop-blur-sm sm:bottom-6 sm:right-6">
-        Territorio en datos
-      </div>
-
-      <style jsx>{`
-        @keyframes scita-float-a {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-          50% {
-            transform: translate3d(0, -8px, 0);
-          }
-        }
-        @keyframes scita-float-b {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-          50% {
-            transform: translate3d(7px, -6px, 0);
-          }
-        }
-        @keyframes scita-float-c {
-          0%,
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
-          50% {
-            transform: translate3d(-7px, -5px, 0);
-          }
-        }
-        @keyframes scita-beacon {
-          0%,
-          100% {
-            transform: scale(1);
-            opacity: 0.9;
-          }
-          50% {
-            transform: scale(1.22);
-            opacity: 1;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-/** Bloque derecho solo texto (marketing). headingId para aria-labelledby desde la section. */
-function CopyColumn({
-  bullets,
+/** Hero SCITA: copy sobre vídeo / portada (el medio vive en el `<section>` del padre). */
+function ScitaHeroBannerCopy({
+  pillars,
   headingId = "scita-hero-heading",
 }: {
-  bullets: readonly string[];
+  pillars: readonly ScitaPillar[];
   headingId?: string;
 }) {
   return (
-    <div className="lg:py-2">
+    <div className="relative mx-auto w-full max-w-[1120px] text-center">
       <h2
         id={headingId}
-        className="font-display text-3xl text-white sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-5xl lg:leading-[1.12]"
+        className="font-display text-[clamp(2.35rem,5vw,4.2rem)] leading-[1.06] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]"
       >
         ¿Qué hace el SCITA?
       </h2>
-      <p className="mt-6 max-w-2xl text-base leading-8 text-white/85 sm:mt-7 sm:text-lg sm:leading-8 lg:text-[1.125rem] lg:leading-9">
+      <p className="mx-auto mt-5 max-w-[74ch] text-[1.05rem] leading-8 text-white/92 sm:text-[1.2rem] sm:leading-9">
         El SCITA es la infraestructura de información territorial del Palenke. Integra datos geoespaciales, alertas
         ambientales y monitoreo comunitario en una sola plataforma — para que las comunidades produzcan, gestionen y
         protejan información sobre su propio territorio.
       </p>
-      <ul className="mt-10 space-y-5 sm:mt-12 sm:space-y-5">
-        {bullets.map((line) => (
-          <li
-            key={line}
-            className="flex items-start gap-4 text-sm leading-7 text-white/80 sm:text-base sm:leading-8 lg:text-[1.05rem] lg:leading-8"
-          >
-            <span className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-[#4ade80] sm:mt-3" aria-hidden />
-            {line}
-          </li>
-        ))}
-      </ul>
+      <div className="mx-auto mt-8 grid max-w-[1240px] grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-black/28 p-3 backdrop-blur-sm sm:grid-cols-2 sm:p-4 lg:mt-10 lg:grid-cols-5 lg:gap-0">
+        {pillars.map((pillar, index) => {
+          const Icon = pillar.icon;
+          return (
+            <div
+              key={pillar.copy}
+              className={`group relative rounded-xl p-3.5 text-center lg:min-h-[208px] lg:rounded-none lg:px-4 lg:py-4 ${
+                index > 0 ? "lg:border-l lg:border-white/12" : ""
+              }`}
+            >
+              <Icon className="mx-auto h-7 w-7 text-lime-300 drop-shadow-[0_0_8px_rgba(190,242,100,0.25)]" aria-hidden />
+              <p className="mt-3 text-[1rem] leading-7 text-white/86">{pillar.copy}</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 /**
- * Solo contenido (grid gráfico + copy). Fondo degradado, borde y ScitaMarketingBackdrop los pinta el padre
- * — evita “dos secciones” con estilos duplicados entre hero y página SCITA.
+ * Contenido del hero SCITA. En `page`, el vídeo y el velado van en el `<section>` (ScitaDashboardHero).
  */
 type ScitaMarketingHeroProps = {
-  filterSvgId: string;
   /** `fill`: ocupa la ventana pegajosa (useScroll). `page`: bloque hero en página completa (p. ej. reduced motion). */
   variant: "fill" | "page";
 };
 
-export function ScitaMarketingHero({ variant, filterSvgId }: ScitaMarketingHeroProps) {
-  const bullets = getScitaMarketingBullets();
+export function ScitaMarketingHero({ variant }: ScitaMarketingHeroProps) {
+  const pillars = getScitaMarketingPillars();
 
-  const innerGrid = (
-    <div className="grid w-full items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-      <GraphicPanel filterSvgId={filterSvgId} />
-      <CopyColumn bullets={bullets} />
-    </div>
-  );
+  const inner = <ScitaHeroBannerCopy pillars={pillars} />;
 
   const paddedPage = (
-    <div className="relative z-10 mx-auto flex min-h-[60vh] max-w-[1800px] flex-col justify-center px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
-      {innerGrid}
+    <div className="relative z-10 mx-auto w-full max-w-[1800px] px-4 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-9">
+      {inner}
     </div>
   );
 
   const paddedFill = (
-    <div className="relative z-10 mx-auto flex min-h-full w-full max-w-[1800px] flex-col justify-center px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
-      {innerGrid}
+    <div className="relative z-10 mx-auto flex min-h-full w-full max-w-[1800px] flex-col justify-center px-4 py-8 sm:px-7 sm:py-10 lg:px-10 lg:py-12">
+      {inner}
     </div>
   );
 

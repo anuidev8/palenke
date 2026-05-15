@@ -1,68 +1,84 @@
 "use client";
 
 /**
- * Layout SCITA en dos secciones:
- * 1) Hero de marketing.
- * 2) Workspace en bloque separado (fuera del hero).
+ * Layout SCITA con morph por scroll (Framer):
+ * 1) Hero de video en pantalla completa.
+ * 2) Al bajar, el hero se reduce a caja central con detalles.
+ * 3) Aparece el panel principal de tableros.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ScitaDashboardHero } from "@/components/palenke/ScitaDashboardHero";
-import { SCITA_TERRITORIAL_SURFACE_CLASS, ScitaMarketingBackdrop } from "@/components/palenke/scitaMarketingHero";
-import type { ScitaModuleId } from "@/components/palenke/ScitaPowerBiBoard";
-import { ScitaWorkspace } from "@/components/palenke/ScitaWorkspace";
+import { ScitaDashboardPanel } from "@/components/palenke/ScitaDashboardPanel";
+import {
+  SCITA_RUNWAY_SCROLL_CLASS,
+  SCITA_TERRITORIAL_SURFACE_CLASS,
+  ScitaMarketingBackdrop,
+} from "@/components/palenke/scitaMarketingHero";
 
-type ScitaPageContentProps = {
-  fieldReportHref: string;
-  geoportalHref: string;
-  showGeoportal: boolean;
-};
+export function ScitaPageContent() {
+  const runwayRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: runwayRef,
+    offset: ["start start", "end end"],
+  });
 
-export function ScitaPageContent({ fieldReportHref, geoportalHref, showGeoportal }: ScitaPageContentProps) {
-  const [activeModuleId, setActiveModuleId] = useState<ScitaModuleId>("titulacion");
-  const [workspaceEntered, setWorkspaceEntered] = useState(false);
-  const workspaceSectionRef = useRef<HTMLElement>(null);
+  const heroScale = useTransform(scrollYProgress, [0, 0.26, 0.5], [1, 0.82, 0.62]);
+  const heroWidth = useTransform(scrollYProgress, [0, 0.26, 0.5], ["100vw", "86vw", "64vw"]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -24]);
+  const heroRadius = useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 24, 30]);
+  const heroShadow = useTransform(
+    scrollYProgress,
+    [0, 0.44, 0.54],
+    [
+      "0 36px 80px rgba(2,10,7,0.45)",
+      "0 18px 42px rgba(2,10,7,0.18)",
+      "0 0 0 rgba(2,10,7,0)",
+    ],
+  );
+  // Keep the SCITA hero visible behind the dashboard handoff; the panel sits above it.
+  const stickyOpacity = useTransform(scrollYProgress, [0, 1], [1, 1]);
 
-  useEffect(() => {
-    const resetAtTop = () => {
-      if (window.scrollY <= 24) {
-        setWorkspaceEntered(false);
-      }
-    };
-
-    window.addEventListener("scroll", resetAtTop, { passive: true });
-    return () => window.removeEventListener("scroll", resetAtTop);
-  }, []);
+  const panelOpacity = useTransform(scrollYProgress, [0.54, 0.66], [0, 1]);
+  const panelY = useTransform(scrollYProgress, [0.54, 0.66], [120, 0]);
+  const panelScale = useTransform(scrollYProgress, [0.54, 0.66], [0.975, 1]);
 
   return (
-    <>
-      <ScitaDashboardHero />
-      <section
-        ref={workspaceSectionRef}
-        className={`relative px-3 py-8 sm:px-5 sm:py-12 lg:px-8 lg:py-16 ${SCITA_TERRITORIAL_SURFACE_CLASS} !border-b-0`}
-      >
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <ScitaMarketingBackdrop />
-        </div>
+    <section
+      id="scita"
+      ref={runwayRef}
+      className={`relative isolate min-h-[235svh] overflow-x-clip overflow-y-visible ${SCITA_TERRITORIAL_SURFACE_CLASS} ${SCITA_RUNWAY_SCROLL_CLASS} !border-b-0`}
+    >
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <ScitaMarketingBackdrop />
+      </div>
+
+      <div className="sticky top-0 z-0 h-[100svh] overflow-hidden">
         <motion.div
-          className="relative z-10 mx-auto w-full max-w-[1920px] overflow-visible"
-          initial={false}
-          animate={workspaceEntered ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 36, scale: 0.985 }}
-          onViewportEnter={() => setWorkspaceEntered(true)}
-          viewport={{ amount: 0.7 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+          style={{ opacity: stickyOpacity }}
         >
-          <ScitaWorkspace
-            placement="page"
-            fieldReportHref={fieldReportHref}
-            geoportalHref={geoportalHref}
-            showGeoportal={showGeoportal}
-            activeModuleId={activeModuleId}
-            onActiveModuleChange={setActiveModuleId}
-          />
+          <motion.div
+            className="h-[100svh] overflow-hidden border border-white/18 bg-[#0a1610]"
+            style={{ y: heroY, scale: heroScale, width: heroWidth, borderRadius: heroRadius, boxShadow: heroShadow }}
+          >
+            <ScitaDashboardHero
+              variant="surface"
+              className="h-full min-h-[100svh]"
+              contentVariant="fill"
+              contentFadeWithScroll={false}
+              introProgress={scrollYProgress}
+            />
+          </motion.div>
         </motion.div>
-      </section>
-    </>
+      </div>
+
+      <div className="relative z-[90] mx-auto w-full max-w-[1920px] px-2 pb-10 sm:px-4 sm:pb-12 lg:px-6 lg:pb-16">
+        <motion.div style={{ opacity: panelOpacity, y: panelY, scale: panelScale }} className="relative z-[100] mt-[88svh]">
+          <ScitaDashboardPanel />
+        </motion.div>
+      </div>
+    </section>
   );
 }
