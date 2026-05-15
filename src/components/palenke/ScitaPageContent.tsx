@@ -2,7 +2,7 @@
 
 /**
  * SCITA scroll choreography (Framer):
- * 1) Hero runway (sticky inside its own track): SCIATA title → description → hero scales down.
+ * 1) Hero runway (sticky inside its own track): SCITA title → description → hero scales down.
  * 2) Once the runway ends, the hero releases (no longer sticky) and scrolls away naturally.
  * 3) The dashboard panel lives in normal flow below — it never overlaps the hero
  *    and stays visible until the user scrolls past the whole section.

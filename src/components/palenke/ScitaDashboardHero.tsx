@@ -154,7 +154,7 @@ export function ScitaDashboardHero({
             className="font-display font-semibold uppercase tracking-[0.03em] text-white drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]"
             style={{ fontSize: "clamp(3.25rem, 17vw, 11rem)", lineHeight: 0.95 }}
           >
-            SCIATA
+            SCITA
           </h1>
           <motion.span
             aria-hidden
