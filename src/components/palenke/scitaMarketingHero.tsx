@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Globe,
   MapPin,
@@ -6,6 +8,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 
 /** Fondo territorial compartido: lo aplica el padre (p. ej. ScitaPageContent, ScitaDashboardHero). */
 export const SCITA_TERRITORIAL_SURFACE_CLASS =
@@ -91,7 +94,7 @@ export function ScitaMarketingBackdrop() {
 }
 
 /** Hero SCITA: copy sobre vídeo / portada (el medio vive en el `<section>` del padre). */
-function ScitaHeroBannerCopy({
+function ScitaHeroBannerCopyStatic({
   pillars,
   headingId = "scita-hero-heading",
 }: {
@@ -102,27 +105,29 @@ function ScitaHeroBannerCopy({
     <div className="relative mx-auto w-full max-w-[1120px] text-center">
       <h2
         id={headingId}
-        className="font-display text-[clamp(2.35rem,5vw,4.2rem)] leading-[1.06] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]"
+        className="font-display text-[clamp(2.5rem,5.4vw,4.6rem)] leading-[1.04] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]"
       >
         ¿Qué hace el SCITA?
       </h2>
-      <p className="mx-auto mt-5 max-w-[74ch] text-[1.05rem] leading-8 text-white/92 sm:text-[1.2rem] sm:leading-9">
+      <p className="mx-auto mt-6 max-w-[68ch] font-sans text-[1.2rem] leading-[1.75rem] text-white/95 sm:mt-7 sm:text-[1.4rem] sm:leading-[2.1rem] lg:text-[1.5rem] lg:leading-[2.3rem]">
         El SCITA es la infraestructura de información territorial del Palenke. Integra datos geoespaciales, alertas
         ambientales y monitoreo comunitario en una sola plataforma — para que las comunidades produzcan, gestionen y
         protejan información sobre su propio territorio.
       </p>
-      <div className="mx-auto mt-8 grid max-w-[1240px] grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-black/28 p-3 backdrop-blur-sm sm:grid-cols-2 sm:p-4 lg:mt-10 lg:grid-cols-5 lg:gap-0">
+      <div className="mx-auto mt-9 grid max-w-[1240px] grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-black/28 p-3 backdrop-blur-sm sm:grid-cols-2 sm:p-4 lg:mt-12 lg:grid-cols-5 lg:gap-0">
         {pillars.map((pillar, index) => {
           const Icon = pillar.icon;
           return (
             <div
               key={pillar.copy}
-              className={`group relative rounded-xl p-3.5 text-center lg:min-h-[208px] lg:rounded-none lg:px-4 lg:py-4 ${
+              className={`group relative rounded-xl p-4 text-center lg:min-h-[216px] lg:rounded-none lg:px-5 lg:py-5 ${
                 index > 0 ? "lg:border-l lg:border-white/12" : ""
               }`}
             >
-              <Icon className="mx-auto h-7 w-7 text-lime-300 drop-shadow-[0_0_8px_rgba(190,242,100,0.25)]" aria-hidden />
-              <p className="mt-3 text-[1rem] leading-7 text-white/86">{pillar.copy}</p>
+              <Icon className="mx-auto h-8 w-8 text-lime-300 drop-shadow-[0_0_8px_rgba(190,242,100,0.25)]" aria-hidden />
+              <p className="mt-3 font-sans text-[1.1rem] leading-[1.65rem] text-white/90 sm:text-[1.15rem] sm:leading-[1.7rem]">
+                {pillar.copy}
+              </p>
             </div>
           );
         })}
@@ -131,18 +136,95 @@ function ScitaHeroBannerCopy({
   );
 }
 
+function ScitaHeroBannerCopyWithScroll({
+  pillars,
+  headingId = "scita-hero-heading",
+  introScrollProgress,
+}: {
+  pillars: readonly ScitaPillar[];
+  headingId?: string;
+  introScrollProgress: MotionValue<number>;
+}) {
+  const headlineOpacity = useTransform(introScrollProgress, [0.28, 0.34, 0.46, 0.56], [1, 1, 0, 0]);
+  const headlineY = useTransform(introScrollProgress, [0.34, 0.54], [0, -20]);
+  const pillarsOpacity = useTransform(introScrollProgress, [0.32, 0.42, 0.52], [0.86, 1, 1]);
+  const pillarsY = useTransform(introScrollProgress, [0.34, 0.52], [14, 0]);
+
+  return (
+    <div className="relative mx-auto w-full max-w-[1120px] text-center">
+      <motion.div className="will-change-[transform,opacity]" style={{ opacity: headlineOpacity, y: headlineY }}>
+        <h2
+          id={headingId}
+          className="font-display text-[clamp(2.5rem,5.4vw,4.6rem)] leading-[1.04] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]"
+        >
+          ¿Qué hace el SCITA?
+        </h2>
+        <p className="mx-auto mt-6 max-w-[68ch] font-sans text-[1.2rem] leading-[1.75rem] text-white/95 sm:mt-7 sm:text-[1.4rem] sm:leading-[2.1rem] lg:text-[1.5rem] lg:leading-[2.3rem]">
+          El SCITA es la infraestructura de información territorial del Palenke. Integra datos geoespaciales, alertas
+          ambientales y monitoreo comunitario en una sola plataforma — para que las comunidades produzcan, gestionen y
+          protejan información sobre su propio territorio.
+        </p>
+      </motion.div>
+
+      <motion.div className="will-change-[transform,opacity]" style={{ opacity: pillarsOpacity, y: pillarsY }}>
+        <div className="mx-auto mt-9 grid max-w-[1240px] grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-black/28 p-3 backdrop-blur-sm sm:grid-cols-2 sm:p-4 lg:mt-12 lg:grid-cols-5 lg:gap-0">
+          {pillars.map((pillar, index) => {
+            const Icon = pillar.icon;
+            return (
+              <div
+                key={pillar.copy}
+                className={`group relative rounded-xl p-4 text-center lg:min-h-[216px] lg:rounded-none lg:px-5 lg:py-5 ${
+                  index > 0 ? "lg:border-l lg:border-white/12" : ""
+                }`}
+              >
+                <Icon className="mx-auto h-8 w-8 text-lime-300 drop-shadow-[0_0_8px_rgba(190,242,100,0.25)]" aria-hidden />
+                <p className="mt-3 font-sans text-[1.1rem] leading-[1.65rem] text-white/90 sm:text-[1.15rem] sm:leading-[1.7rem]">
+                  {pillar.copy}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function ScitaHeroBannerCopy({
+  pillars,
+  headingId = "scita-hero-heading",
+  introScrollProgress,
+}: {
+  pillars: readonly ScitaPillar[];
+  headingId?: string;
+  introScrollProgress?: MotionValue<number>;
+}) {
+  if (introScrollProgress) {
+    return (
+      <ScitaHeroBannerCopyWithScroll
+        pillars={pillars}
+        headingId={headingId}
+        introScrollProgress={introScrollProgress}
+      />
+    );
+  }
+  return <ScitaHeroBannerCopyStatic pillars={pillars} headingId={headingId} />;
+}
+
 /**
  * Contenido del hero SCITA. En `page`, el vídeo y el velado van en el `<section>` (ScitaDashboardHero).
  */
 type ScitaMarketingHeroProps = {
   /** `fill`: ocupa la ventana pegajosa (useScroll). `page`: bloque hero en página completa (p. ej. reduced motion). */
   variant: "fill" | "page";
+  /** Progreso de scroll del runway (0–1): atenúa título + párrafo y acentúa la parrilla de pilares. */
+  introScrollProgress?: MotionValue<number>;
 };
 
-export function ScitaMarketingHero({ variant }: ScitaMarketingHeroProps) {
+export function ScitaMarketingHero({ variant, introScrollProgress }: ScitaMarketingHeroProps) {
   const pillars = getScitaMarketingPillars();
 
-  const inner = <ScitaHeroBannerCopy pillars={pillars} />;
+  const inner = <ScitaHeroBannerCopy pillars={pillars} introScrollProgress={introScrollProgress} />;
 
   const paddedPage = (
     <div className="relative z-10 mx-auto w-full max-w-[1800px] px-4 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-9">

@@ -1,10 +1,11 @@
 "use client";
 
 /**
- * Layout SCITA con morph por scroll (Framer):
- * 1) Hero de video en pantalla completa.
- * 2) Al bajar, el hero se reduce a caja central con detalles.
- * 3) Aparece el panel principal de tableros.
+ * SCITA scroll choreography (Framer):
+ * 1) Hero runway (sticky inside its own track): SCIATA title → description → hero scales down.
+ * 2) Once the runway ends, the hero releases (no longer sticky) and scrolls away naturally.
+ * 3) The dashboard panel lives in normal flow below — it never overlaps the hero
+ *    and stays visible until the user scrolls past the whole section.
  */
 
 import { useRef } from "react";
@@ -18,66 +19,61 @@ import {
 } from "@/components/palenke/scitaMarketingHero";
 
 export function ScitaPageContent() {
-  const runwayRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: runwayRef,
+  const heroRunwayRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRunwayRef,
     offset: ["start start", "end end"],
   });
 
-  const heroScale = useTransform(scrollYProgress, [0, 0.26, 0.5], [1, 0.82, 0.62]);
-  const heroWidth = useTransform(scrollYProgress, [0, 0.26, 0.5], ["100vw", "86vw", "64vw"]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -24]);
-  const heroRadius = useTransform(scrollYProgress, [0, 0.3, 0.5], [0, 24, 30]);
+  // Hero box morph — scoped to its own runway so it never fights the panel.
+  const heroScale = useTransform(heroProgress, [0, 0.55, 1], [1, 0.9, 0.78]);
+  const heroWidth = useTransform(heroProgress, [0, 0.55, 1], ["100vw", "92vw", "74vw"]);
+  const heroRadius = useTransform(heroProgress, [0, 0.55, 1], [0, 22, 32]);
   const heroShadow = useTransform(
-    scrollYProgress,
-    [0, 0.44, 0.54],
+    heroProgress,
+    [0, 0.55, 1],
     [
       "0 36px 80px rgba(2,10,7,0.45)",
-      "0 18px 42px rgba(2,10,7,0.18)",
-      "0 0 0 rgba(2,10,7,0)",
+      "0 22px 48px rgba(2,10,7,0.28)",
+      "0 16px 38px rgba(2,10,7,0.22)",
     ],
   );
-  // Keep the SCITA hero visible behind the dashboard handoff; the panel sits above it.
-  const stickyOpacity = useTransform(scrollYProgress, [0, 1], [1, 1]);
-
-  const panelOpacity = useTransform(scrollYProgress, [0.54, 0.66], [0, 1]);
-  const panelY = useTransform(scrollYProgress, [0.54, 0.66], [120, 0]);
-  const panelScale = useTransform(scrollYProgress, [0.54, 0.66], [0.975, 1]);
 
   return (
     <section
       id="scita"
-      ref={runwayRef}
-      className={`relative isolate min-h-[235svh] overflow-x-clip overflow-y-visible ${SCITA_TERRITORIAL_SURFACE_CLASS} ${SCITA_RUNWAY_SCROLL_CLASS} !border-b-0`}
+      className={`relative isolate overflow-x-clip overflow-y-visible ${SCITA_TERRITORIAL_SURFACE_CLASS} ${SCITA_RUNWAY_SCROLL_CLASS} !border-b-0`}
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <ScitaMarketingBackdrop />
       </div>
 
-      <div className="sticky top-0 z-0 h-[100svh] overflow-hidden">
-        <motion.div
-          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
-          style={{ opacity: stickyOpacity }}
-        >
+      {/* Hero runway — sticky lives only inside this track, so it releases before the panel. */}
+      <div ref={heroRunwayRef} className="relative h-[200svh]">
+        <div className="sticky top-0 flex h-[100svh] items-center justify-center overflow-hidden">
           <motion.div
             className="h-[100svh] overflow-hidden border border-white/18 bg-[#0a1610]"
-            style={{ y: heroY, scale: heroScale, width: heroWidth, borderRadius: heroRadius, boxShadow: heroShadow }}
+            style={{
+              scale: heroScale,
+              width: heroWidth,
+              borderRadius: heroRadius,
+              boxShadow: heroShadow,
+            }}
           >
             <ScitaDashboardHero
               variant="surface"
               className="h-full min-h-[100svh]"
               contentVariant="fill"
               contentFadeWithScroll={false}
-              introProgress={scrollYProgress}
+              introProgress={heroProgress}
             />
           </motion.div>
-        </motion.div>
+        </div>
       </div>
 
-      <div className="relative z-[90] mx-auto w-full max-w-[1920px] px-2 pb-10 sm:px-4 sm:pb-12 lg:px-6 lg:pb-16">
-        <motion.div style={{ opacity: panelOpacity, y: panelY, scale: panelScale }} className="relative z-[100] mt-[88svh]">
-          <ScitaDashboardPanel />
-        </motion.div>
+      {/* Panel — normal flow, no scroll-driven opacity, stays visible until the section ends. */}
+      <div className="relative z-10 mx-auto w-full max-w-[2240px] pb-10 sm:px-4 sm:pb-12 lg:px-5 lg:pb-16 xl:px-8">
+        <ScitaDashboardPanel />
       </div>
     </section>
   );

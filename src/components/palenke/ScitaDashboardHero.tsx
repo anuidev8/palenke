@@ -144,9 +144,35 @@ export function ScitaDashboardHero({
         className="pointer-events-none absolute inset-0 z-[12] flex items-center justify-center px-6 text-center"
         style={{ opacity: introOpacity, y: introY, scale: introScale }}
       >
-        <h1 className="font-display text-[clamp(3.2rem,17vw,11rem)] font-semibold uppercase tracking-[0.03em] text-white drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]">
-          SCIATA
-        </h1>
+        <motion.div
+          className="flex flex-col items-center"
+          initial={{ opacity: 0, y: 52, scale: 0.93, filter: "blur(12px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <h1
+            className="font-display font-semibold uppercase tracking-[0.03em] text-white drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]"
+            style={{ fontSize: "clamp(3.25rem, 17vw, 11rem)", lineHeight: 0.95 }}
+          >
+            SCIATA
+          </h1>
+          <motion.span
+            aria-hidden
+            className="mt-8 block h-px w-[min(14rem,42vw)] origin-center bg-gradient-to-r from-transparent via-[#4ade80]/60 to-transparent"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 1.1, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformOrigin: "center center" }}
+          />
+          <motion.p
+            className="mt-6 max-w-md font-sans text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200/75 sm:text-sm"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          >
+            Sistema Comunitario de Información Territorial
+          </motion.p>
+        </motion.div>
       </motion.div>
 
       <motion.div
@@ -159,13 +185,17 @@ export function ScitaDashboardHero({
       </motion.div>
 
       <motion.div
-        className="relative z-10"
+        className={
+          isSection
+            ? "relative z-10"
+            : "absolute inset-0 z-[11] flex items-center justify-center"
+        }
         style={{ opacity: mergedContentOpacity, scale: contentScale, y: contentY }}
         initial={{ filter: "blur(8px)" }}
         animate={{ filter: "blur(0px)" }}
         transition={{ duration: 0.82, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
       >
-        <ScitaMarketingHero variant={resolvedContentVariant} />
+        <ScitaMarketingHero variant={resolvedContentVariant} introScrollProgress={baseProgress} />
       </motion.div>
     </section>
   );

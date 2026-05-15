@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronRight, Eye, Maximize2, Minimize2 } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronRight, ExternalLink, Maximize2, Minimize2 } from "lucide-react";
 import { SCITA_MARKETING_BANNER_SRC } from "@/components/palenke/scitaMarketingHero";
 
 export type ScitaDashboardId = "gobierno" | "conservacion" | "titulacion";
@@ -129,7 +131,7 @@ function DashboardMenuCard({
       whileTap={{ scale: 0.98 }}
       transition={panelSpring}
       aria-pressed={selected}
-      className={`group w-full rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1a12] sm:px-3.5 sm:py-3.5 md:px-4 md:py-3.5 ${
+      className={`group w-full rounded-2xl border px-2.5 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1a12] sm:px-3 sm:py-3.5 md:px-3 md:py-3.5 ${
         selected
           ? "border-amber-300/80 bg-white/12 shadow-[inset_0_0_0_1px_rgba(251,191,36,0.35)]"
           : "border-white/10 bg-black/20 hover:border-white/30 hover:bg-white/[0.07]"
@@ -147,8 +149,8 @@ function DashboardMenuCard({
           <Image src={dashboard.iconSrc} alt="" width={48} height={48} className="h-12 w-12 object-contain" aria-hidden />
         </motion.div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[18px] font-semibold leading-tight text-white">{dashboard.shortLabel}</p>
-          <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-white/70">{dashboard.description}</p>
+          <p className="truncate text-base font-semibold leading-tight text-white sm:text-lg">{dashboard.shortLabel}</p>
+          <p className="mt-1 line-clamp-2 text-sm leading-snug text-white/75 sm:text-[15px] sm:leading-snug">{dashboard.description}</p>
         </div>
         <ChevronRight
           className={`h-5 w-5 shrink-0 transition-colors ${selected ? "text-amber-300" : "text-white/45 group-hover:text-white/80"}`}
@@ -165,6 +167,86 @@ function DashboardMenuCard({
  * View → Page view → Fit to width | Format → Canvas → Page size.
  * @see https://community.powerbi.com/t5/Power-Query/White-space-in-embedded-iframe/td-p/613836
  */
+function PowerBiBoardLoader() {
+  return (
+    <motion.div
+      key="scita-board-loader"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#070f0c] via-[#0c1a12] to-[#0a1610]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.55, ease: panelEase } }}
+      transition={{ duration: 0.35, ease: panelEase }}
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.18]"
+        style={{
+          backgroundImage: "radial-gradient(rgba(74,222,128,0.45) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
+      <motion.div
+        className="relative flex flex-col items-center"
+        initial={{ opacity: 0, y: 18, scale: 0.94, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <motion.div
+          className="relative flex h-24 w-24 items-center justify-center sm:h-28 sm:w-28"
+          animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <motion.span
+            aria-hidden
+            className="absolute inset-0 rounded-full bg-emerald-400/15 blur-xl"
+            animate={{ scale: [1, 1.18, 1], opacity: [0.45, 0.75, 0.45] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <Image
+            src="/brands/palenkelogo-light.svg"
+            alt="Palenke"
+            width={112}
+            height={112}
+            className="relative h-full w-full object-contain drop-shadow-[0_4px_24px_rgba(74,222,128,0.35)]"
+            priority
+          />
+        </motion.div>
+
+        <motion.span
+          aria-hidden
+          className="mt-8 block h-px w-[min(12rem,38vw)] origin-center bg-gradient-to-r from-transparent via-[#4ade80]/60 to-transparent"
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ duration: 0.95, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformOrigin: "center center" }}
+        />
+
+        <motion.p
+          className="mt-5 font-sans text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200/85 sm:text-[13px]"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Cargando tablero…
+        </motion.p>
+
+        <div className="mt-4 flex items-center gap-1.5" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="h-1.5 w-1.5 rounded-full bg-emerald-300/85"
+              animate={{ opacity: [0.25, 1, 0.25], y: [0, -2, 0] }}
+              transition={{ duration: 1.05, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}
+            />
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function PowerBiEmbedFrame({
   title,
   src,
@@ -176,6 +258,7 @@ function PowerBiEmbedFrame({
   embedHeight: number;
   footerCropPx?: number;
 }) {
+  const [loaded, setLoaded] = useState(false);
   // Publish-to-web keeps a bottom bar; crop it using known pixel height from the original embed size.
   const rawCropBottom = footerCropPx / embedHeight;
   const safeCropBottom = Math.min(Math.max(rawCropBottom, 0), 0.35);
@@ -188,19 +271,42 @@ function PowerBiEmbedFrame({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.32, ease: panelEase }}
     >
-      <iframe
-        title={title}
-        src={buildChromelessEmbedUrl(src)}
-        className="absolute left-0 top-0 block w-full border-0"
-        style={{ height: `${100 + safeCropBottom * 100}%` }}
-        allowFullScreen
-        loading="lazy"
-      />
+      <motion.div
+        className="absolute inset-0 h-full w-full"
+        initial={false}
+        animate={{
+          opacity: loaded ? 1 : 0,
+          scale: loaded ? 1 : 1.015,
+          filter: loaded ? "blur(0px)" : "blur(6px)",
+        }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <iframe
+          title={title}
+          src={buildChromelessEmbedUrl(src)}
+          onLoad={() => setLoaded(true)}
+          className="absolute left-0 top-0 block w-full border-0"
+          style={{ height: `${100 + safeCropBottom * 100}%` }}
+          allowFullScreen
+          loading="lazy"
+        />
+      </motion.div>
+
+      <AnimatePresence initial={false}>
+        {loaded ? null : <PowerBiBoardLoader />}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
+function hrefWithCurrentSearch(path: string, search: string) {
+  return search ? `${path}?${search}` : path;
+}
+
 export function ScitaDashboardPanel() {
+  const searchParams = useSearchParams();
+  const searchString = searchParams.toString();
+
   const [activeId, setActiveId] = useState<ScitaDashboardId>("gobierno");
   const [showBannerDetails, setShowBannerDetails] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -268,10 +374,10 @@ export function ScitaDashboardPanel() {
     <motion.div
       layout
       ref={boardRef}
-      className={`relative z-[1] flex w-full max-w-full isolate overflow-hidden ${
+      className={`relative z-[1] flex w-full max-w-full isolate ${
         expanded
-          ? "fixed inset-0 z-[90] h-screen min-h-0 rounded-none border-0 bg-[#051008]"
-          : "flex flex-col rounded-[28px] border border-[#1f3b2d]/40 bg-[#f5f4ed] shadow-[0_28px_64px_rgba(4,16,11,0.35)] md:flex-row"
+          ? "fixed inset-0 z-[90] h-dvh min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain rounded-none border-0 bg-[#051008]"
+          : "flex flex-col overflow-x-clip overflow-y-visible rounded-[28px] border border-[#1f3b2d]/40 bg-[#f5f4ed] shadow-[0_28px_64px_rgba(4,16,11,0.35)] md:flex-row"
       }`}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
@@ -293,10 +399,10 @@ export function ScitaDashboardPanel() {
       <motion.aside
         layout
         transition={panelSpring}
-        className={`relative min-w-0 shrink-0 border-[#d7d0bf] ${
+        className={`relative flex min-h-0 min-w-0 shrink-0 flex-col border-[#d7d0bf] ${
           expanded
-            ? "absolute inset-y-0 left-0 z-30 w-[280px] max-w-[88vw] border-r bg-[#09160f]/95 text-white backdrop-blur-xl sm:max-w-none sm:w-[300px]"
-            : "w-full min-h-0 border-b bg-gradient-to-b from-[#0e251a] via-[#091b13] to-[#07140f] text-white md:w-[288px] md:shrink-0 md:border-b-0 md:border-r lg:w-[304px] xl:w-[320px]"
+            ? "absolute inset-y-0 left-0 z-30 w-[min(88vw,340px)] max-w-[88vw] border-r bg-[#09160f]/95 text-white backdrop-blur-xl sm:max-w-none sm:w-[360px]"
+            : "w-full min-h-0 border-b bg-gradient-to-b from-[#0e251a] via-[#091b13] to-[#07140f] text-white md:w-[332px] md:shrink-0 md:border-b-0 md:border-r lg:w-[360px] xl:w-[388px] 2xl:w-[412px]"
         }`}
         aria-label="Menú de tableros"
       >
@@ -316,28 +422,19 @@ export function ScitaDashboardPanel() {
 
         <motion.div
           layout
-          className="relative z-10 flex min-h-0 flex-col gap-3 p-3 sm:gap-3.5 sm:p-3.5 md:max-h-[92dvh] md:overflow-y-auto md:overscroll-y-contain md:py-4 lg:gap-4"
+          className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 px-2 py-3 sm:gap-3.5 sm:px-2.5 sm:py-3.5 md:max-h-[92dvh] md:overflow-y-auto md:overscroll-y-contain md:px-2.5 md:py-4 lg:gap-4"
         >
           <motion.div layout="position">
-            <p className="text-[11px] font-bold uppercase tracking-[0.17em] text-emerald-200/85">Módulos principales</p>
+            <p className="text-xs font-bold uppercase tracking-[0.17em] text-emerald-200/85 sm:text-[13px]">Módulos principales</p>
             <h2 className="mt-1 font-display text-[clamp(1.35rem,3.5vw,1.85rem)] font-semibold leading-tight text-white sm:text-[1.75rem] md:text-[29px]">
               SCITA
             </h2>
-            <p className="mt-1 max-w-[32ch] text-[12px] leading-relaxed text-white/70 sm:text-[13px] md:max-w-none">
+            <p className="mt-1 max-w-[32ch] text-sm leading-relaxed text-white/75 sm:text-[15px] md:max-w-none">
               Selecciona un módulo para abrir su tablero territorial en vista ampliada.
             </p>
           </motion.div>
 
-          <div className="rounded-2xl border border-white/10 bg-black/25 p-2.5 sm:p-3">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-200/80">
-              <Eye className="h-3.5 w-3.5" aria-hidden />
-              Módulo en vista
-            </div>
-            <p className="mt-2 text-base font-semibold leading-tight text-white">{active.shortLabel}</p>
-            <p className="mt-1 text-xs leading-snug text-white/70">{active.description}</p>
-          </div>
-
-          <nav className="grid gap-2.5 sm:gap-3">
+          <nav className="grid shrink-0 gap-2.5 sm:gap-3">
             {DASHBOARDS.map((dashboard) => (
               <DashboardMenuCard
                 key={dashboard.id}
@@ -348,16 +445,44 @@ export function ScitaDashboardPanel() {
             ))}
           </nav>
 
-          <div className="mt-auto rounded-2xl border border-emerald-200/20 bg-emerald-900/20 p-2.5 sm:p-3">
-            <p className="text-sm font-semibold text-emerald-100">Visual limpio y adaptable</p>
-            <p className="mt-1 text-xs leading-relaxed text-emerald-50/75">
-              Conserva toda la lógica del tablero y mejora el enfoque de lectura sobre los datos.
-            </p>
+          <div className="min-h-2 flex-1 shrink-0" aria-hidden />
+
+          <div className="flex shrink-0 flex-col gap-2.5 sm:gap-3">
+            <Link
+              href={hrefWithCurrentSearch("/scita/formulario", searchString)}
+              className="group flex flex-col gap-3 rounded-2xl border-2 border-[#8b4a2f]/60 bg-gradient-to-br from-[#c4713d] to-[#9a4a2c] p-3 shadow-lg transition hover:border-[#fbc02d]/40 hover:shadow-xl sm:p-3.5"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                  <AlertTriangle className="h-5 w-5 text-white" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-[15px] font-bold leading-snug text-white sm:text-lg">Crear reporte de alerta</h3>
+                  <p className="mt-1 text-sm leading-snug text-white/90 sm:text-[15px]">Registra amenazas o novedades desde el territorio.</p>
+                </div>
+              </div>
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/95 px-3 py-2.5 text-sm font-bold text-[#7a3b24] transition group-hover:bg-white sm:text-base">
+                Ir al formulario
+                <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+              </span>
+            </Link>
+
+            <Link
+              href={hrefWithCurrentSearch("/geoportal", searchString)}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-3 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/18 sm:px-4 sm:py-3 sm:text-[15px]"
+            >
+              Abrir SIG completo
+              <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+            </Link>
+          </div>
+
+          <div className="shrink-0 border-t border-white/10 pt-3 text-center">
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.38em] text-white/45 sm:text-[13px]">ISI</p>
           </div>
         </motion.div>
       </motion.aside>
 
-      <motion.div layout className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <motion.div layout className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip overflow-y-visible">
 
         {!expanded ? (
           <div className="px-4 pt-4 sm:px-6">
@@ -399,14 +524,14 @@ export function ScitaDashboardPanel() {
                       transition={{ duration: 0.28, ease: panelEase }}
                       className="overflow-hidden"
                     >
-                      <p className="mt-3 max-w-[92ch] rounded-xl border border-white/25 bg-black/35 px-4 py-3 text-sm leading-relaxed text-white/92 backdrop-blur-sm sm:text-[0.95rem]">
+                      <p className="mt-3 max-w-[92ch] rounded-xl border border-white/25 bg-black/35 px-4 py-3 text-[15px] leading-relaxed text-white/92 backdrop-blur-sm sm:text-base">
                         {active.detailDescription}
                       </p>
                       <div className="mt-3 max-w-[92ch] rounded-xl border border-white/20 bg-black/28 px-4 py-3 backdrop-blur-sm">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-200/85">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-200/85 sm:text-[13px]">
                           Detalle del tablero (mock)
                         </p>
-                        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-white/90 sm:text-[0.92rem]">
+                        <ul className="mt-2 space-y-1.5 text-[15px] leading-relaxed text-white/90 sm:text-base">
                           {active.detailBullets.map((item) => (
                             <li key={item} className="flex items-start gap-2">
                               <span className="mt-[0.42rem] h-1.5 w-1.5 shrink-0 rounded-full bg-lime-300" aria-hidden />
@@ -423,7 +548,7 @@ export function ScitaDashboardPanel() {
           </div>
         ) : null}
 
-        <div className={`relative flex min-h-0 min-w-0 flex-1 ${expanded ? "px-2 pb-2 pt-2 sm:px-3 sm:pb-3" : "px-4 pb-4 pt-4 sm:px-6 sm:pb-6"}`}>
+        <div className={`relative flex min-h-0 min-w-0 flex-1 flex-col ${expanded ? "min-h-0 overflow-x-clip overflow-y-auto overscroll-y-contain" : "overflow-x-clip overflow-y-visible"} ${expanded ? "px-2 pb-2 pt-2 sm:px-3 sm:pb-3" : "px-4 pb-4 pt-4 sm:px-6 sm:pb-6"}`}>
           <motion.button
             type="button"
             onClick={toggleExpanded}
