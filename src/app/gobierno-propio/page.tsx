@@ -2,6 +2,8 @@ import { SiteLayout } from "@/components/mock/ui";
 import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboardGrid";
 import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
 import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
+import GobiernoPropioGallerySection from "@/components/palenke/GobiernoPropioGallerySection";
+import { getVisibleGobiernoGalleryMedia } from "@/lib/gobierno-gallery-data";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams } from "@/lib/viewer";
 
@@ -80,6 +82,7 @@ export default async function GobiernoPropioPage({
 }) {
   const params = await searchParams;
   const role = await getViewerRoleFromRequest(params);
+  const galleryMedia = getVisibleGobiernoGalleryMedia(role).toSorted((a, b) => b.year - a.year);
 
   return (
     <SiteLayout
@@ -168,6 +171,13 @@ export default async function GobiernoPropioPage({
           </div>
           
           <InstrumentDashboardGrid instruments={instruments} role={role} />
+        </div>
+      </section>
+
+      {/* ── Galería audiovisual de Gobierno Propio ── */}
+      <section className="border-t border-[#e8dfd3] bg-[#f7f3ed] px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <GobiernoPropioGallerySection items={galleryMedia} />
         </div>
       </section>
 
