@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AdminLayout, TableCard, Toolbar, VisibilityBadge } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { TableCard, Toolbar, VisibilityBadge } from "@/components/mock/ui";
 import { accs } from "@/lib/mock-data";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";

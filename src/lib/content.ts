@@ -5,6 +5,11 @@ import {
 } from "@/lib/document-source";
 import type { DocumentRecord, Visibility, ViewerRole } from "@/lib/mock-data";
 import { canDownloadDocument } from "@/lib/mock-data";
+import {
+  getLoUltimoPublicationBySlug,
+  getLoUltimoPublications,
+  toInternalNewsItem,
+} from "@/lib/lo-ultimo-publications";
 import { pcnNewsArticles } from "@/lib/newsroom";
 import { createSupabaseService } from "@/lib/supabase/service";
 
@@ -28,6 +33,7 @@ export type InternalNewsItem = {
   category: string;
   location: string | null;
   coverImageUrl: string | null;
+  galleryImageUrls?: string[];
   visibility: "public" | "internal";
   featured: boolean;
   publishedAt: string;
@@ -95,42 +101,10 @@ const externalNewsFallback: ExternalNewsItem[] = pcnNewsArticles.slice(0, 4).map
   sourceLabel: "Renacientes / PCN",
 }));
 
-const internalNewsFallback: InternalNewsItem[] = [
-  {
-    id: "fallback-news-1",
-    slug: "mision-territorial-guaviare-marzo-2026",
-    title: "Misión territorial en Guaviare para fortalecer el gobierno propio",
-    summary:
-      "El equipo del Palenke acompañó una agenda de trabajo con consejos comunitarios para revisar prioridades de protección territorial y rutas organizativas.",
-    body:
-      "Durante la jornada se consolidaron acuerdos de seguimiento para reglamentos internos, protección hídrica y articulación con procesos de memoria comunitaria. La visita permitió actualizar necesidades de documentación, agenda de formación y coordinación interterritorial para el segundo trimestre del año.",
-    category: "Territorio",
-    location: "Guaviare",
-    coverImageUrl: null,
-    visibility: "public",
-    featured: true,
-    publishedAt: "2026-03-26T10:00:00-05:00",
-    createdAt: "2026-03-26T10:00:00-05:00",
-    updatedAt: "2026-03-26T10:00:00-05:00",
-  },
-  {
-    id: "fallback-news-2",
-    slug: "encuentro-consejos-comunitarios-ovejas",
-    title: "Encuentro con consejos comunitarios de la cuenca del río Ovejas",
-    summary:
-      "Se realizó una jornada de coordinación para priorizar rutas jurídicas, agenda ambiental y circulación de documentos de apoyo para liderazgos locales.",
-    body:
-      "La reunión permitió definir una agenda inmediata de acompañamiento técnico y político, con énfasis en alertas territoriales, seguimiento a normativa reciente y preparación de próximos encuentros comunitarios.",
-    category: "Gobierno propio",
-    location: "Suárez, Cauca",
-    coverImageUrl: null,
-    visibility: "public",
-    featured: false,
-    publishedAt: "2026-03-21T15:30:00-05:00",
-    createdAt: "2026-03-21T15:30:00-05:00",
-    updatedAt: "2026-03-21T15:30:00-05:00",
-  },
-];
+const internalNewsFallback: InternalNewsItem[] = getLoUltimoPublications().map((item) => ({
+  ...toInternalNewsItem(item),
+  galleryImageUrls: item.galleryImageUrls,
+}));
 
 const eventsFallback: EventItem[] = [
   {
@@ -606,11 +580,30 @@ export async function getExternalEnterateNews(limit = 4): Promise<ExternalNewsIt
   }
 }
 
+/** Public "Lo último" feed from docs/references (always used on home + /incidencia). */
+export async function listLoUltimoNews(options?: { limit?: number }): Promise<InternalNewsItem[]> {
+  const items = internalNewsFallback.filter((item) => item.visibility === "public");
+  return typeof options?.limit === "number" ? items.slice(0, options.limit) : items;
+}
+
 export async function listInternalNews(options?: {
   limit?: number;
   includeInternal?: boolean;
+  /** When true, reads from Supabase CMS instead of reference publications. */
+  fromDatabase?: boolean;
 }): Promise<InternalNewsItem[]> {
   const includeInternal = options?.includeInternal ?? false;
+  const fromDatabase = options?.fromDatabase ?? false;
+
+  if (!fromDatabase) {
+    let items = internalNewsFallback.filter(
+      (item) => includeInternal || item.visibility === "public",
+    );
+    if (options?.limit) {
+      items = items.slice(0, options.limit);
+    }
+    return items;
+  }
 
   if (!hasSupabaseServiceConfig()) {
     return internalNewsFallback
@@ -646,7 +639,18 @@ export async function listInternalNews(options?: {
 }
 
 export async function getInternalNewsBySlug(slug: string, includeInternal = false) {
-  const items = await listInternalNews({ includeInternal });
+  const fromReferences = getLoUltimoPublicationBySlug(slug);
+  if (
+    fromReferences &&
+    (includeInternal || fromReferences.visibility === "public")
+  ) {
+    return {
+      ...toInternalNewsItem(fromReferences),
+      galleryImageUrls: fromReferences.galleryImageUrls,
+    };
+  }
+
+  const items = await listInternalNews({ includeInternal, fromDatabase: includeInternal });
   return items.find((item) => item.slug === slug) ?? null;
 }
 

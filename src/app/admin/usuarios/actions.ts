@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { createSupabaseServer } from "@/lib/supabase/server";
+import { displayNameFromEmail, logAdminActivity } from "@/lib/admin-activity";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
 
@@ -148,6 +149,14 @@ export async function createUserAction(formData: FormData) {
       throw new Error(`No se pudo crear el perfil del usuario: ${profileError.message}`);
     }
 
+    await logAdminActivity({
+      kind: "user_created",
+      title: `${name} — cuenta creada`,
+      section: "Usuarios",
+      entityType: "user",
+      entityId: created.user.id,
+    });
+
     revalidatePath("/admin");
     revalidatePath("/admin/usuarios");
     revalidatePath("/admin/usuarios/nuevo");
@@ -184,6 +193,7 @@ export async function updateUserAction(id: string, formData: FormData) {
     }
 
     const supabase = createSupabaseService();
+    const { data: current } = await supabase.from("users").select("email, role, active").eq("id", id).maybeSingle();
     await ensureNotLastActiveAdmin(supabase, id, toDbRole(role), active);
 
     if (sessionUserId === id && (!active || toDbRole(role) !== "admin")) {
@@ -217,6 +227,35 @@ export async function updateUserAction(id: string, formData: FormData) {
       throw new Error(`No se pudo actualizar perfil del usuario: ${profileError.message}`);
     }
 
+    const subjectName = name || displayNameFromEmail(current?.email ?? email);
+    if (newPassword) {
+      await logAdminActivity({
+        kind: "password_reset",
+        title: `${subjectName} — contraseña restablecida`,
+        section: "Usuarios",
+        entityType: "user",
+        entityId: id,
+      });
+    }
+    if (current?.active === true && !active) {
+      await logAdminActivity({
+        kind: "user_deactivated",
+        title: `${subjectName} — cuenta desactivada`,
+        section: "Usuarios",
+        entityType: "user",
+        entityId: id,
+      });
+    }
+    if (current?.role && current.role !== toDbRole(role)) {
+      await logAdminActivity({
+        kind: "user_role_changed",
+        title: `${subjectName} — rol actualizado a ${role}`,
+        section: "Usuarios",
+        entityType: "user",
+        entityId: id,
+      });
+    }
+
     revalidatePath("/admin");
     revalidatePath("/admin/usuarios");
     revalidatePath(`/admin/usuarios/${id}/editar`);
@@ -247,12 +286,22 @@ export async function deleteUserAction(id: string) {
     }
 
     const supabase = createSupabaseService();
+    const { data: current } = await supabase.from("users").select("email").eq("id", id).maybeSingle();
     await ensureNotLastActiveAdmin(supabase, id, "internal", false);
 
     const { error: deleteError } = await supabase.auth.admin.deleteUser(id);
     if (deleteError) {
       throw new Error(`No se pudo eliminar el usuario: ${deleteError.message}`);
     }
+
+    const deletedName = displayNameFromEmail(current?.email ?? "usuario");
+    await logAdminActivity({
+      kind: "user_deactivated",
+      title: `${deletedName} — cuenta eliminada`,
+      section: "Usuarios",
+      entityType: "user",
+      entityId: id,
+    });
 
     revalidatePath("/admin");
     revalidatePath("/admin/usuarios");

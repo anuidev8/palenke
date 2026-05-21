@@ -11,7 +11,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ScitaDashboardHero } from "@/components/palenke/ScitaDashboardHero";
-import { ScitaDashboardPanel } from "@/components/palenke/ScitaDashboardPanel";
+import { ScitaDashboardPanel, type ScitaDashboardPanelProps } from "@/components/palenke/ScitaDashboardPanel";
 import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import {
   SCITA_RUNWAY_SCROLL_CLASS,
@@ -19,7 +19,11 @@ import {
   ScitaMarketingBackdrop,
 } from "@/components/palenke/scitaMarketingHero";
 
-export function ScitaPageContent() {
+export function ScitaPageContent({
+  dashboards,
+  viewerRole,
+  isAuthenticated,
+}: ScitaDashboardPanelProps) {
   const heroRunwayRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRunwayRef,
@@ -74,7 +78,11 @@ export function ScitaPageContent() {
 
       {/* Panel — normal flow, no scroll-driven opacity, stays visible until the section ends. */}
       <div className="relative z-10 mx-auto w-full max-w-[2240px] pb-10 sm:px-4 sm:pb-12 lg:px-5 lg:pb-16 xl:px-8">
-        <ScitaDashboardPanel />
+        <ScitaDashboardPanel
+          dashboards={dashboards}
+          viewerRole={viewerRole}
+          isAuthenticated={isAuthenticated}
+        />
       </div>
 
       <OrientationNetworkSection variant="dark" introVariant="title-only" className="relative z-10" />

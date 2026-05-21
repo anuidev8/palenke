@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { createUserAction } from "../actions";

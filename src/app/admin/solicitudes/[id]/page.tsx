@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AdminLayout, Callout, StatusPill } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { Callout, StatusPill } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import {
   getAccessRequestByIdWithMeta,

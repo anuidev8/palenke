@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { isAdmin } from "@/lib/viewer";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
+import { logAdminActivity, sectionForDocumentInstrument } from "@/lib/admin-activity";
 import { createSupabaseService } from "@/lib/supabase/service";
 import {
   getRutaMetodologicaStoragePath,
@@ -118,6 +119,14 @@ export async function uploadRutaMetodologica(formData: FormData) {
         throw new Error(`No se pudo crear metadata en documentos: ${insertError.message}`);
       }
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: sectionForDocumentInstrument(instrument),
+      entityType: "document",
+      entityId: existingPublicDoc?.id,
+    });
 
     revalidatePath("/admin/documentos");
     revalidatePath("/admin/documentos/rutas-metodologicas");

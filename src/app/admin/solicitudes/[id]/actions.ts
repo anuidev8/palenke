@@ -14,6 +14,7 @@ import {
 } from "@/lib/document-source";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
+import { logAdminActivity } from "@/lib/admin-activity";
 import { config, hasSupabaseServiceConfig } from "@/lib/config";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
@@ -66,6 +67,16 @@ async function markRequestStatus(id: string, status: ReviewStatus, notes: string
   if (error || !data) {
     throw new Error(error?.message ?? "Unable to update request status.");
   }
+
+  const statusLabel = status === "approved" ? "aprobada" : "rechazada";
+  await logAdminActivity({
+    kind: "access_review",
+    title: `${data.full_name} — solicitud ${statusLabel}`,
+    section: "Solicitudes",
+    entityType: "access_request",
+    entityId: data.id,
+    occurredAt: data.reviewed_at ?? new Date().toISOString(),
+  });
 
   return data;
 }

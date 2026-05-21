@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { FileText, Key, RefreshCw, UserPlus, UserX, type LucideIcon } from "lucide-react";
-import { AdminLayout, MetricCard } from "@/components/mock/ui";
-import { adminQuickStats, recentActivity } from "@/lib/mock-data";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { MetricCard } from "@/components/mock/ui";
+import { adminQuickStats } from "@/lib/mock-data";
+import { listRecentAdminActivity, type AdminActivityRecord } from "@/lib/admin-activity";
+import { canAccessVisualContentAdmin } from "@/lib/admin-nav";
 import { requireAdmin } from "@/lib/admin-access";
 import type { SearchParams } from "@/lib/viewer";
 import { withRole } from "@/lib/viewer";
@@ -11,14 +15,17 @@ export default async function AdminHomePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { role } = await requireAdmin(searchParams);
+  noStore();
+  const { role, email } = await requireAdmin(searchParams);
+  const showVisualContent = canAccessVisualContentAdmin(email);
+  const recentActivity = await listRecentAdminActivity(12);
 
   return (
     <AdminLayout
       role={role}
       active="inicio"
       title="Panel de gestión"
-      intro="Vista general del estado del sistema y accesos directos a Biblioteca, Noticias y agenda, Dashboards, ACCs, Usuarios, Campañas y contenido visual IA."
+      intro="Vista general del estado del sistema y accesos directos a Biblioteca, Noticias y agenda, Dashboards, Usuarios y Alertas SCITA."
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {adminQuickStats.map((stat) => (
@@ -40,24 +47,29 @@ export default async function AdminHomePage({
               + Nuevo evento
             </Link>
             <Link href={withRole("/admin/dashboards/nuevo", role)} className="button-secondary">
-              + Nuevo dashboard
+              + Nuevo tablero SCITA
             </Link>
-            <Link href={withRole("/admin/accs/nuevo", role)} className="button-secondary">
-              + Nueva ACC
+            <Link href={withRole("/admin/alertas", role)} className="button-secondary">
+              Alertas SCITA
             </Link>
-            <Link href={withRole("/admin/campanas/nueva", role)} className="button-secondary">
-              + Nueva campaña
-            </Link>
-            <Link href={withRole("/admin/contenido-visual", role)} className="button-secondary">
-              + Generar contenido visual
-            </Link>
+            {showVisualContent ? (
+              <Link href={withRole("/admin/contenido-visual", role)} className="button-secondary">
+                + Generar contenido visual
+              </Link>
+            ) : null}
           </div>
         </article>
 
         <article className="surface-card space-y-4">
           <h2 className="font-display text-3xl text-[color:var(--forest)]">Actividad reciente</h2>
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-[color:var(--muted-strong)]">
+              Aún no hay actividad registrada. Los cambios en biblioteca, usuarios, tableros y novedades
+              aparecerán aquí.
+            </p>
+          ) : null}
           <div className="grid gap-3">
-            {recentActivity.map((activity) => {
+            {recentActivity.map((activity: AdminActivityRecord) => {
               const kindMeta: Record<string, { Icon: LucideIcon; color: string }> = {
                 content: { Icon: FileText, color: "text-[color:var(--forest)]" },
                 user_created: { Icon: UserPlus, color: "text-emerald-700" },

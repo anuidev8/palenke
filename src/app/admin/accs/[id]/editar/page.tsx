@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { AccForm } from "@/components/mock/admin-forms";
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { requireAdmin } from "@/lib/admin-access";
 import { accs } from "@/lib/mock-data";
 import type { SearchParams } from "@/lib/viewer";

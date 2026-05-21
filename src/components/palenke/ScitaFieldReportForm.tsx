@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AlertTriangle, Droplets, FileImage, HelpCircle, MessageSquare, Mic, TreePine, Waves, X, Zap } from "lucide-react";
+import { AlertTriangle, Droplets, FileImage, HelpCircle, LayoutDashboard, MessageSquare, Mic, TreePine, Waves, X, Zap } from "lucide-react";
+import { normalizeScitaBoardOrigin, SCITA_BOARD_OPTIONS } from "@/lib/scita-report-form";
 
 const categories = [
   { id: "hidrica", label: "Amenaza hídrica", sublabel: "Ríos, cuencas, contaminación", icon: Droplets, color: "#1565c0", bg: "#e3f2fd", border: "#1565c0" },
@@ -16,12 +17,14 @@ const mediaTypes = [
 ] as const;
 
 type ScitaFieldReportFormProps = {
-  formAction?: string;
+  formAction?: any;
   cancelHref?: string;
   onCancel?: () => void;
   selectedCategory?: string;
   selectedMedia?: string;
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  tableroOrigen?: string;
+  role?: string;
 };
 
 export function ScitaFieldReportForm({
@@ -31,9 +34,20 @@ export function ScitaFieldReportForm({
   selectedCategory = "",
   selectedMedia = "",
   onSubmit,
+  tableroOrigen = "",
+  role = "",
 }: ScitaFieldReportFormProps) {
+  const preselectedBoard = normalizeScitaBoardOrigin(tableroOrigen);
+  const preselectedBoardLabel = SCITA_BOARD_OPTIONS.find((board) => board.id === preselectedBoard)?.label;
+
   return (
-    <form action={formAction} method={formAction ? "GET" : undefined} onSubmit={onSubmit} className="w-full">
+    <form
+      action={formAction}
+      method={typeof formAction === "string" ? "GET" : undefined}
+      onSubmit={onSubmit}
+      className="w-full"
+    >
+      <input type="hidden" name="role" value={role} />
       <div className="mb-4 overflow-hidden rounded-[28px] bg-[#2e7d32]">
         <div className="flex items-start justify-between px-7 py-6">
           <div>
@@ -131,6 +145,7 @@ export function ScitaFieldReportForm({
           <textarea
             name="descripcion"
             rows={4}
+            required
             placeholder="Cuéntanos qué está pasando… (ej: 'La quebrada lleva semanas con agua oscura y con olor raro')"
             className="w-full resize-vertical rounded-[14px] border border-[#e8dfd3] px-4 py-3 text-sm text-[#1a1a1a] placeholder:text-[#bab4ac] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
           />
@@ -162,8 +177,37 @@ export function ScitaFieldReportForm({
 
       <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">
         <p className="eyebrow mb-1">Paso 3 · Opcional</p>
-        <h2 className="font-display text-xl text-[#1a1a1a]">¿Cómo podemos contactarte?</h2>
-        <p className="mt-1 text-sm text-[#7a756e]">Si quieres que el equipo del Palenke te dé seguimiento al reporte.</p>
+        <h2 className="font-display text-xl text-[#1a1a1a]">Contexto y contacto</h2>
+        <p className="mt-1 text-sm text-[#7a756e]">
+          Puedes indicar el tablero SCITA relacionado y, si quieres, un medio para dar seguimiento.
+        </p>
+
+        <div className="mt-5">
+          <label htmlFor="tablero_origen" className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#1a1a1a]">
+            <LayoutDashboard className="h-4 w-4 text-[#7a756e]" aria-hidden="true" />
+            Tablero SCITA relacionado
+            <span className="font-normal text-[#7a756e]">(opcional)</span>
+          </label>
+          {preselectedBoardLabel ? (
+            <p className="mb-2 rounded-[12px] border border-[#c8e6c9] bg-[#e8f5e9] px-3 py-2 text-xs text-[#2e7d32]">
+              Detectamos el tablero <strong>{preselectedBoardLabel}</strong> desde el enlace. Puedes cambiarlo o dejarlo sin especificar.
+            </p>
+          ) : null}
+          <select
+            id="tablero_origen"
+            name="tablero_origen"
+            defaultValue={preselectedBoard}
+            className="w-full rounded-[14px] border border-[#e8dfd3] bg-white px-4 py-3 text-sm text-[#1a1a1a] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
+          >
+            <option value="">No especificado</option>
+            {SCITA_BOARD_OPTIONS.map((board) => (
+              <option key={board.id} value={board.id}>
+                {board.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="nombre" className="mb-2 block text-sm font-semibold text-[#1a1a1a]">Nombre <span className="font-normal text-[#7a756e]">(opcional)</span></label>

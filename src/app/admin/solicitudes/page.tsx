@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AdminLayout, Callout, StatusPill, TableCard, Toolbar } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { Callout, StatusPill, TableCard, Toolbar } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import {
   countPendingAccessRequests,

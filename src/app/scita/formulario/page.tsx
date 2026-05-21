@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { ScitaFieldReportForm } from "@/components/palenke/ScitaFieldReportForm";
+import { ScitaFieldReportFormClient } from "@/components/palenke/ScitaFieldReportFormClient";
 import { SiteLayout } from "@/components/mock/ui";
+import { hasSupabaseServiceConfig } from "@/lib/config";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
+import { submitScitaFieldReportAction } from "./actions";
 
 export default async function FormularioAmbientalPage({
   searchParams,
@@ -17,7 +19,8 @@ export default async function FormularioAmbientalPage({
   // Pre-selected values from query (for mockup state)
   const selectedCategory = Array.isArray(params.categoria) ? params.categoria[0] : (params.categoria ?? "");
   const selectedMedia = Array.isArray(params.media) ? params.media[0] : (params.media ?? "");
-  const selectedPin = params.pin ?? "";
+  const selectedTablero = Array.isArray(params.tablero) ? params.tablero[0] : (params.tablero ?? "");
+  const persistMode = hasSupabaseServiceConfig() ? "live" : "mock";
 
   return (
     <SiteLayout
@@ -74,11 +77,14 @@ export default async function FormularioAmbientalPage({
               </div>
             </div>
           ) : (
-            <ScitaFieldReportForm
-              formAction={`${withRole("/scita/formulario", role)}?submitted=1`}
+            <ScitaFieldReportFormClient
+              persistMode={persistMode}
+              submitAction={persistMode === "live" ? submitScitaFieldReportAction : undefined}
               cancelHref={withRole("/scita", role)}
               selectedCategory={selectedCategory}
               selectedMedia={selectedMedia}
+              tableroOrigen={selectedTablero}
+              role={role}
             />
           )}
         </div>

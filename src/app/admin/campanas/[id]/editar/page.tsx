@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { CampaignForm } from "@/components/mock/admin-forms";
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { requireAdmin } from "@/lib/admin-access";
 import { campaigns } from "@/lib/mock-data";
 import type { SearchParams } from "@/lib/viewer";

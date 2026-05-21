@@ -1,4 +1,5 @@
-import type { ViewerRole, Visibility } from "@/lib/mock-data";
+import type { ViewerRole } from "@/lib/mock-data";
+import type { PalenkeGalleryMedia } from "@/lib/palenke-gallery-media";
 
 /** Sections used when filtering Gobierno Propio contextual content */
 export const GOBIERNO_GALLERY_SECTIONS = [
@@ -11,22 +12,10 @@ export const GOBIERNO_GALLERY_SECTIONS = [
 
 export type GobiernoGallerySection = (typeof GOBIERNO_GALLERY_SECTIONS)[number];
 
-export type GobiernoGalleryMediaKind = "image" | "video";
+export type GobiernoGalleryMediaKind = PalenkeGalleryMedia["kind"];
 
-export type GobiernoGalleryMedia = {
-  id: string;
-  title: string;
+export type GobiernoGalleryMedia = PalenkeGalleryMedia & {
   section: GobiernoGallerySection;
-  type: string;
-  description: string;
-  territory: string;
-  council: string;
-  year: number;
-  kind: GobiernoGalleryMediaKind;
-  posterUrl: string;
-  /** Image URL when kind is image; direct video file (.mp4) or embed URL when kind is video */
-  mediaUrl: string;
-  visibility: Visibility;
 };
 
 export const gobiernoPropioGalleryMedia: GobiernoGalleryMedia[] = [

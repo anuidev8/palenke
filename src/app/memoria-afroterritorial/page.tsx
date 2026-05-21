@@ -1,7 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
+import { MemoriaAfroterritorialSubnav } from "@/components/palenke/MemoriaAfroterritorialSubnav";
 import { VideoThumbnail } from "@/components/palenke/VideoThumbnail";
+import {
+  getVisibleMediatecaUbuntuGalleryMedia,
+  MEDIATECA_UBUNTU_CATEGORIES,
+} from "@/lib/mediateca-ubuntu-gallery-data";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 
@@ -12,6 +18,10 @@ export default async function MemoriaAfroterritorialPage({
 }) {
   const params = await searchParams;
   const role = await getViewerRoleFromRequest(params);
+  const mediatecaPreviewImages = getVisibleMediatecaUbuntuGalleryMedia(role)
+    .filter((item) => item.kind === "image")
+    .toSorted((a, b) => b.year - a.year)
+    .slice(0, 4);
 
   return (
     <SiteLayout
@@ -42,6 +52,8 @@ export default async function MemoriaAfroterritorialPage({
           </div>
         </div>
       </section>
+
+      <MemoriaAfroterritorialSubnav role={role} />
 
       {/* ── Definición + Función (left) | Imagen (right) ── */}
       <section className="relative overflow-hidden border-b border-[#e8dfd3] bg-[#F7F5F0] px-4 py-14 sm:px-6 lg:px-8">
@@ -202,7 +214,9 @@ export default async function MemoriaAfroterritorialPage({
         </div>
       </section>
 
-      {/* ── Memoria viva del territorio ── */}
+     
+
+      {/* ── Mediateca Ubuntu ── */}
       <section className="relative overflow-hidden border-t border-[#e8dfd3] bg-[#FAFAF7] px-4 py-14 sm:px-6 lg:px-8">
         <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
           {/* Rhythmic flowing ribbons with PCN Brand Colors */}
@@ -221,65 +235,86 @@ export default async function MemoriaAfroterritorialPage({
         </div>
         <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-2 lg:gap-14">
 
-          {/* Left — Definición y Función */}
+          {/* Left — Definición */}
           <div>
-            <p className="eyebrow mb-3">Memoria viva del territorio</p>
-            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">El Latir de Nuestra Cultura</h2>
+            <p className="eyebrow mb-3 text-[#2e7d32]">Memoria Afroterritorial</p>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Mediateca Ubuntu</h2>
             <p className="mt-5 text-base leading-8 text-[#4a4540]">
-              Es el eco de nuestros alabaos, la fuerza de nuestros liderazgos y la sabiduría de nuestras abuelas.
-              Aquí circula el pensamiento afrodescendiente, abrazando la academia, la cultura comunitaria y las
-              expresiones vivas que hacen palpitar al territorio.
+              Archivo audiovisual comunitario con fotografías, videos, audios y entrevistas de nuestros
+              procesos territoriales — organizado por colecciones de Consejos Comunitarios y
+              encuentros del Palenke.
             </p>
-            <h3 className="mt-8 font-display text-2xl text-[#1a1a1a]">Cómo Mantenemos Viva la Llama</h3>
             <ul className="mt-6 space-y-3">
-              {[
-                { text: "Dar a conocer las investigaciones y el pensamiento propio nacido de nuestras entrañas.", color: "bg-[#2e7d32]" },
-                { text: "Recoger con amor las historias, luchas y experiencias de cada rincón del territorio.", color: "bg-[#fbc02d]" },
-                { text: "Celebrar nuestras prácticas culturales, saberes y el arte que nos define.", color: "bg-[#d32f2f]" },
-                { text: "Construir puentes vivos entre el conocimiento comunitario, la organización y la academia.", color: "bg-[#2e7d32]" },
-              ].map((item) => (
-                <li key={item.text} className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]">
-                  <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${item.color}`} />
-                  {item.text}
+              {MEDIATECA_UBUNTU_CATEGORIES.filter((c) => c.id !== "todas").map((collection) => (
+                <li
+                  key={collection.id}
+                  className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]"
+                >
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#fbc02d]" />
+                  {collection.label}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Right — Memoria viva del territorio CTA card */}
+          {/* Right — Mediateca Ubuntu CTA card */}
           <Link
-            href={withRole("/biblioteca", role, { section: "Memoria viva del territorio" })}
-            className="relative flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[28px] p-8 outline-none ring-offset-2 ring-offset-[#FAFAF7] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-white/60"
-            style={{
-              background:
-                "radial-gradient(ellipse at 80% 80%, rgba(211,47,47,0.35), transparent 60%), radial-gradient(ellipse at 20% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.4), transparent 60%), linear-gradient(150deg, #1c1a19 0%, #26211e 60%, #1a1614 100%)",
-            }}
+            href={withRole("/memoria-afroterritorial/mediateca-ubuntu", role)}
+            className="group relative flex min-h-[320px] flex-col justify-end overflow-hidden rounded-[28px] p-8 outline-none ring-offset-2 ring-offset-[#FAFAF7] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[#2e7d32] lg:min-h-[400px]"
           >
-            {/* abstract organic flow */}
-            <svg className="absolute inset-0 h-full w-full opacity-[0.15]" viewBox="0 0 400 300" preserveAspectRatio="none">
+            {mediatecaPreviewImages.length > 0 ? (
+              <div className="absolute inset-0 grid grid-cols-2 grid-rows-2" aria-hidden="true">
+                {mediatecaPreviewImages.map((item) => (
+                  <div key={item.id} className="relative overflow-hidden">
+                    <Image
+                      src={item.posterUrl}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 400px"
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at 80% 80%, rgba(211,47,47,0.35), transparent 60%), radial-gradient(ellipse at 20% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 25% 75%, rgba(46,125,50,0.4), transparent 60%), linear-gradient(150deg, #1c1a19 0%, #26211e 60%, #1a1614 100%)",
+                }}
+                aria-hidden="true"
+              />
+            )}
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-[#1a1614]/95 via-[#1a1614]/55 to-[#1a1614]/25"
+              aria-hidden="true"
+            />
+            <svg
+              className="absolute inset-0 h-full w-full opacity-[0.12]"
+              viewBox="0 0 400 300"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
               <path d="M-50,150 Q100,250 200,100 T450,150" fill="none" stroke="#fbc02d" strokeWidth="4" />
               <path d="M-50,200 Q150,300 250,150 T450,200" fill="none" stroke="#d32f2f" strokeWidth="3" />
             </svg>
-            
-            {/* decorative colored dots */}
-            <div className="absolute right-6 top-6 grid grid-cols-4 gap-2 opacity-60" aria-hidden="true">
-              {['bg-[#fbc02d]', 'bg-[#d32f2f]', 'bg-[#2e7d32]', 'bg-[#fbc02d]',
-                'bg-[#2e7d32]', 'bg-[#fbc02d]', 'bg-[#d32f2f]', 'bg-[#2e7d32]',
-                'bg-[#d32f2f]', 'bg-[#2e7d32]', 'bg-[#fbc02d]', 'bg-[#d32f2f]'].map((color, i) => (
-                <span key={i} className={`h-1.5 w-1.5 rounded-full ${color}`} />
-              ))}
+            <div className="relative z-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+                Archivo audiovisual comunitario
+              </p>
+              <h3 className="mt-2 font-display text-2xl leading-tight text-white sm:text-3xl">
+                Fotos, videos<br />y entrevistas
+              </h3>
+              <p className="mt-3 max-w-sm text-sm leading-6 text-white/75">
+                Colecciones de C.C. Los Cimarrones, C.C. Capitanía y registros generales del
+                Palenke — la misma galería que en Gobierno Propio.
+              </p>
+              <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white">
+                Explorar Mediateca Ubuntu
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
             </div>
-            <h3 className="font-display text-2xl leading-tight text-white sm:text-3xl">
-              Memoria viva<br />del territorio
-            </h3>
-            <p className="mt-3 text-sm leading-6 text-white/70">
-              Producción académica, cultural y comunitaria — saberes ancestrales, investigaciones
-              propias y expresiones artísticas del Pacífico.
-            </p>
-            <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white">
-              Explorar memoria viva
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </span>
           </Link>
         </div>
       </section>

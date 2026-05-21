@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Newspaper, Radio } from "lucide-react";
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { requireAdmin } from "@/lib/admin-access";
 import { listEvents, listInternalNews } from "@/lib/content";
 import type { SearchParams } from "@/lib/viewer";
@@ -13,7 +13,7 @@ export default async function AdminNovedadesPage({
 }) {
   const { role } = await requireAdmin(searchParams);
   const [newsItems, events] = await Promise.all([
-    listInternalNews({ includeInternal: true }),
+    listInternalNews({ includeInternal: true, fromDatabase: true }),
     listEvents({ includeInternal: true }),
   ]);
 

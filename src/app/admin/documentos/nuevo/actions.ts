@@ -10,6 +10,7 @@ import {
   isStaticPublicDocumentPath,
   normalizeStoragePath,
 } from "@/lib/document-source";
+import { logAdminActivity, sectionForDocumentInstrument } from "@/lib/admin-activity";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -243,6 +244,14 @@ export async function createDocumentAction(formData: FormData) {
     if (insertError || !inserted?.id) {
       throw new Error(`No se pudo crear el documento: ${insertError?.message ?? "insert failed"}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: sectionForDocumentInstrument(instrument),
+      entityType: "document",
+      entityId: inserted.id,
+    });
 
     revalidatePath("/admin/documentos");
     revalidatePath("/admin/documentos/nuevo");

@@ -10,6 +10,7 @@ import {
   isStaticPublicDocumentPath,
   normalizeStoragePath,
 } from "@/lib/document-source";
+import { logAdminActivity, sectionForDocumentInstrument } from "@/lib/admin-activity";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -255,6 +256,14 @@ export async function updateDocumentAction(id: string, formData: FormData) {
     if (updateError) {
       throw new Error(`No se pudo actualizar el documento: ${updateError.message}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: sectionForDocumentInstrument(instrument),
+      entityType: "document",
+      entityId: id,
+    });
 
     revalidatePath("/admin/documentos");
     revalidatePath(`/admin/documentos/${id}/editar`);

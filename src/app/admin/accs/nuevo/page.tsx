@@ -1,5 +1,5 @@
 import { AccForm } from "@/components/mock/admin-forms";
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { requireAdmin } from "@/lib/admin-access";
 import type { SearchParams } from "@/lib/viewer";
 

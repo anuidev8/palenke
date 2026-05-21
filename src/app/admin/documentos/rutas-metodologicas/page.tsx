@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { AdminLayout, Callout, TableCard } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { Callout, TableCard } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { hasSupabaseServiceConfig } from "@/lib/config";

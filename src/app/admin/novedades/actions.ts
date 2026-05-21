@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasSupabaseServiceConfig } from "@/lib/config";
+import { logAdminActivity } from "@/lib/admin-activity";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -90,23 +91,35 @@ export async function createInternalNewsAction(formData: FormData) {
 
     const supabase = createSupabaseService();
     const slug = normalizeSlug(title);
-    const { error } = await supabase.from("internal_news").insert({
-      slug,
-      title,
-      summary,
-      body,
-      category,
-      location,
-      cover_image_url: coverImageUrl,
-      visibility,
-      featured,
-      published_at: publishedAt,
-      updated_at: new Date().toISOString(),
-    });
+    const { data: created, error } = await supabase
+      .from("internal_news")
+      .insert({
+        slug,
+        title,
+        summary,
+        body,
+        category,
+        location,
+        cover_image_url: coverImageUrl,
+        visibility,
+        featured,
+        published_at: publishedAt,
+        updated_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
 
     if (error) {
       throw new Error(`No se pudo crear la noticia: ${error.message}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: "Lo Último",
+      entityType: "internal_news",
+      entityId: created?.id,
+    });
 
     revalidateContentPaths();
     redirect("/admin/novedades/noticias?notice=created");
@@ -162,6 +175,14 @@ export async function updateInternalNewsAction(id: string, formData: FormData) {
     if (error) {
       throw new Error(`No se pudo actualizar la noticia: ${error.message}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: "Lo Último",
+      entityType: "internal_news",
+      entityId: id,
+    });
 
     revalidateContentPaths();
     revalidatePath(`/admin/novedades/noticias/${id}/editar`);
@@ -225,26 +246,38 @@ export async function createEventAction(formData: FormData) {
 
     const supabase = createSupabaseService();
     const slug = normalizeSlug(title);
-    const { error } = await supabase.from("events").insert({
-      slug,
-      title,
-      summary,
-      description,
-      category,
-      location,
-      territory,
-      resource_url: resourceUrl,
-      resource_label: resourceLabel,
-      visibility,
-      featured,
-      starts_at: startsAt,
-      ends_at: endsAt,
-      updated_at: new Date().toISOString(),
-    });
+    const { data: created, error } = await supabase
+      .from("events")
+      .insert({
+        slug,
+        title,
+        summary,
+        description,
+        category,
+        location,
+        territory,
+        resource_url: resourceUrl,
+        resource_label: resourceLabel,
+        visibility,
+        featured,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        updated_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
 
     if (error) {
       throw new Error(`No se pudo crear el evento: ${error.message}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: "Agenda",
+      entityType: "event",
+      entityId: created?.id,
+    });
 
     revalidateContentPaths();
     redirect("/admin/novedades/eventos?notice=created");
@@ -307,6 +340,14 @@ export async function updateEventAction(id: string, formData: FormData) {
     if (error) {
       throw new Error(`No se pudo actualizar el evento: ${error.message}`);
     }
+
+    await logAdminActivity({
+      kind: "content",
+      title,
+      section: "Agenda",
+      entityType: "event",
+      entityId: id,
+    });
 
     revalidateContentPaths();
     revalidatePath(`/admin/novedades/eventos/${id}/editar`);

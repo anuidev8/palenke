@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Globe, Lock } from "lucide-react";
-import { AdminLayout, StatusPill, TableCard } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { StatusPill, TableCard } from "@/components/mock/ui";
 import { campaigns } from "@/lib/mock-data";
 import { requireAdmin } from "@/lib/admin-access";
 import type { SearchParams } from "@/lib/viewer";

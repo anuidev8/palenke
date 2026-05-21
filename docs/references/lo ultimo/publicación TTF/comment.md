@@ -1,0 +1,3 @@
+Durante el año 2025, el PCN consolidó una nueva alianza estratégica con Turning Tides Facility (TTF), que es una iniciativa orientada a la justicia territorial, la gobernanza comunitaria del agua y la protección de maritorios y ecosistemas acuáticos.
+Esta alianza representa un avance estructural en la defensa de los derechos hídricos del Pueblo Negro en Colombia, fortaleciendo el litigio estratégico para la titulación colectiva de manglares, cuerpos de agua, playones y sabanas.
+💧 El agua es vida, memoria y territorio.

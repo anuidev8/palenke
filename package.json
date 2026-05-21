@@ -14,7 +14,9 @@
     "sync:plan-instrumentos-storage:verify": "node scripts/upload-plan-instrumentos-storage.mjs --verify",
     "sync:plan-instrumentos-storage:verify-db": "node scripts/upload-plan-instrumentos-storage.mjs --verify-db",
     "verify:plan-instrumentos-auth-e2e": "node scripts/verify-plan-instrumentos-auth-e2e.mjs",
-    "verify:plan-instrumentos-admin-actions-e2e": "node scripts/verify-plan-instrumentos-admin-actions-e2e.mjs"
+    "verify:plan-instrumentos-admin-actions-e2e": "node scripts/verify-plan-instrumentos-admin-actions-e2e.mjs",
+    "sync:mediateca-ubuntu-storage": "node scripts/sync-mediateca-ubuntu-storage.mjs",
+    "sync:mediateca-ubuntu-storage:dry": "node scripts/sync-mediateca-ubuntu-storage.mjs --dry-run"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
@@ -26,6 +28,7 @@
     "powerbi-client": "^2.23.10",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "recharts": "^3.8.1",
     "resend": "^6.9.4",
     "zod": "^4.3.6"
   },

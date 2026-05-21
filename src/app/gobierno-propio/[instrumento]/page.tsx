@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, Leaf, Scale, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
@@ -147,6 +147,8 @@ const instrumentos = {
 } as const;
 
 type InstrumentoSlug = keyof typeof instrumentos;
+
+const SCITA_AREAS_BOARD_INSTRUMENTS = new Set<InstrumentoSlug>(["conservacion", "proteccion-hidrica"]);
 type AccessLevel = "admin" | "coordination";
 type DocumentVisibility = "public" | "internal" | "sensitive";
 
@@ -312,6 +314,8 @@ export default async function InstrumentoPage({
   const canDownloadBaseSupabaseDoc = baseSupabaseDoc
     ? canDownloadDocument(role, baseSupabaseDoc.visibility)
     : false;
+  const showScitaAreasBoard = SCITA_AREAS_BOARD_INSTRUMENTS.has(instrumentoKey);
+  const scitaAreasHref = withRole("/scita?tablero=conservacion", role);
 
   return (
     <SiteLayout
@@ -400,8 +404,8 @@ export default async function InstrumentoPage({
                   style={{ background: inst.color }} 
                 />
                 
-                <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                  <div 
+                <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center">
+                  <div
                     className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] shadow-inner border border-black/5"
                     style={{ background: inst.lightBg, color: inst.color }}
                   >
@@ -415,29 +419,63 @@ export default async function InstrumentoPage({
                         : "Guía general y estructura modelo (sin información específica de Consejos). Acceso público."}
                     </p>
                   </div>
-                  {baseSupabaseDoc ? (
-                    canDownloadBaseSupabaseDoc ? (
-                      <LoadingDownloadButton
-                        href={baseSupabaseDoc.url}
-                        label="Descargar documento"
-                        className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                        style={{ background: inst.color }}
-                      />
+                  <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:items-end">
+                    {baseSupabaseDoc ? (
+                      canDownloadBaseSupabaseDoc ? (
+                        <LoadingDownloadButton
+                          href={baseSupabaseDoc.url}
+                          label="Descargar documento"
+                          className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                          style={{ background: inst.color }}
+                        />
+                      ) : (
+                        <Link
+                          href={requestHref}
+                          className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f8f5f2] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] hover:bg-[#f0ebe4]"
+                        >
+                          Solicitar acceso
+                        </Link>
+                      )
                     ) : (
-                      <Link
-                        href={requestHref}
-                        className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f8f5f2] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] hover:bg-[#f0ebe4]"
-                      >
-                        Solicitar acceso
-                      </Link>
-                    )
-                  ) : (
-                    <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f4f1ec] px-7 py-3.5 text-sm font-bold text-[#7a756e]">
-                      Documento pendiente de carga
-                    </span>
-                  )}
+                      <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f4f1ec] px-7 py-3.5 text-sm font-bold text-[#7a756e]">
+                        Documento pendiente de carga
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {showScitaAreasBoard ? (
+                <div className="relative mt-6 overflow-hidden rounded-[24px] border border-[#e8dfd3] bg-white p-8 shadow-sm transition-shadow hover:shadow-md group">
+                  <div
+                    className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-10 blur-3xl transition-transform duration-700 group-hover:scale-150"
+                    style={{ background: inst.color }}
+                  />
+                  <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center">
+                    <div
+                      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] border border-black/5 shadow-inner"
+                      style={{ background: inst.lightBg, color: inst.color }}
+                    >
+                      <LayoutDashboard className="h-8 w-8" aria-hidden="true" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="mb-2 font-display text-2xl text-[#1a1a1a]">Tablero de áreas en SCITA</h3>
+                      <p className="text-base leading-relaxed text-[#4a4540]">
+                        Visualiza el estado de las áreas de conservación comunitaria, ecosistemas estratégicos y
+                        señales de presión ambiental en el territorio.
+                      </p>
+                    </div>
+                    <Link
+                      href={scitaAreasHref}
+                      className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
+                      style={{ background: inst.color }}
+                    >
+                      <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+                      Explorar tablero de áreas
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             {/* Right: Key points & actions (Sticky Sidebar) */}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteLayout } from "@/components/mock/ui";
+import { LoUltimoPublicationGallery } from "@/components/palenke/LoUltimoPublicationGallery";
 import { getInternalNewsBySlug } from "@/lib/content";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
@@ -21,6 +22,13 @@ export default async function IncidenciaDetailPage({
     notFound();
   }
 
+  const galleryImages =
+    item.galleryImageUrls?.length
+      ? item.galleryImageUrls
+      : item.coverImageUrl
+        ? [item.coverImageUrl]
+        : [];
+
   return (
     <SiteLayout
       role={role}
@@ -40,7 +48,9 @@ export default async function IncidenciaDetailPage({
               Lo Último
             </span>
             <span className="rounded-full bg-[#f0eae0] px-4 py-1.5 text-xs font-semibold text-[#4a4540]">
-              {new Intl.DateTimeFormat("es-CO", { dateStyle: "full", timeStyle: "short" }).format(new Date(item.publishedAt))}
+              {new Intl.DateTimeFormat("es-CO", { dateStyle: "full", timeStyle: "short" }).format(
+                new Date(item.publishedAt),
+              )}
             </span>
             {item.location ? (
               <span className="rounded-full bg-[#f0eae0] px-4 py-1.5 text-xs font-semibold text-[#4a4540]">
@@ -57,13 +67,8 @@ export default async function IncidenciaDetailPage({
 
       <section className="px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          {item.coverImageUrl ? (
-            <div
-              className="mb-8 h-[340px] rounded-[28px] bg-cover bg-center"
-              style={{
-                backgroundImage: `linear-gradient(180deg, rgba(26,26,26,0.15), rgba(26,26,26,0.55)), url(${item.coverImageUrl})`,
-              }}
-            />
+          {galleryImages.length > 0 ? (
+            <LoUltimoPublicationGallery images={galleryImages} title={item.title} />
           ) : null}
 
           <article className="surface-card">

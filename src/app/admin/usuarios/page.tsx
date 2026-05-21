@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { TriangleAlert } from "lucide-react";
-import { AdminLayout, Callout, StatusPill, TableCard, Toolbar } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { Callout, StatusPill, TableCard, Toolbar } from "@/components/mock/ui";
 import { formatLastLogin, organizations, users, USER_LIMIT } from "@/lib/mock-data";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
@@ -132,7 +133,7 @@ export default async function AdminUsuariosPage({
       <Toolbar
         actions={
           <div className="flex flex-wrap items-center gap-3">
-            <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+            <span className={`rounded-full border px-3 py-1 text-xs font-semibold whitespace-nowrap ${
               atLimit
                 ? "border-red-200 bg-red-50 text-red-700"
                 : "border-[color:var(--border-strong)] bg-[color:var(--sand-strong)] text-[color:var(--muted-strong)]"
@@ -140,71 +141,118 @@ export default async function AdminUsuariosPage({
               {countLabel}
             </span>
             {atLimit ? null : (
-              <Link href={withRole("/admin/usuarios/nuevo", role)} className="button-primary">
+              <Link href={withRole("/admin/usuarios/nuevo", role)} className="button-primary whitespace-nowrap">
                 + Nuevo usuario
               </Link>
             )}
           </div>
         }
       >
-        <form action="/admin/usuarios" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <input
-            name="q"
-            defaultValue={getFirstParam(params.q)}
-            placeholder="Buscar nombre/correo"
-            className="input-shell"
-          />
-          <select name="userRole" defaultValue={selectedRole} className="input-shell">
-            <option value="">Rol</option>
-            <option value="Admin">Admin</option>
-            <option value="Interno">Interno</option>
-          </select>
-          <select name="org" defaultValue={selectedOrg} className="input-shell">
-            <option value="">Organización</option>
-            {organizationOptions.map((org) => (
-              <option key={org} value={org}>{org}</option>
-            ))}
-          </select>
-          <button type="submit" className="button-secondary">
+        <form
+          action="/admin/usuarios"
+          className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,0.75fr)_minmax(0,1fr)_auto] lg:items-end"
+        >
+          <label className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--muted)]">
+              Buscar
+            </span>
+            <input
+              name="q"
+              defaultValue={getFirstParam(params.q)}
+              placeholder="Nombre o correo"
+              className="input-shell w-full"
+            />
+          </label>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--muted)]">
+              Rol
+            </span>
+            <select name="userRole" defaultValue={selectedRole} className="input-shell w-full">
+              <option value="">Todos</option>
+              <option value="Admin">Admin</option>
+              <option value="Interno">Interno</option>
+            </select>
+          </label>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--muted)]">
+              Organización
+            </span>
+            <select name="org" defaultValue={selectedOrg} className="input-shell w-full">
+              <option value="">Todas</option>
+              {organizationOptions.map((org) => (
+                <option key={org} value={org}>{org}</option>
+              ))}
+            </select>
+          </label>
+          <button type="submit" className="button-secondary w-full sm:w-auto lg:mb-0.5">
             Filtrar
           </button>
         </form>
       </Toolbar>
 
       <TableCard
-        headers={["Nombre", "Organización", "Rol", "Último acceso", "Estado", "⋮"]}
+        headers={["Usuario", "Correo", "Organización", "Rol", "Último acceso", "Estado", "Acciones"]}
+        minTableWidth="min-w-[1040px]"
+        columnWidths={["w-[14%]", "w-[26%]", "w-[14%]", "w-[10%]", "w-[14%]", "w-[10%]", "w-[12%]"]}
+        columnAlign={["left", "left", "left", "left", "left", "left", "right"]}
+        emptyMessage="No hay usuarios que coincidan con los filtros."
+        footer={
+          <p className="text-sm text-[color:var(--muted-strong)]">
+            Mostrando <span className="font-semibold text-[color:var(--forest)]">{filtered.length}</span> de{" "}
+            <span className="font-semibold text-[color:var(--forest)]">{usersData.length}</span> usuarios
+          </p>
+        }
         rows={filtered.map((user) => [
-          <div key="name" className="flex flex-col gap-0.5">
+          <div key="name" className="min-w-0">
             <Link
               href={withRole(`/admin/usuarios/${user.id}/editar`, role)}
-              className="font-medium text-[color:var(--forest)] underline"
+              className="block truncate font-semibold text-[color:var(--forest)] underline decoration-[color:var(--border-strong)] underline-offset-2 hover:decoration-[color:var(--forest)]"
             >
               {user.name}
             </Link>
-            <span className="text-xs text-[color:var(--muted)]">{user.email}</span>
             {user.mustChangePassword ? (
-              <span className="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
-                <TriangleAlert className="h-3 w-3" aria-hidden="true" />
-                <span>Cambio de contraseña pendiente</span>
+              <span className="mt-1.5 inline-flex max-w-full items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                <TriangleAlert className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">Cambio de contraseña pendiente</span>
               </span>
             ) : null}
           </div>,
-          <span key="org" className="text-sm text-[color:var(--muted-strong)]">{user.organization}</span>,
-          <span key="role" className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
-            user.role === "Admin"
-              ? "bg-[color:var(--forest)] text-[color:var(--sand)]"
-              : "bg-[color:var(--sand-strong)] text-[color:var(--forest)]"
-          }`}>{user.role}</span>,
-          <span key="login" className="text-sm text-[color:var(--muted-strong)]">
+          <span
+            key="email"
+            className="block truncate text-sm text-[color:var(--muted-strong)]"
+            title={user.email}
+          >
+            {user.email}
+          </span>,
+          <span key="org" className="block truncate text-sm text-[color:var(--muted-strong)]" title={user.organization}>
+            {user.organization}
+          </span>,
+          <span
+            key="role"
+            className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${
+              user.role === "Admin"
+                ? "bg-[color:var(--forest)] text-[color:var(--sand)]"
+                : "bg-[color:var(--sand-strong)] text-[color:var(--forest)]"
+            }`}
+          >
+            {user.role}
+          </span>,
+          <span key="login" className="whitespace-nowrap text-sm text-[color:var(--muted-strong)]">
             {formatLastLogin(user.lastLoginAt ?? undefined)}
           </span>,
           <StatusPill key="status" label={user.active ? "Activa" : "Desactivada"} tone={user.active ? "success" : "danger"} />,
-          <div key="actions" className="flex flex-wrap gap-2">
-            <Link href={withRole(`/admin/usuarios/${user.id}/editar`, role)} className="button-ghost">
+          <div key="actions" className="flex items-center justify-end gap-1 whitespace-nowrap">
+            <Link
+              href={withRole(`/admin/usuarios/${user.id}/editar`, role)}
+              className="rounded-xl px-3 py-2 text-sm font-medium text-[color:var(--forest)] transition hover:bg-[color:var(--sand-strong)]"
+            >
               Editar
             </Link>
-            <form action={deleteUserAction.bind(null, user.id)}>
-              <button type="submit" className="button-ghost text-[#d32f2f]">
+            <form action={deleteUserAction.bind(null, user.id)} className="inline">
+              <button
+                type="submit"
+                className="rounded-xl px-3 py-2 text-sm font-medium text-[#c62828] transition hover:bg-red-50"
+              >
                 Eliminar
               </button>
             </form>

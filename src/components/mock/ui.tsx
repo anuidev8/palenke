@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowLeft,
   ArrowRight,
   Ban,
   CheckCircle2,
@@ -28,6 +27,7 @@ type Crumb = {
 };
 
 import { SiteHeader } from "./SiteHeader";
+import { ContactFooterLink } from "@/components/palenke/ContactFooterLink";
 
 type SiteLayoutProps = {
   role: ViewerRole;
@@ -62,7 +62,7 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
             </span>
           </Link>
           <p className="max-w-sm text-sm leading-6 text-white/60">
-            Casa digital del Proceso de Comunidades Negras — espacio político, organizativo y de producción de conocimiento articulado por la Corporación Agencia Afrocolombiana Hileros.
+            Plataforma de Gobierno propio del Proceso de Comunidades Negras - espacio político, organizativo y de producción de conocimiento articulado por la Corporación Agencia Afrocolombiana Hileros.
           </p>
         </div>
 
@@ -105,17 +105,17 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
                 <Link href={withRole("/accesibilidad", role)} className="text-white/70 transition hover:text-white">
                   Accesibilidad
                 </Link>
-                <a href="mailto:datos@palenke.org" className="text-white/70 transition hover:text-white">
-                  Contacto
-                </a>
+                <ContactFooterLink />
               </div>
             </div>
 
             <div className="space-y-4 text-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/40">Aliados</p>
               <div className="grid gap-2.5">
-                <span className="text-white/70">Proceso de Comunidades Negras</span>
-                <span className="text-white/70">Corporación Agencia Afrocolombiana Hileros</span>
+                <span className="text-white/70">CLARIFI</span>
+                <span className="text-white/70">Turning Tides</span>
+                <span className="text-white/70">Tenure Facility</span>
+                <span className="text-white/70">International Land Coalition</span>
               </div>
             </div>
           </>
@@ -737,126 +737,6 @@ export function StatusPill({
   return <span className={`status-pill status-${tone}`}>{label}</span>;
 }
 
-export function AdminLayout({
-  role,
-  active,
-  title,
-  intro,
-  pendingSolicitudesCount,
-  children,
-}: {
-  role: ViewerRole;
-  active:
-    | "inicio"
-    | "solicitudes"
-    | "documentos"
-    | "novedades"
-    | "dashboards"
-    | "accs"
-    | "usuarios"
-    | "campanas"
-    | "contenido-visual";
-  title: string;
-  intro?: string;
-  pendingSolicitudesCount?: number;
-  children: ReactNode;
-}) {
-  const navItems = [
-    { id: "inicio", label: "Inicio", href: "/admin" },
-    { id: "solicitudes", label: "Solicitudes", href: "/admin/solicitudes" },
-    { id: "documentos", label: "Biblioteca", href: "/admin/documentos" },
-    { id: "novedades", label: "Noticias y agenda", href: "/admin/novedades" },
-    { id: "dashboards", label: "Dashboards", href: "/admin/dashboards" },
-    { id: "accs", label: "ACCs", href: "/admin/accs" },
-    { id: "usuarios", label: "Usuarios", href: "/admin/usuarios" },
-    { id: "campanas", label: "Campañas", href: "/admin/campanas" },
-    { id: "contenido-visual", label: "Contenido visual IA", href: "/admin/contenido-visual" },
-  ] as const;
-
-  return (
-    <div className="min-h-screen bg-[color:var(--page)] text-[color:var(--forest)]">
-      <header className="border-b border-[color:var(--border-soft)] bg-white/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--muted)]">Panel admin</p>
-            <h1 className="font-display text-3xl text-[color:var(--forest)]">{title}</h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-[color:var(--border-strong)] px-4 py-2 text-sm font-medium text-[color:var(--forest)]">
-              {getViewerName(role)}
-            </span>
-            <Link href={withRole("/", role)} className="button-secondary">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              <span>Volver al sitio</span>
-            </Link>
-            <Link href="/" className="button-ghost">
-              Cerrar sesión
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[250px_1fr] lg:px-8">
-        <aside className="surface-card h-fit p-4">
-          <details className="lg:hidden">
-            <summary className="list-none text-sm font-semibold text-[color:var(--forest)]">Secciones del panel</summary>
-            <nav aria-label="Panel de administración" className="mt-4 grid gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={withRole(item.href, role)}
-                  aria-current={active === item.id ? "page" : undefined}
-                  className={`rounded-2xl px-4 py-3 text-sm font-medium ${
-                    active === item.id ? "bg-[color:var(--forest)] text-[color:var(--sand)]" : "bg-[color:var(--sand-strong)] text-[color:var(--forest)]"
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <span>{item.label}</span>
-                    {item.id === "solicitudes" && pendingSolicitudesCount ? (
-                      <span className="rounded-full bg-[color:var(--danger)] px-2 py-0.5 text-xs font-semibold text-white">
-                        {pendingSolicitudesCount}
-                      </span>
-                    ) : null}
-                  </span>
-                </Link>
-              ))}
-            </nav>
-          </details>
-
-          <nav aria-label="Panel de administración" className="hidden gap-2 lg:grid">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={withRole(item.href, role)}
-                aria-current={active === item.id ? "page" : undefined}
-                className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                  active === item.id
-                    ? "bg-[color:var(--forest)] text-[color:var(--sand)]"
-                    : "bg-[color:var(--sand-strong)] text-[color:var(--forest)] hover:bg-[color:var(--gold-100)]"
-                }`}
-              >
-                <span className="inline-flex items-center gap-2">
-                  <span>{item.label}</span>
-                  {item.id === "solicitudes" && pendingSolicitudesCount ? (
-                    <span className="rounded-full bg-[color:var(--danger)] px-2 py-0.5 text-xs font-semibold text-white">
-                      {pendingSolicitudesCount}
-                    </span>
-                  ) : null}
-                </span>
-              </Link>
-            ))}
-          </nav>
-        </aside>
-
-        <div className="space-y-6">
-          {intro ? <p className="max-w-4xl text-base leading-7 text-[color:var(--muted-strong)]">{intro}</p> : null}
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function Toolbar({
   children,
   actions,
@@ -865,9 +745,11 @@ export function Toolbar({
   actions?: ReactNode;
 }) {
   return (
-    <div className="surface-card flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
-      <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">{children}</div>
-      {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
+    <div className="surface-card flex flex-col gap-4 p-5 sm:p-6 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
+      <div className="min-w-0 w-full flex-1">{children}</div>
+      {actions ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-3 lg:justify-end">{actions}</div>
+      ) : null}
     </div>
   );
 }
@@ -877,18 +759,37 @@ export function TableCard({
   rows,
   footer,
   columnWidths,
+  columnAlign,
+  minTableWidth = "min-w-[720px]",
+  emptyMessage,
 }: {
   headers: string[];
   rows: ReactNode[][];
   footer?: ReactNode;
-  /** Optional min-width classes per column for better layout on different devices (e.g. ["w-10", "min-w-[220px]"]). */
+  /** Optional width classes per column (e.g. ["w-[18%]", "min-w-[200px]"]). Enables table-fixed layout. */
   columnWidths?: string[];
+  /** Per-column alignment: left (default), center, or right. */
+  columnAlign?: Array<"left" | "center" | "right">;
+  /** Tailwind min-width on the table element (e.g. "min-w-[1080px]"). */
+  minTableWidth?: string;
+  emptyMessage?: string;
 }) {
   const hasColWidths = columnWidths && columnWidths.length === headers.length;
+  const alignClass = (index: number) => {
+    const align = columnAlign?.[index] ?? "left";
+    if (align === "center") return "text-center";
+    if (align === "right") return "text-right";
+    return "text-left";
+  };
+
   return (
     <div className="surface-card overflow-hidden p-0">
-      <div className="overflow-x-auto">
-        <table className="min-w-[880px] w-full divide-y divide-[color:var(--border-soft)] text-left text-sm">
+      <div className="overflow-x-auto [-webkit-overflow-scrolling:touch]">
+        <table
+          className={`w-full divide-y divide-[color:var(--border-soft)] text-left text-sm ${minTableWidth} ${
+            hasColWidths ? "table-fixed" : ""
+          }`}
+        >
           {hasColWidths ? (
             <colgroup>
               {columnWidths!.map((w, i) => (
@@ -898,18 +799,36 @@ export function TableCard({
           ) : null}
           <thead className="bg-[color:var(--sand-strong)]">
             <tr>
-              {headers.map((header) => (
-                <th key={header} className="px-5 py-4 font-semibold text-[color:var(--forest)] sm:px-6 sm:py-5">
+              {headers.map((header, index) => (
+                <th
+                  key={header}
+                  className={`px-4 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--forest)] sm:px-5 lg:px-6 lg:py-4 ${alignClass(index)} ${
+                    index === 0 ? "rounded-tl-[28px]" : ""
+                  } ${index === headers.length - 1 ? "rounded-tr-[28px]" : ""}`}
+                >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-[color:var(--border-soft)] bg-white">
+            {rows.length === 0 && emptyMessage ? (
+              <tr>
+                <td
+                  colSpan={headers.length}
+                  className="px-6 py-12 text-center text-sm text-[color:var(--muted-strong)]"
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : null}
             {rows.map((row, index) => (
-              <tr key={index}>
+              <tr key={index} className="transition-colors hover:bg-[color:rgb(255_250_240_/_0.45)]">
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="px-5 py-4 align-top text-[color:var(--muted-strong)] sm:px-6 sm:py-5">
+                  <td
+                    key={cellIndex}
+                    className={`px-4 py-4 align-middle text-[color:var(--muted-strong)] sm:px-5 lg:px-6 ${alignClass(cellIndex)}`}
+                  >
                     {cell}
                   </td>
                 ))}
@@ -918,7 +837,7 @@ export function TableCard({
           </tbody>
         </table>
       </div>
-      {footer ? <div className="border-t border-[color:var(--border-soft)] px-5 py-4 sm:px-6 sm:py-5">{footer}</div> : null}
+      {footer ? <div className="border-t border-[color:var(--border-soft)] px-5 py-4 sm:px-6">{footer}</div> : null}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminApiRequest } from "@/lib/admin-access";
+import { requireVisualContentAdminApiRequest } from "@/lib/admin-access";
 import { generateVisualSuggestions } from "@/lib/visual-content/generator";
 import {
   type VisualScreenId,
@@ -13,7 +13,7 @@ export const maxDuration = 120;
 
 export async function POST(request: NextRequest) {
   try {
-    const deniedResponse = await requireAdminApiRequest();
+    const deniedResponse = await requireVisualContentAdminApiRequest();
     if (deniedResponse) {
       return deniedResponse;
     }

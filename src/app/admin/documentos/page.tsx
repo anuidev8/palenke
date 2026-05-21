@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { AdminLayout, Callout, Toolbar, VisibilityBadge } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
+import { Callout, Toolbar, VisibilityBadge } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { createSupabaseService } from "@/lib/supabase/service";

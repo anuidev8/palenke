@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminApiRequest } from "@/lib/admin-access";
+import { requireVisualContentAdminApiRequest } from "@/lib/admin-access";
 import {
   generateVisualContent,
   type GenerateVisualContentInput,
@@ -26,7 +26,7 @@ const SUPPORTED_OUTPUT_DESTINATIONS: OutputDestination[] = [
 
 export async function POST(request: NextRequest) {
   try {
-    const deniedResponse = await requireAdminApiRequest();
+    const deniedResponse = await requireVisualContentAdminApiRequest();
     if (deniedResponse) {
       return deniedResponse;
     }

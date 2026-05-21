@@ -19,10 +19,8 @@ import {
   HomePoliticalOrientationAccordion,
   HomeWhoWeAreAccordion,
 } from "@/components/home/HomeInfoAccordions";
-import {
-  getExternalEnterateNews,
-  listInternalNews,
-} from "@/lib/content";
+import { getExternalEnterateNews, listLoUltimoNews } from "@/lib/content";
+import { LoUltimoListRow } from "@/components/palenke/LoUltimoListRow";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 import { HomeVideoGallery } from "@/components/home/HomeVideoGallery";
 
@@ -36,7 +34,7 @@ export default async function HomePage({
   const notice = params.notice;
   const [noticias, ultimasNoticias] = await Promise.all([
     getExternalEnterateNews(3),
-    listInternalNews({ limit: 4 }),
+    listLoUltimoNews({ limit: 5 }),
   ]);
 
   return (
@@ -324,7 +322,7 @@ export default async function HomePage({
                 color: "#2e7d32",
                 lightBg: "#d8f3dc",
                 tag: "Gobierno propio",
-                title: "Áreas de conservación bioculturales",
+                title: "Áreas bioculturales de conservación comunitaria",
                 description:
                   "Territorios colectivos con enfoque de pueblo negro: cartografía, acuerdos comunitarios y estrategias de conservación biocultural.",
                 href: "/gobierno-propio",
@@ -337,7 +335,7 @@ export default async function HomePage({
                 title: "Protección hídrica",
                 description:
                   "Instrumentos, resoluciones y rutas de litigio para la defensa de cuencas y fuentes de agua.",
-                href: "/gobierno-propio",
+                href: "/gobierno-propio/proteccion-hidrica",
                 cta: "Ver instrumentos",
               },
               {
@@ -478,26 +476,13 @@ export default async function HomePage({
               </Link>
             </div>
 
-            <div className="divide-y divide-[#e8dfd3] overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-white">
+            <div className="divide-y divide-[#e8dfd3] overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-white shadow-[0_12px_40px_rgba(26,26,26,0.04)]">
               {ultimasNoticias.map((n) => (
-                <Link
+                <LoUltimoListRow
                   key={n.id}
+                  item={n}
                   href={withRole(`/incidencia/${n.slug}`, role)}
-                  className="flex items-start gap-4 px-5 py-4 transition hover:bg-[#f8f5f2]"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fddede] text-xs font-bold text-[#d32f2f]">
-                    {n.category.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-[#7a756e]">
-                      {new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(new Date(n.publishedAt))} ·{" "}
-                      <span className="font-semibold text-[#1a1a1a]">{n.category}</span>
-                    </p>
-                    <p className="mt-1 text-sm font-medium leading-5 text-[#1a1a1a]">{n.title}</p>
-                    <p className="mt-0.5 text-xs text-[#7a756e]">{n.location ?? "Palenke / PCN"}</p>
-                  </div>
-                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#7a756e]" aria-hidden="true" />
-                </Link>
+                />
               ))}
             </div>
 

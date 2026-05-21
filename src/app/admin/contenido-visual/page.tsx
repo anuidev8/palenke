@@ -1,6 +1,6 @@
-import { AdminLayout } from "@/components/mock/ui";
+import { AdminLayout } from "@/components/mock/AdminLayout";
 import { AdminVisualContentGenerator } from "@/components/mock/AdminVisualContentGenerator";
-import { requireAdmin } from "@/lib/admin-access";
+import { requireVisualContentAdmin } from "@/lib/admin-access";
 import type { SearchParams } from "@/lib/viewer";
 import { getVisualScreenOptions, getVisualTopicOptions } from "@/lib/visual-content/profiles";
 
@@ -9,7 +9,7 @@ export default async function AdminContenidoVisualPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { role } = await requireAdmin(searchParams);
+  const { role } = await requireVisualContentAdmin(searchParams);
   const topics = getVisualTopicOptions();
   const screens = getVisualScreenOptions();
 

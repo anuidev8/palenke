@@ -2,98 +2,39 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, ChevronDown, ChevronRight, ExternalLink, Maximize2, Minimize2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Globe,
+  HelpCircle,
+  Lock,
+  Maximize2,
+  Minimize2,
+} from "lucide-react";
+import {
+  ScitaDashboardGuideModal,
+  ScitaDashboardGuideSummary,
+} from "@/components/palenke/ScitaDashboardGuideModal";
 import { SCITA_MARKETING_BANNER_SRC } from "@/components/palenke/scitaMarketingHero";
+import type { ViewerRole } from "@/lib/mock-data";
+import type { ScitaDashboardRecord } from "@/lib/scita-dashboards";
+import { normalizeScitaBoardOrigin } from "@/lib/scita-report-form";
+import { isInternal } from "@/lib/viewer";
 
-export type ScitaDashboardId = "gobierno" | "conservacion" | "titulacion";
+export type ScitaDashboardId = ScitaDashboardRecord["moduleKey"];
 
-type DashboardConfig = {
-  id: ScitaDashboardId;
-  title: string;
-  shortLabel: string;
-  description: string;
-  detailDescription: string;
-  detailBullets: string[];
-  embedUrl: string;
-  iframeTitle: string;
-  embedWidth: number;
-  embedHeight: number;
-  footerCropPx?: number;
-  iconSrc: string;
-};
-
-const DEFAULT_EMBED_WIDTH = 600;
-const DEFAULT_EMBED_HEIGHT = 373.5;
 const DEFAULT_POWERBI_FOOTER_PX = 56;
 
-const DASHBOARDS: DashboardConfig[] = [
-  {
-    id: "gobierno",
-    title: "Instrumentos de Gobierno Propio",
-    shortLabel: "Gobierno propio",
-    description: "Reglamentos, normas internas y planes de etnodesarrollo comunitario.",
-    detailDescription:
-      "Este tablero consolida la información de reglamentos comunitarios, planes de uso y planes de etnodesarrollo para identificar avances, brechas y prioridades de gobernanza. Permite comparar territorios, fortalecer la toma de decisiones internas y sustentar procesos organizativos con evidencia territorial para escenarios de planificación anual y rendición comunitaria.",
-    detailBullets: [
-      "Cobertura: consejos comunitarios, instrumento vigente, estado de adopción y nivel de actualización.",
-      "Lectura principal: qué territorios tienen avances normativos robustos y cuáles requieren acompañamiento técnico o jurídico.",
-      "Cruce sugerido: relacionar instrumentos con conflictos de uso del suelo, presión extractiva y alertas territoriales.",
-      "Uso político: preparar reuniones con autoridades, asambleas y mesas interinstitucionales con evidencia consolidada.",
-    ],
-    iframeTitle: "P_Instrumentos de Gobierno Propio",
-    embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiZjljZDMxZjMtMjNhNS00ZGMzLTgwMTYtY2E5YzM4ZGNhNjE5IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
-    embedWidth: DEFAULT_EMBED_WIDTH,
-    embedHeight: DEFAULT_EMBED_HEIGHT,
-    footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
-    iconSrc: "/assets/scita/icons/icon-gobierno.png",
-  },
-  {
-    id: "conservacion",
-    title: "Áreas de Conservación Comunitaria",
-    shortLabel: "Conservación",
-    description: "Figuras de protección, biodiversidad y seguimiento territorial de ecosistemas.",
-    detailDescription:
-      "Este módulo muestra el estado de las áreas de conservación comunitaria, la distribución de ecosistemas estratégicos y señales de presión ambiental en el territorio. Su lectura facilita priorizar acciones de protección, monitoreo y control comunitario sobre bosques, cuencas y zonas de alta importancia biocultural en ventanas de seguimiento mensual y trimestral.",
-    detailBullets: [
-      "Cobertura: áreas bioculturales, cuencas priorizadas, cobertura boscosa y puntos críticos de presión.",
-      "Lectura principal: identificar dónde se concentra la amenaza y qué zonas mantienen mayor resiliencia ecológica.",
-      "Cruce sugerido: contrastar cambios de cobertura con reportes de campo y eventos climáticos recientes.",
-      "Uso operativo: priorizar brigadas comunitarias, rutas de verificación y medidas de restauración temprana.",
-    ],
-    iframeTitle: "P_Áreas de Conservación Comunitaria",
-    embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiNTk3NmZlYmMtN2U2NS00NTFkLWEzOTEtZjAzNTg0ZTZhNjU2IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
-    embedWidth: DEFAULT_EMBED_WIDTH,
-    embedHeight: DEFAULT_EMBED_HEIGHT,
-    footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
-    iconSrc: "/assets/scita/icons/icon-conservacion.png",
-  },
-  {
-    id: "titulacion",
-    title: "Titulación Colectiva De Comunidades Negras",
-    shortLabel: "Titulación colectiva",
-    description: "Consejos comunitarios y territorios colectivos en trámite y adjudicación.",
-    detailDescription:
-      "Este tablero presenta el comportamiento de procesos de titulación colectiva por consejo comunitario y por estado del trámite, visibilizando avances y rezagos. Sirve para orientar incidencia jurídica y política, respaldar gestiones institucionales y dar seguimiento a la garantía efectiva de derechos territoriales en ciclos de gestión ante entidades públicas.",
-    detailBullets: [
-      "Cobertura: expedientes por territorio, fase del trámite, tiempos acumulados y estado administrativo.",
-      "Lectura principal: detectar cuellos de botella en procesos de adjudicación y formalización colectiva.",
-      "Cruce sugerido: comparar avance de titulación con presión territorial y conflictividad local.",
-      "Uso estratégico: sustentar acciones de incidencia, seguimiento legal y priorización de casos urgentes.",
-    ],
-    iframeTitle: "P_Titulación Colectiva De Comunidades Negras",
-    embedUrl:
-      "https://app.powerbi.com/view?r=eyJrIjoiZjZlYzMzZDctNDcwMy00Zjc5LTg1ZjUtODRjYTYzZGZkZGE4IiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
-    embedWidth: DEFAULT_EMBED_WIDTH,
-    embedHeight: DEFAULT_EMBED_HEIGHT,
-    footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
-    iconSrc: "/assets/scita/icons/icon-titulacion.png",
-  },
-];
+export type ScitaDashboardPanelProps = {
+  dashboards: ScitaDashboardRecord[];
+  viewerRole: ViewerRole;
+  isAuthenticated: boolean;
+};
 
 const panelEase = [0.22, 1, 0.36, 1] as const;
 const panelSpring = { type: "spring" as const, stiffness: 380, damping: 32 };
@@ -112,12 +53,78 @@ function buildChromelessEmbedUrl(baseUrl: string) {
   return url.toString();
 }
 
+type BoardVisibilityTab = "public" | "internal";
+
+function ScitaBoardVisibilityTabs({
+  activeTab,
+  publicCount,
+  internalCount,
+  onChange,
+}: {
+  activeTab: BoardVisibilityTab;
+  publicCount: number;
+  internalCount: number;
+  onChange: (tab: BoardVisibilityTab) => void;
+}) {
+  const tabs: { id: BoardVisibilityTab; label: string; count: number; Icon: typeof Globe }[] = [
+    { id: "public", label: "Públicos", count: publicCount, Icon: Globe },
+    { id: "internal", label: "Internos", count: internalCount, Icon: Lock },
+  ];
+
+  return (
+    <div
+      role="tablist"
+      aria-label="Tipo de tableros"
+      className="grid grid-cols-2 gap-1 rounded-xl border border-white/10 bg-black/25 p-1"
+    >
+      {tabs.map(({ id, label, count, Icon }) => {
+        const selected = activeTab === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            onClick={() => onChange(id)}
+            className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80 ${
+              selected
+                ? id === "public"
+                  ? "bg-sky-500/25 text-sky-100 shadow-[inset_0_0_0_1px_rgba(125,211,252,0.35)]"
+                  : "bg-amber-500/25 text-amber-100 shadow-[inset_0_0_0_1px_rgba(251,191,36,0.35)]"
+                : "text-white/55 hover:bg-white/8 hover:text-white/85"
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span>{label}</span>
+            <span className="tabular-nums opacity-75">({count})</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ScitaSessionAccessTag({ viewerIsInternal }: { viewerIsInternal: boolean }) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+        viewerIsInternal
+          ? "border-amber-300/45 bg-amber-400/15 text-amber-100"
+          : "border-sky-300/40 bg-sky-400/15 text-sky-100"
+      }`}
+    >
+      {viewerIsInternal ? <Lock className="h-3 w-3" aria-hidden /> : <Globe className="h-3 w-3" aria-hidden />}
+      {viewerIsInternal ? "Interno" : "Público"}
+    </span>
+  );
+}
+
 function DashboardMenuCard({
   dashboard,
   selected,
   onSelect,
 }: {
-  dashboard: DashboardConfig;
+  dashboard: ScitaDashboardRecord;
   selected: boolean;
   onSelect: () => void;
 }) {
@@ -150,7 +157,9 @@ function DashboardMenuCard({
         </motion.div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-semibold leading-tight text-white sm:text-lg">{dashboard.shortLabel}</p>
-          <p className="mt-1 line-clamp-2 text-sm leading-snug text-white/75 sm:text-[15px] sm:leading-snug">{dashboard.description}</p>
+          <p className="mt-1 line-clamp-2 text-sm leading-snug text-white/75 sm:text-[15px] sm:leading-snug">
+            {dashboard.description}
+          </p>
         </div>
         <ChevronRight
           className={`h-5 w-5 shrink-0 transition-colors ${selected ? "text-amber-300" : "text-white/45 group-hover:text-white/80"}`}
@@ -252,11 +261,14 @@ function PowerBiEmbedFrame({
   src,
   embedHeight,
   footerCropPx = DEFAULT_POWERBI_FOOTER_PX,
+  fillContainer = false,
 }: {
   title: string;
   src: string;
   embedHeight: number;
   footerCropPx?: number;
+  /** Fullscreen / expanded: 100% sizing so the embed repaints after layout changes. */
+  fillContainer?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
   // Publish-to-web keeps a bottom bar; crop it using known pixel height from the original embed size.
@@ -285,8 +297,12 @@ function PowerBiEmbedFrame({
           title={title}
           src={buildChromelessEmbedUrl(src)}
           onLoad={() => setLoaded(true)}
-          className="absolute left-0 top-0 block w-full border-0"
-          style={{ height: `${100 + safeCropBottom * 100}%` }}
+          className="absolute left-0 top-0 block h-full w-full border-0"
+          style={
+            fillContainer
+              ? undefined
+              : { height: `${100 + safeCropBottom * 100}%`, width: "100%" }
+          }
           allowFullScreen
           loading="lazy"
         />
@@ -303,47 +319,163 @@ function hrefWithCurrentSearch(path: string, search: string) {
   return search ? `${path}?${search}` : path;
 }
 
-export function ScitaDashboardPanel() {
+export function ScitaDashboardPanel({
+  dashboards,
+  viewerRole,
+  isAuthenticated,
+}: ScitaDashboardPanelProps) {
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
+  const tableroParam = searchParams.get("tablero");
 
-  const [activeId, setActiveId] = useState<ScitaDashboardId>("gobierno");
+  const viewerIsInternal = isInternal(viewerRole);
+
+  const publicBoards = useMemo(
+    () => dashboards.filter((dashboard) => dashboard.visibility === "public"),
+    [dashboards],
+  );
+  const internalBoards = useMemo(
+    () => dashboards.filter((dashboard) => dashboard.visibility === "internal"),
+    [dashboards],
+  );
+  const showVisibilityTabs = viewerIsInternal && internalBoards.length > 0;
+
+  const [visibilityTab, setVisibilityTab] = useState<BoardVisibilityTab>("public");
+  const [activeId, setActiveId] = useState(() => dashboards[0]?.id ?? "");
   const [showBannerDetails, setShowBannerDetails] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
+  const [cssExpanded, setCssExpanded] = useState(false);
   const [surfaceHeight, setSurfaceHeight] = useState<number | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
-  const active = DASHBOARDS.find((d) => d.id === activeId) ?? DASHBOARDS[0];
-  const reportAspectRatio = active.embedWidth / active.embedHeight;
+  const appliedTableroParam = useRef(false);
+  const isExpanded = expanded || cssExpanded;
+
+  const visibleBoards = showVisibilityTabs
+    ? visibilityTab === "public"
+      ? publicBoards
+      : internalBoards
+    : dashboards;
+
+  const handleVisibilityTabChange = useCallback(
+    (tab: BoardVisibilityTab) => {
+      setVisibilityTab(tab);
+      const list = tab === "public" ? publicBoards : internalBoards;
+      if (!list.length) return;
+
+      const current = dashboards.find((dashboard) => dashboard.id === activeId);
+      const sameModule = current
+        ? list.find((dashboard) => dashboard.moduleKey === current.moduleKey)
+        : undefined;
+      setActiveId(sameModule?.id ?? list[0].id);
+    },
+    [activeId, dashboards, internalBoards, publicBoards],
+  );
+
+  useEffect(() => {
+    if (!dashboards.length) {
+      setActiveId("");
+      return;
+    }
+    if (!visibleBoards.length) {
+      const fallback = visibilityTab === "internal" ? publicBoards : internalBoards;
+      if (fallback[0]) {
+        setVisibilityTab(fallback[0].visibility);
+        setActiveId(fallback[0].id);
+      }
+      return;
+    }
+    if (!visibleBoards.some((dashboard) => dashboard.id === activeId)) {
+      setActiveId(visibleBoards[0].id);
+    }
+  }, [activeId, dashboards, internalBoards, publicBoards, visibilityTab, visibleBoards]);
+
+  useEffect(() => {
+    if (!showVisibilityTabs) return;
+    const current = dashboards.find((dashboard) => dashboard.id === activeId);
+    if (current?.visibility === "public" || current?.visibility === "internal") {
+      setVisibilityTab(current.visibility);
+    }
+  }, [activeId, dashboards, showVisibilityTabs]);
+
+  useEffect(() => {
+    if (appliedTableroParam.current || !dashboards.length) return;
+    const moduleKey = normalizeScitaBoardOrigin(tableroParam);
+    if (!moduleKey) return;
+
+    const preferred =
+      (viewerIsInternal
+        ? dashboards.find((dashboard) => dashboard.moduleKey === moduleKey && dashboard.visibility === "internal")
+        : undefined) ??
+      dashboards.find((dashboard) => dashboard.moduleKey === moduleKey && dashboard.visibility === "public") ??
+      dashboards.find((dashboard) => dashboard.moduleKey === moduleKey);
+
+    if (!preferred) return;
+
+    appliedTableroParam.current = true;
+    setActiveId(preferred.id);
+    setVisibilityTab(preferred.visibility);
+  }, [dashboards, tableroParam, viewerIsInternal]);
+
+  const active = dashboards.find((d) => d.id === activeId) ?? dashboards[0];
+  const fieldReportUrl = useMemo(() => {
+    const params = new URLSearchParams(searchString);
+    if (active) {
+      params.set("tablero", active.moduleKey);
+    }
+    return `/scita/formulario?${params.toString()}`;
+  }, [searchString, active]);
+  const reportAspectRatio = active ? active.embedWidth / active.embedHeight : 600 / 373.5;
 
   const toggleExpanded = useCallback(async () => {
     if (!boardRef.current) return;
-    try {
-      if (!document.fullscreenElement) {
-        await boardRef.current.requestFullscreen();
-        setExpanded(true);
-      } else {
+
+    if (cssExpanded) {
+      setCssExpanded(false);
+      return;
+    }
+
+    if (document.fullscreenElement === boardRef.current) {
+      try {
         await document.exitFullscreen();
+      } catch {
+        setIsNativeFullscreen(false);
         setExpanded(false);
       }
-    } catch {
-      setExpanded((v) => !v);
+      return;
     }
-  }, []);
+
+    try {
+      await boardRef.current.requestFullscreen();
+      setIsNativeFullscreen(true);
+      setExpanded(true);
+    } catch {
+      setIsNativeFullscreen(false);
+      setExpanded(false);
+      setCssExpanded(true);
+    }
+  }, [cssExpanded]);
 
   useEffect(() => {
     const onFullscreenChange = () => {
-      setExpanded(Boolean(document.fullscreenElement));
+      const native = document.fullscreenElement === boardRef.current;
+      setIsNativeFullscreen(native);
+      if (native) {
+        setCssExpanded(false);
+        setExpanded(true);
+      } else if (!cssExpanded) {
+        setExpanded(false);
+      }
     };
     document.addEventListener("fullscreenchange", onFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
-  }, []);
+  }, [cssExpanded]);
 
   useEffect(() => {
-    if (expanded) return;
-
     const element = surfaceRef.current;
-    if (!element || typeof window === "undefined") return;
+    if (!element || typeof window === "undefined" || isExpanded) return;
 
     const updateSurfaceHeight = () => {
       const width = element.getBoundingClientRect().width;
@@ -368,22 +500,52 @@ export function ScitaDashboardPanel() {
       observer?.disconnect();
       window.removeEventListener("resize", updateSurfaceHeight);
     };
-  }, [expanded, reportAspectRatio]);
+  }, [isExpanded, reportAspectRatio]);
+
+  useEffect(() => {
+    if (!isExpanded || typeof window === "undefined") return;
+    let frame2 = 0;
+    const frame1 = requestAnimationFrame(() => {
+      frame2 = requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+    });
+    return () => {
+      cancelAnimationFrame(frame1);
+      cancelAnimationFrame(frame2);
+    };
+  }, [isExpanded, activeId]);
+
+  if (!active) {
+    return (
+      <div className="rounded-[28px] border border-[#d8d1bc] bg-[#f5f4ed] px-6 py-12 text-center">
+        <p className="font-display text-xl text-[#244334]">No hay tableros disponibles</p>
+        <p className="mt-2 text-sm text-[#3d5248]">
+          {viewerIsInternal
+            ? "Revisa el estado de los tableros en el panel de administración."
+            : "Los tableros internos requieren una sesión con perfil interno o administrador."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
-      layout
+      layout={!isExpanded}
+      layoutRoot={isExpanded}
       ref={boardRef}
       className={`relative z-[1] flex w-full max-w-full isolate ${
-        expanded
-          ? "fixed inset-0 z-[90] h-dvh min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain rounded-none border-0 bg-[#051008]"
-          : "flex flex-col overflow-x-clip overflow-y-visible rounded-[28px] border border-[#1f3b2d]/40 bg-[#f5f4ed] shadow-[0_28px_64px_rgba(4,16,11,0.35)] md:flex-row"
+        isExpanded
+          ? isNativeFullscreen
+            ? "scita-board-fullscreen flex h-full min-h-0 w-full max-w-full flex-row overflow-hidden rounded-none border-0 bg-[#051008]"
+            : "fixed inset-0 z-[90] flex h-dvh min-h-0 w-full flex-row overflow-hidden rounded-none border-0 bg-[#051008]"
+          : "flex flex-col overflow-x-clip overflow-y-visible rounded-[28px] border border-[#1f3b2d]/40 bg-[#f5f4ed] shadow-[0_28px_64px_rgba(4,16,11,0.35)] md:flex-row md:items-stretch"
       }`}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: panelEase }}
     >
-      {!expanded ? (
+      {!isExpanded ? (
         <div
           className="pointer-events-none absolute inset-0 opacity-50"
           aria-hidden
@@ -400,9 +562,9 @@ export function ScitaDashboardPanel() {
         layout
         transition={panelSpring}
         className={`relative flex min-h-0 min-w-0 shrink-0 flex-col border-[#d7d0bf] ${
-          expanded
-            ? "absolute inset-y-0 left-0 z-30 w-[min(88vw,340px)] max-w-[88vw] border-r bg-[#09160f]/95 text-white backdrop-blur-xl sm:max-w-none sm:w-[360px]"
-            : "w-full min-h-0 border-b bg-gradient-to-b from-[#0e251a] via-[#091b13] to-[#07140f] text-white md:w-[332px] md:shrink-0 md:border-b-0 md:border-r lg:w-[360px] xl:w-[388px] 2xl:w-[412px]"
+          isExpanded
+            ? "z-30 h-full w-[min(88vw,340px)] max-w-[88vw] shrink-0 border-r bg-[#09160f]/95 text-white backdrop-blur-xl sm:max-w-none sm:w-[360px]"
+            : "flex w-full min-h-0 flex-col border-b bg-gradient-to-b from-[#0e251a] via-[#091b13] to-[#07140f] text-white md:w-[332px] md:shrink-0 md:overflow-hidden md:border-b-0 md:border-r lg:w-[360px] xl:w-[388px] 2xl:w-[412px]"
         }`}
         aria-label="Menú de tableros"
       >
@@ -420,22 +582,48 @@ export function ScitaDashboardPanel() {
           }}
         />
 
-        <motion.div
-          layout
-          className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 px-2 py-3 sm:gap-3.5 sm:px-2.5 sm:py-3.5 md:max-h-[92dvh] md:overflow-y-auto md:overscroll-y-contain md:px-2.5 md:py-4 lg:gap-4"
-        >
-          <motion.div layout="position">
-            <p className="text-xs font-bold uppercase tracking-[0.17em] text-emerald-200/85 sm:text-[13px]">Módulos principales</p>
-            <h2 className="mt-1 font-display text-[clamp(1.35rem,3.5vw,1.85rem)] font-semibold leading-tight text-white sm:text-[1.75rem] md:text-[29px]">
-              SCITA
-            </h2>
-            <p className="mt-1 max-w-[32ch] text-sm leading-relaxed text-white/75 sm:text-[15px] md:max-w-none">
-              Selecciona un módulo para abrir su tablero territorial en vista ampliada.
+        <motion.div layout className="relative z-10 flex min-h-0 w-full flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto overscroll-y-contain px-3.5 pt-4 sm:gap-4 sm:px-4 sm:pt-5 lg:gap-4">
+          <motion.div layout="position" className="shrink-0 space-y-1.5">
+            <motion.div className="flex flex-wrap items-start justify-between gap-2 gap-y-1.5">
+              <h2 className="font-display text-[clamp(1.25rem,3.2vw,1.65rem)] font-semibold leading-tight text-white">
+                Tableros territoriales
+              </h2>
+              <ScitaSessionAccessTag viewerIsInternal={viewerIsInternal} />
+            </motion.div>
+            <p className="text-sm text-white/60">Elige un módulo para abrir su vista.</p>
+            <p className="text-xs leading-relaxed text-white/55">
+              {viewerIsInternal ? (
+                <>
+                  Sesión {isAuthenticated ? "activa" : "simulada"} · rol{" "}
+                  <span className="font-semibold text-emerald-200/90">{viewerRole}</span>
+                  {showVisibilityTabs
+                    ? " · usa las pestañas para alternar tableros públicos e internos"
+                    : " · ves tableros públicos e internos"}
+                </>
+              ) : isAuthenticated ? (
+                <>Inicia sesión con perfil interno para ver tableros restringidos.</>
+              ) : (
+                <>Solo tableros públicos. Inicia sesión como equipo para ver versiones internas.</>
+              )}
             </p>
+
+            {showVisibilityTabs ? (
+              <ScitaBoardVisibilityTabs
+                activeTab={visibilityTab}
+                publicCount={publicBoards.length}
+                internalCount={internalBoards.length}
+                onChange={handleVisibilityTabChange}
+              />
+            ) : null}
           </motion.div>
 
-          <nav className="grid shrink-0 gap-2.5 sm:gap-3">
-            {DASHBOARDS.map((dashboard) => (
+          <nav
+            className="grid shrink-0 gap-2.5 sm:gap-3"
+            aria-label={showVisibilityTabs ? `Módulos ${visibilityTab === "public" ? "públicos" : "internos"}` : "Módulos"}
+            role={showVisibilityTabs ? "tabpanel" : undefined}
+          >
+            {visibleBoards.map((dashboard) => (
               <DashboardMenuCard
                 key={dashboard.id}
                 dashboard={dashboard}
@@ -444,12 +632,14 @@ export function ScitaDashboardPanel() {
               />
             ))}
           </nav>
+          </div>
 
-          <div className="min-h-2 flex-1 shrink-0" aria-hidden />
-
-          <div className="flex shrink-0 flex-col gap-2.5 sm:gap-3">
+          <div
+            className="flex shrink-0 flex-col gap-2.5 border-t border-white/10 bg-[#091b13] px-3.5 pb-4 pt-3 sm:gap-3 sm:px-4 sm:pb-5"
+            aria-label="Acciones y ayuda"
+          >
             <Link
-              href={hrefWithCurrentSearch("/scita/formulario", searchString)}
+              href={fieldReportUrl}
               className="group flex flex-col gap-3 rounded-2xl border-2 border-[#8b4a2f]/60 bg-gradient-to-br from-[#c4713d] to-[#9a4a2c] p-3 shadow-lg transition hover:border-[#fbc02d]/40 hover:shadow-xl sm:p-3.5"
             >
               <div className="flex items-start gap-3">
@@ -457,8 +647,12 @@ export function ScitaDashboardPanel() {
                   <AlertTriangle className="h-5 w-5 text-white" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-[15px] font-bold leading-snug text-white sm:text-lg">Crear reporte de alerta</h3>
-                  <p className="mt-1 text-sm leading-snug text-white/90 sm:text-[15px]">Registra amenazas o novedades desde el territorio.</p>
+                  <h3 className="font-display text-[15px] font-bold leading-snug text-white sm:text-lg">
+                    Crear reporte de alerta
+                  </h3>
+                  <p className="mt-1 text-sm leading-snug text-white/90 sm:text-[15px]">
+                    Registra amenazas o novedades desde el territorio.
+                  </p>
                 </div>
               </div>
               <span className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/95 px-3 py-2.5 text-sm font-bold text-[#7a3b24] transition group-hover:bg-white sm:text-base">
@@ -474,18 +668,21 @@ export function ScitaDashboardPanel() {
               Abrir SIG completo
               <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
             </Link>
-          </div>
 
-          <div className="shrink-0 border-t border-white/10 pt-3 text-center">
-            <p className="font-display text-xs font-semibold uppercase tracking-[0.38em] text-white/45 sm:text-[13px]">ISI</p>
+            <ScitaDashboardGuideSummary onOpenGuide={() => setGuideOpen(true)} />
           </div>
         </motion.div>
       </motion.aside>
 
-      <motion.div layout className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip overflow-y-visible">
+      <motion.div
+        layout={!isExpanded}
+        className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip ${
+          isExpanded ? "h-full min-h-0 overflow-hidden" : "overflow-y-visible"
+        }`}
+      >
 
-        {!expanded ? (
-          <div className="px-4 pt-4 sm:px-6">
+        {!isExpanded ? (
+          <div className="px-5 pt-5 sm:px-7 sm:pt-6">
             <motion.div
               key={active.id}
               layout
@@ -528,10 +725,7 @@ export function ScitaDashboardPanel() {
                         {active.detailDescription}
                       </p>
                       <div className="mt-3 max-w-[92ch] rounded-xl border border-white/20 bg-black/28 px-4 py-3 backdrop-blur-sm">
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-200/85 sm:text-[13px]">
-                          Detalle del tablero (mock)
-                        </p>
-                        <ul className="mt-2 space-y-1.5 text-[15px] leading-relaxed text-white/90 sm:text-base">
+                        <ul className="space-y-1.5 text-[15px] leading-relaxed text-white/90 sm:text-base">
                           {active.detailBullets.map((item) => (
                             <li key={item} className="flex items-start gap-2">
                               <span className="mt-[0.42rem] h-1.5 w-1.5 shrink-0 rounded-full bg-lime-300" aria-hidden />
@@ -548,7 +742,13 @@ export function ScitaDashboardPanel() {
           </div>
         ) : null}
 
-        <div className={`relative flex min-h-0 min-w-0 flex-1 flex-col ${expanded ? "min-h-0 overflow-x-clip overflow-y-auto overscroll-y-contain" : "overflow-x-clip overflow-y-visible"} ${expanded ? "px-2 pb-2 pt-2 sm:px-3 sm:pb-3" : "px-4 pb-4 pt-4 sm:px-6 sm:pb-6"}`}>
+        <motion.div
+          className={`relative flex min-h-0 min-w-0 flex-1 flex-col ${
+            isExpanded
+              ? "h-full min-h-0 overflow-hidden px-2 pb-2 pt-2 sm:px-3 sm:pb-3"
+              : "overflow-x-clip overflow-y-visible px-5 pb-5 pt-3 sm:px-7 sm:pb-7 sm:pt-4"
+          }`}
+        >
           <motion.button
             type="button"
             onClick={toggleExpanded}
@@ -556,24 +756,24 @@ export function ScitaDashboardPanel() {
             whileTap={{ scale: 0.96 }}
             transition={panelSpring}
             className={`absolute right-6 top-4 z-20 inline-flex h-9 w-9 items-center justify-center rounded-xl border shadow-sm transition sm:right-8 ${
-              expanded
+              isExpanded
                 ? "border-white/20 bg-black/50 text-white hover:bg-black/70"
                 : "border-[#d6d0be] bg-white/95 text-[#244334] hover:bg-[#f4f1e6]"
             }`}
-            aria-label={expanded ? "Salir de pantalla completa" : "Pantalla completa del tablero"}
+            aria-label={isExpanded ? "Salir de pantalla completa" : "Pantalla completa del tablero"}
           >
-            {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </motion.button>
           <motion.div
-            layout
+            layout={!isExpanded}
             ref={surfaceRef}
             className={`relative min-h-0 min-w-0 overflow-hidden rounded-2xl border bg-[#0b0b0b] ${
-              expanded
-                ? "flex-1 border-white/12 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]"
+              isExpanded
+                ? "h-full min-h-[280px] flex-1 border-white/12 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]"
                 : "w-full border-[#d8d1bc] shadow-[0_18px_36px_rgba(3,10,8,0.22)]"
             }`}
             style={
-              expanded
+              isExpanded
                 ? undefined
                 : {
                     aspectRatio: `${active.embedWidth} / ${active.embedHeight}`,
@@ -588,11 +788,31 @@ export function ScitaDashboardPanel() {
                 src={active.embedUrl}
                 embedHeight={active.embedHeight}
                 footerCropPx={active.footerCropPx}
+                fillContainer={isExpanded}
               />
             </AnimatePresence>
           </motion.div>
-        </div>
+
+          {!isExpanded ? (
+            <motion.div
+              layout
+              className="mt-3 hidden shrink-0 items-center justify-between gap-3 rounded-2xl border border-[#d8d1bc]/80 bg-[#f0ede4] px-4 py-3 md:flex sm:px-5"
+            >
+              <p className="text-sm text-[#3d5248]">Guía rápida para leer los tableros territoriales.</p>
+              <button
+                type="button"
+                onClick={() => setGuideOpen(true)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#8b7355]/40 bg-[#e8c98a] px-4 py-2 text-sm font-semibold text-[#1a2418] transition hover:bg-[#f0d49a]"
+              >
+                <HelpCircle className="h-4 w-4" aria-hidden />
+                Ver pasos
+              </button>
+            </motion.div>
+          ) : null}
+        </motion.div>
       </motion.div>
+
+      <ScitaDashboardGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
     </motion.div>
   );
 }

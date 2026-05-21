@@ -6,7 +6,7 @@ import Image from "next/image";
 import type { ViewerRole } from "@/lib/mock-data";
 import { isInternal, withRole } from "@/lib/viewer";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { LogOut, LayoutDashboard, FolderClock } from "lucide-react";
+import { LogOut, FolderClock } from "lucide-react";
 
 function getRoleLabel(role: ViewerRole) {
   if (role === "admin") {
@@ -180,13 +180,6 @@ export function SiteHeader({
                     </div>
                   </div>
                   <Link
-                    href="/studio"
-                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--forest)] transition-colors hover:bg-[color:var(--sand-strong)]"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Mi Estudio</span>
-                  </Link>
-                  <Link
                     href="/mis-solicitudes"
                     className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--forest)] transition-colors hover:bg-[color:var(--sand-strong)]"
                   >
@@ -252,13 +245,6 @@ export function SiteHeader({
                         <p className="truncate text-xs text-[color:var(--muted)]">{user.email}</p>
                         <p className="mt-1 text-xs text-[color:var(--muted)]">{getRoleLabel(viewerRole)}</p>
                       </div>
-                      <Link
-                        href="/studio"
-                        className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
-                      >
-                        <LayoutDashboard className="h-4 w-4" />
-                        Mi Estudio
-                      </Link>
                       <Link
                         href="/mis-solicitudes"
                         className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-[#1a1a1a] hover:bg-[#f0eae0]"
