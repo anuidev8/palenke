@@ -8,6 +8,7 @@ import {
   getVisibleMediatecaUbuntuGalleryMedia,
   MEDIATECA_UBUNTU_CATEGORIES,
 } from "@/lib/mediateca-ubuntu-gallery-data";
+import { MEMORIA_NUESTRA_MEMORIA_IMAGE_URL } from "@/lib/memoria-afroterritorial-assets";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 
@@ -115,14 +116,26 @@ export default async function MemoriaAfroterritorialPage({
           {/* Right — Imagen representativa (enlace a Biblioteca · Memoria viva) */}
           <Link
             href={withRole("/biblioteca", role, { section: "Memoria viva del territorio" })}
-            className="relative block min-h-[320px] overflow-hidden rounded-[28px] outline-none ring-offset-2 ring-offset-[#F7F5F0] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[#2e7d32] lg:min-h-[400px]"
-            style={{
-              background:
-                "radial-gradient(ellipse at 20% 80%, rgba(46,125,50,0.4), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(251,192,45,0.25), transparent 60%), radial-gradient(ellipse at 90% 90%, rgba(211,47,47,0.3), transparent 60%), linear-gradient(150deg, #1f1d1b 0%, #292420 60%, #171513 100%)",
-            }}
+            className="group relative block min-h-[320px] overflow-hidden rounded-[28px] outline-none ring-offset-2 ring-offset-[#F7F5F0] transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[#2e7d32] lg:min-h-[400px]"
           >
+            <Image
+              src={MEMORIA_NUESTRA_MEMORIA_IMAGE_URL}
+              alt=""
+              fill
+              className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={85}
+            />
+            <div
+              className="absolute inset-0 z-[1]"
+              aria-hidden="true"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 20% 80%, rgba(46,125,50,0.45), transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(251,192,45,0.28), transparent 60%), radial-gradient(ellipse at 90% 90%, rgba(211,47,47,0.35), transparent 60%), linear-gradient(150deg, rgba(31,29,27,0.55) 0%, rgba(41,36,32,0.65) 60%, rgba(23,21,19,0.75) 100%)",
+              }}
+            />
             <svg
-              className="absolute inset-0 h-full w-full opacity-30"
+              className="absolute inset-0 z-[2] h-full w-full opacity-30"
               viewBox="0 0 600 400"
               preserveAspectRatio="xMidYMid slice"
               aria-hidden="true"
@@ -148,7 +161,7 @@ export default async function MemoriaAfroterritorialPage({
               <circle cx="320" cy="245" r="4" fill="#d32f2f" stroke="white" strokeWidth="2" />
               <circle cx="500" cy="70" r="3" fill="#ffffff" opacity="0.8" />
             </svg>
-            <div className="absolute bottom-6 left-6 right-6">
+            <div className="absolute bottom-6 left-6 right-6 z-[3]">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
                 Memoria viva del territorio
               </p>
