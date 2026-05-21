@@ -1,0 +1,196 @@
+================================================================================
+PALENKE — VIDEO "GOBIERNO PROPIO COMUNITARIO"
+Solo footage cinematográfico · sin UI · sin ríos · enfoque 100% comunidad
+================================================================================
+
+TEMA DEL VIDEO (obligatorio):
+Gobierno propio afrocolombiano: Consejos Comunitarios decidiendo, planificando y
+cuidando el territorio en asamblea, en el espacio comunal y en el trabajo colectivo.
+La comunidad es el protagonista — no el paisaje acuático.
+
+ESTILO VISUAL:
+Documental cinematográfico, hora dorada, luz cálida lateral, movimientos lentos,
+24 fps, digno y colectivo. Pacífico colombiano — palapa, casa comunal, plaza de
+reunión, bosque al fondo (sin enfocar río, caño, manglar acuático ni planos de agua).
+
+NO MOSTRAR:
+- Río, caño, estuario, playa, mar, manglar con agua visible, dron sobre agua
+- Pesca en canoa, orilla de río, reflejos en agua, siluetas mirando el horizonte acuático
+- UI web, texto en pantalla, logos, oficinas estatales, policía, violencia
+
+NO INCLUIR: rostros frontales identificables, documentos con texto legible.
+
+================================================================================
+1. MENSAJE EN UNA FRASE
+================================================================================
+
+"El Gobierno Propio se ve en la asamblea, en el acuerdo y en el trabajo comunitario
+del territorio — no en un paisaje vacío."
+
+================================================================================
+2. QUÉ DEBE MOSTRAR EL VIDEO (SOLO COMUNIDAD)
+================================================================================
+
+A) ASAMBLEA / CABILDO / CASA DE GOBIERNO
+   - Círculo o semicírculo de personas en espacio comunal (palapa, patio, sala de madera).
+   - Espaldas, perfiles, siluetas; manos levantadas en acuerdo.
+   - Adultos mayores, mujeres, hombres y jóvenes en la misma deliberación.
+   - Luz dorada entrando por un lado; ambiente de decisión colectiva, no espectáculo.
+
+B) PLANIFICACIÓN TERRITORIAL
+   - Mesa al aire libre o en casa comunal: mapa dibujado a mano, cuadernos, lápices.
+   - Manos señalando zonas del territorio en el papel (planes de uso y manejo).
+   - Dos o tres personas inclinadas sobre el mapa, conversando en voz baja.
+
+C) REGLAMENTOS Y CONVIVENCIA
+   - Grupo revisando cuadernos o carpetas sin texto legible a cámara.
+   - Gestos de escucha: una persona habla, otras asienten (perfiles y tres cuartos).
+
+D) ETNODESARROLLO Y JUVENTUDES
+   - Taller al aire libre con jóvenes: pizarra con dibujos abstractos, materiales en mesa.
+   - Trabajo manual colectivo: artesanía, agro, organización — manos y herramientas.
+
+E) CONSERVACIÓN (SIN AGUA)
+   - Caminata lenta por sendero en bosque o zona verde acordada por la comunidad.
+   - Grupo pequeño observando árboles o zona conservada desde tierra firme.
+   - Comité ambiental reunido bajo árboles, señalando el bosque (no el río).
+
+F) CIERRE COMUNITARIO
+   - Comunidad de pie o sentada mirando hacia el interior del territorio (bosque, camino, finca).
+   - Abrazo de manos, apretones de manos, salida lenta del espacio de asamblea al atardecer.
+   - Plano final: puerta o entrada de casa comunal con luz dorada (loop suave).
+
+================================================================================
+3. LOS CINCO EJES DEL MÓDULO (solo con imágenes de comunidad)
+================================================================================
+
+1. Reglamentos internos     → asamblea, acuerdos, escucha mutua
+2. Planes de uso y manejo  → mapa en mesa, deliberación sobre el territorio
+3. Etnodesarrollo          → juventudes en taller, trabajo colectivo
+4. Conservación            → recorrido en bosque, comité bajo árboles (tierra firme)
+5. Protección del territorio → vigilancia comunitaria en sendero, no en agua
+
+================================================================================
+4. ESPECIFICACIONES TÉCNICAS
+================================================================================
+
+Relación:     16:9
+Resolución:   1920×1080 mínimo (4K preferible)
+Duración:     3:00 – 3:45 (largo) · 20–40 s (clip corto loop)
+FPS:          24
+Luz:          golden hour en todas las escenas
+Cámara:       steadicam lenta, planos medios y generales; sin dron sobre agua
+Loop:         recomendado — abrir y cerrar en misma asamblea o casa comunal
+Audio:        sin audio
+
+================================================================================
+5. GUION VISUAL (~3:30) — SIN RÍO
+================================================================================
+
+0:00 – 0:40   ASAMBLEA — llegada lenta al círculo comunitario, personas sentadas,
+              luz dorada, ambiente de cabildo
+
+0:40 – 1:20   ACUERDO — manos levantadas, alguien habla de perfil, grupo asiente
+
+1:20 – 2:00   MAPA — mesa con plano territorial; dedos sobre zonas; mayor y joven juntos
+
+2:00 – 2:35   JUVENTUD — taller al aire libre, pizarra, trabajo en grupo
+
+2:35 – 3:05   BOSQUE — caminata comunitaria por sendero; comité observando zona verde
+
+3:05 – 3:30   CIERRE — comunidad frente a casa comunal / palapa al atardecer; loop
+
+CLIP CORTO (25 s): asamblea 12s → mapa en mesa 8s → cierre en casa comunal 5s.
+
+================================================================================
+6. PALETA (IMAGEN)
+================================================================================
+
+- Verde territorio:     #2e7d32, #1b5e20 (bosque, acentos)
+- Dorado hora dorada:   #fbc02d, #f57f17 (luz, etnodesarrollo)
+- Tierra / madera:      #4a4540, #EAE6DD, tonos cálidos de palapa
+- Acento acuerdo:       #e65100 sutil (reglamentos)
+- Planificación:        #1565c0 muy sutil en mapas dibujados (no dominar)
+
+================================================================================
+7. PROMPT MAESTRO — COPIAR Y PEGAR
+================================================================================
+
+--- INGLÉS ---
+
+Cinematic 16:9 documentary video, 24fps, golden hour throughout. Topic: Afro-Colombian
+Pacific community self-governance (Gobierno Propio) — Community Councils in collective
+assembly, deliberation, and territorial planning. COMMUNITY ONLY as protagonist.
+
+Sequence: slow steadicam into outdoor community assembly in circle under wooden palapa
+or communal house — backs and profiles, elders women men and youth, raised hands in
+agreement; close hands on hand-drawn territorial map on rustic table, land-use planning
+discussion; profile of speaker and listening group; youth outdoor workshop with chalkboard
+sketches and group work; slow walk on forest trail with small community committee
+observing conservation zone from dry land; golden sunset light on communal building
+entrance, people leaving assembly together.
+
+Setting: Pacific Colombia Afro-descendant village — earth paths, wooden structures,
+tropical forest background, NO river, NO water body, NO boat, NO beach, NO aerial
+drone over water, NO mangrove water, NO fishing on water.
+
+Mood: dignified, collective, institutional community power — NOT tourist, NOT folklore,
+NOT government office, NOT police. Photorealistic, natural film grade, soft warm light.
+
+No on-screen text, no logos, no UI, no readable documents, no identifiable front faces,
+no violence, no stereotypes.
+
+--- ESPAÑOL ---
+
+Video documental cinematográfico 16:9, 24 fps, hora dorada. Tema: Gobierno Propio
+comunitario afrocolombiano — Consejos Comunitarios en asamblea, deliberación y
+planificación del territorio. SOLO LA COMUNIDAD como protagonista.
+
+Secuencia: entrada lenta a asamblea al aire libre en círculo bajo palapa o casa comunal
+— espaldas y perfiles, mayores, mujeres, hombres y jóvenes, manos en acuerdo; manos
+sobre mapa territorial dibujado en mesa rústica, conversación de uso del suelo; quien
+habla de perfil y grupo que escucha; taller juvenil con pizarra y trabajo en grupo;
+caminata lenta por sendero en bosque con comité comunitario observando zona conservada
+desde tierra firme; luz dorada al atardecer en entrada de casa comunal, salida de la asamblea.
+
+Entorno: vereda/comunidad del Pacífico colombiano — caminos de tierra, estructuras de
+madera, bosque al fondo. SIN río, SIN cuerpo de agua, SIN canoa, SIN playa, SIN dron
+sobre agua, SIN manglar acuático, SIN pesca en el agua.
+
+Tono: digno, colectivo, poder comunitario — no turismo, no folclor, no oficina estatal.
+Fotorrealista, luz cálida natural.
+
+Sin texto en pantalla, sin logos, sin interfaz, sin documentos legibles, sin rostros
+frontales identificables, sin violencia ni estereotipos.
+
+--- CLIP CORTO (25 s) ---
+
+Golden hour cinematic documentary: Afro-Colombian community assembly outdoors in circle
+under wooden palapa, raised hands agreement, hands on territorial map table, no water
+no river. Collective governance Gobierno Propio. 24fps 16:9 photorealistic. No text
+no logos no UI no faces.
+
+================================================================================
+8. NEGATIVE PROMPT
+================================================================================
+
+river, stream, creek, estuary, ocean, sea, beach, mangrove water, canoe on water,
+fishing boat, waterfront, riverbank, aerial drone over water, water reflection,
+swimming, waterfall, UI, website, dashboard, text, logo, government office, police,
+military, violence, folklore dance, tourist, cartoon, 3D render, hyper-saturated,
+fisheye, shaky vlog, fast cuts, night scene, identifiable frontal faces, readable text
+
+================================================================================
+9. CHECKLIST
+================================================================================
+
+[ ] Protagonista = comunidad (asamblea, mapa, taller, comité en bosque)
+[ ] Cero planos de río, mar, caño, manglar con agua o dron acuático
+[ ] Tema Gobierno Propio / Consejos Comunitarios claro
+[ ] Hora dorada, 16:9, 24 fps, tono digno
+[ ] Sin UI, sin logos, sin texto legible, sin rostros frontales
+[ ] Incluye asamblea + planificación territorial mínimo
+
+================================================================================
+FIN
+================================================================================

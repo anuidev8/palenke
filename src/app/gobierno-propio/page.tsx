@@ -3,7 +3,12 @@ import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboar
 import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
 import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import GobiernoPropioGallerySection from "@/components/palenke/GobiernoPropioGallerySection";
+import { VideoThumbnail } from "@/components/palenke/VideoThumbnail";
 import { getVisibleGobiernoGalleryMedia } from "@/lib/gobierno-gallery-data";
+import {
+  GOBIERNO_PROPIO_HERO_VIDEO_DURATION,
+  GOBIERNO_PROPIO_HERO_VIDEO_SRC,
+} from "@/lib/gobierno-propio-assets";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams } from "@/lib/viewer";
 
@@ -92,68 +97,74 @@ export default async function GobiernoPropioPage({
         { label: "Gobierno Propio" },
       ]}
     >
-      {/* ── Dashboard Top Section (Row 1) ── */}
-      <section className="relative overflow-hidden bg-[#EAE6DD] px-4 py-16 sm:px-6 lg:px-8 border-b border-[#e8dfd3]">
-        {/* Dribbble-style Afro Abstract Background Graphics */}
+      {/* ── 1) GOBIERNO PROPIO + VIDEO DE PRESENTACIÓN (mismo layout que Memoria) ── */}
+      <section className="bg-[#1a1a1a]">
+        <div className="relative">
+          <VideoThumbnail
+            label="Video de presentación"
+            duration={GOBIERNO_PROPIO_HERO_VIDEO_DURATION}
+            tag="Gobierno Propio"
+            videoSrc={GOBIERNO_PROPIO_HERO_VIDEO_SRC}
+            overlayVariant="pcn-soft"
+            autoPlay
+            style={{ minHeight: 480 }}
+          />
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 pb-8 pt-20 lg:px-10">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/60">
+              1. GOBIERNO PROPIO
+            </p>
+            <h1 className="font-display text-3xl text-white sm:text-4xl lg:text-5xl">
+              Gobierno propio
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Definición + impacto (left) | tarjeta funciones (right) ── */}
+      <section className="relative overflow-hidden border-b border-[#e8dfd3] bg-[#EAE6DD] px-4 py-14 sm:px-6 lg:px-8">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          {/* Large dynamic circle & arch representing community and leadership */}
           <svg className="absolute -top-40 -left-20 w-[800px] h-[800px] text-[#2e7d32]/[0.03]" fill="currentColor" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <path d="M 0 100 A 100 100 0 0 1 200 100" />
             <circle cx="100" cy="100" r="40" fill="#EAE6DD" />
             <circle cx="100" cy="100" r="15" />
             <path d="M 10 100 L 190 100" stroke="#EAE6DD" strokeWidth="4" />
           </svg>
-
-          {/* Stepped ancestral patterns */}
           <svg className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] text-[#d32f2f]/[0.025]" fill="none" stroke="currentColor" strokeWidth="6" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <polyline points="0,200 40,200 40,160 80,160 80,120 120,120 120,80 160,80 160,40 200,40" />
             <polyline points="0,160 40,160 40,120 80,120 80,80 120,80 120,40 160,40 160,0" />
           </svg>
-
-          {/* Deep green rich blur overlay for PCN aesthetic */}
           <div className="absolute top-[20%] right-[30%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#2e7d32]/[0.05] to-transparent blur-[140px]" />
           <div className="absolute bottom-0 left-[20%] w-[400px] h-[400px] rounded-full bg-gradient-to-t from-[#fbc02d]/[0.05] to-transparent blur-[100px]" />
         </div>
-        
-        <div className="relative z-10 mx-auto w-full max-w-7xl">
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start justify-between">
-            {/* Left Column: Title & Intro */}
-            <div className="flex-1 max-w-2xl space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#e8dfd3] shadow-sm">
-                <div className="h-2 w-2 rounded-full bg-[#2e7d32]" />
-                <span className="text-sm font-semibold tracking-wide text-[#2e7d32] uppercase">
-                  Módulo Palenke
-                </span>
-              </div>
-              
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-[#1a1a1a] tracking-tight leading-[1.1]">
-                Gobierno propio
-              </h1>
-              
-              <p className="text-xl sm:text-2xl leading-relaxed text-[#1a1a1a] font-display font-medium">
-                El <span className="text-[#2e7d32]">Gobierno Propio</span> es el conjunto de normas, decisiones y prácticas mediante las cuales los Consejos Comunitarios ejercen autoridad sobre sus territorios colectivos.
-              </p>
-              
-              <p className="text-lg text-[#4a4540] leading-relaxed">
-                Este espacio del Palenke organiza los instrumentos que materializan la autonomía territorial afrodescendiente.
-              </p>
+
+        <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-1.5 shadow-sm">
+              <div className="h-2 w-2 rounded-full bg-[#2e7d32]" />
+              <span className="text-sm font-semibold uppercase tracking-wide text-[#2e7d32]">
+                Módulo Palenke
+              </span>
             </div>
-            
-            {/* Right Column: Key Highlights / Impact */}
-            <div className="w-full lg:w-[460px] shrink-0">
-              <div className="bg-white rounded-[32px] p-8 sm:p-10 border border-[#e8dfd3] shadow-sm relative overflow-hidden">
-                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d8f3dc]/20 blur-3xl pointer-events-none" />
-                <div className="relative z-10">
-                  <p className="eyebrow text-[#2e7d32] mb-6 tracking-widest text-sm">
-                    NUESTRO IMPACTO
-                  </p>
-                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-6 leading-snug">
-                    El poder de nuestro gobierno
-                  </h3>
-                  <GovernmentFunctionsList />
-                </div>
-              </div>
-            </div>
+            <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">
+              Autonomía territorial comunitaria
+            </h2>
+            <p className="text-base leading-8 text-[#4a4540] sm:text-lg">
+              El <span className="font-semibold text-[#2e7d32]">Gobierno Propio</span> es el
+              conjunto de normas, decisiones y prácticas mediante las cuales los Consejos
+              Comunitarios ejercen autoridad sobre sus territorios colectivos.
+            </p>
+            <p className="text-base leading-8 text-[#4a4540]">
+              Este espacio del Palenke organiza los instrumentos que materializan la autonomía
+              territorial afrodescendiente.
+            </p>
+          </div>
+
+          <div className="rounded-[32px] border border-[#e8dfd3] bg-white p-8 shadow-sm sm:p-10">
+            <p className="eyebrow mb-6 text-sm tracking-widest text-[#2e7d32]">NUESTRO IMPACTO</p>
+            <h3 className="mb-6 font-display text-2xl leading-snug text-[#1a1a1a]">
+              El poder de nuestro gobierno
+            </h3>
+            <GovernmentFunctionsList />
           </div>
         </div>
       </section>
