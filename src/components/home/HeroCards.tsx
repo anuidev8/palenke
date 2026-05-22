@@ -72,25 +72,12 @@ export function HeroCards({
             className="group relative flex h-40 flex-col justify-end overflow-hidden rounded-[24px] border border-white/10 bg-[#1a1a1a] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl hover:shadow-black/50 sm:h-56 sm:p-5 xl:h-60"
           >
             <video
+              autoPlay
               loop
               muted
               playsInline
-              preload="none"
+              preload="metadata"
               poster={card.poster}
-              onMouseEnter={(event) => {
-                void event.currentTarget.play().catch(() => {});
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.pause();
-                event.currentTarget.currentTime = 0;
-              }}
-              onFocus={(event) => {
-                void event.currentTarget.play().catch(() => {});
-              }}
-              onBlur={(event) => {
-                event.currentTarget.pause();
-                event.currentTarget.currentTime = 0;
-              }}
               className="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
             >
               <source src={card.video} type="video/mp4" />

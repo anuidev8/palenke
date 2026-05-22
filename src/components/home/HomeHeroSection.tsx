@@ -21,7 +21,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const volumeFadeRafRef = useRef<number | null>(null);
 
   const [hasUserActivatedMedia, setHasUserActivatedMedia] = useState(false);
-  const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(false);
+  const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
   const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(false);
   const [hasScrolledPastHeroTop, setHasScrolledPastHeroTop] = useState(false);
 
@@ -243,10 +243,11 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                   <div className="absolute inset-0 overflow-hidden">
                     <video
                       ref={cardVideoRef}
+                      autoPlay
                       loop
                       muted
                       playsInline
-                      preload="none"
+                      preload="metadata"
                       className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
                     >
                       <source src={HERO_VIDEO_SRC} type="video/mp4" />
