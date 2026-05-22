@@ -246,7 +246,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="none"
                       className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
                     >
                       <source src={HERO_VIDEO_SRC} type="video/mp4" />

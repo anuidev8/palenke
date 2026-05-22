@@ -85,7 +85,7 @@ type ContentDocumentRow = {
 
 const EXTERNAL_NEWS_CATEGORY_ID = 27;
 const EXTERNAL_NEWS_REVALIDATE_SECONDS = 60 * 15;
-const EXTERNAL_NEWS_FETCH_TIMEOUT_MS = 3_500;
+const EXTERNAL_NEWS_FETCH_TIMEOUT_MS = 1_800;
 const externalNewsFallbackImages = [
   "/assets/hero-cards/incidencia.png",
   "/assets/hero-cards/memoria-afroterritorial.png",
