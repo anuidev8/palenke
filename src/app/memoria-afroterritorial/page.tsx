@@ -8,9 +8,7 @@ import {
   getVisibleMediatecaUbuntuGalleryMedia,
 } from "@/lib/mediateca-ubuntu-gallery-data";
 import {
-  MEMORIA_AFROTERRITORIAL_HERO_AUDIO_SRC,
   MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION,
-  MEMORIA_AFROTERRITORIAL_HERO_VIDEO_FALLBACK_SRC,
   MEMORIA_AFROTERRITORIAL_HERO_VIDEO_SRC,
   MEMORIA_NUESTRA_MEMORIA_IMAGE_URL,
 } from "@/lib/memoria-afroterritorial-assets";
@@ -46,8 +44,6 @@ export default async function MemoriaAfroterritorialPage({
             duration={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION}
             tag="Memoria Afroterritorial"
             videoSrc={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_SRC}
-            fallbackVideoSrc={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_FALLBACK_SRC}
-            audioSrc={MEMORIA_AFROTERRITORIAL_HERO_AUDIO_SRC}
             style={{ minHeight: 480 }}
           />
           {/* Page title overlay at bottom-left */}

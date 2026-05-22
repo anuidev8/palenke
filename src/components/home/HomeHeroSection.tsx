@@ -8,14 +8,9 @@ import type { ViewerRole } from "@/lib/mock-data";
 import { HeroCards } from "@/components/home/HeroCards";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 
-const HERO_VIDEO_SRC = "/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4";
-const HERO_AUDIO_SRC = "/assets/Somos%20la%20voz%20del%20territorio%20.mp3.mpeg";
+const HERO_VIDEO_SRC = "/videos/home-hero-presentacion.mp4";
 const HERO_AUDIO_TARGET_VOLUME = 0.16;
 const AUDIO_FADE_DURATION_MS = 900;
-
-type FadeAudioOptions = {
-  pauseAtEnd?: boolean;
-};
 
 function clampVolume(value: number) {
   return Math.max(0, Math.min(1, value));
@@ -23,18 +18,17 @@ function clampVolume(value: number) {
 
 export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const cardVideoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const audioFadeRafRef = useRef<number | null>(null);
+  const volumeFadeRafRef = useRef<number | null>(null);
   const queuedAudioResumeRef = useRef<(() => void) | null>(null);
 
   const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
   const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(true);
   const [hasScrolledPastHeroTop, setHasScrolledPastHeroTop] = useState(false);
 
-  const stopAudioFade = useCallback(() => {
-    if (audioFadeRafRef.current !== null) {
-      cancelAnimationFrame(audioFadeRafRef.current);
-      audioFadeRafRef.current = null;
+  const stopVolumeFade = useCallback(() => {
+    if (volumeFadeRafRef.current !== null) {
+      cancelAnimationFrame(volumeFadeRafRef.current);
+      volumeFadeRafRef.current = null;
     }
   }, []);
 
@@ -49,22 +43,19 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
     queuedAudioResumeRef.current = null;
   }, []);
 
-  const fadeAudioTo = useCallback(
-    (target: number, durationMs: number, options?: FadeAudioOptions) => {
-      const audio = audioRef.current;
-      if (!audio) {
+  const fadeVideoVolumeTo = useCallback(
+    (target: number, durationMs: number) => {
+      const video = cardVideoRef.current;
+      if (!video) {
         return;
       }
 
       const safeTarget = clampVolume(target);
-      stopAudioFade();
+      stopVolumeFade();
 
-      const startVolume = clampVolume(audio.volume);
+      const startVolume = clampVolume(video.volume);
       if (durationMs <= 0 || Math.abs(startVolume - safeTarget) < 0.005) {
-        audio.volume = safeTarget;
-        if (options?.pauseAtEnd && safeTarget === 0) {
-          audio.pause();
-        }
+        video.volume = safeTarget;
         return;
       }
 
@@ -73,32 +64,30 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       const step = (now: number) => {
         const progress = Math.min(1, (now - startTime) / durationMs);
         const eased = 1 - Math.pow(1 - progress, 3);
-        audio.volume = clampVolume(startVolume + (safeTarget - startVolume) * eased);
+        video.volume = clampVolume(startVolume + (safeTarget - startVolume) * eased);
 
         if (progress < 1) {
-          audioFadeRafRef.current = requestAnimationFrame(step);
+          volumeFadeRafRef.current = requestAnimationFrame(step);
           return;
         }
 
-        audioFadeRafRef.current = null;
-        audio.volume = safeTarget;
-        if (options?.pauseAtEnd && safeTarget === 0) {
-          audio.pause();
-        }
+        volumeFadeRafRef.current = null;
+        video.volume = safeTarget;
       };
 
-      audioFadeRafRef.current = requestAnimationFrame(step);
+      volumeFadeRafRef.current = requestAnimationFrame(step);
     },
-    [stopAudioFade],
+    [stopVolumeFade],
   );
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) {
+    const video = cardVideoRef.current;
+    if (!video) {
       return;
     }
 
-    audio.volume = 0;
+    video.volume = 0;
+    video.muted = true;
   }, []);
 
   useEffect(() => {
@@ -133,25 +122,25 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   }, [isHeroMediaPlaying]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) {
+    const video = cardVideoRef.current;
+    if (!video) {
       return;
     }
 
     let cancelled = false;
 
-    async function tryPlayAudio() {
-      const currentAudio = audioRef.current;
-      if (!currentAudio) {
+    async function tryPlayWithAudio() {
+      const currentVideo = cardVideoRef.current;
+      if (!currentVideo) {
         return;
       }
 
       try {
-        currentAudio.muted = false;
-        await currentAudio.play();
+        currentVideo.muted = false;
+        await currentVideo.play();
 
         if (!cancelled) {
-          fadeAudioTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
+          fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
         }
       } catch {
         if (
@@ -172,15 +161,15 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
             return;
           }
 
-          const resumedAudio = audioRef.current;
-          if (!resumedAudio) {
+          const resumedVideo = cardVideoRef.current;
+          if (!resumedVideo) {
             return;
           }
 
           try {
-            resumedAudio.muted = false;
-            await resumedAudio.play();
-            fadeAudioTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
+            resumedVideo.muted = false;
+            await resumedVideo.play();
+            fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
           } catch {
             // Browser still blocked playback. User can tap the audio toggle again.
           }
@@ -193,28 +182,33 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
     }
 
     if (isHeroMediaPlaying && isHeroAudioEnabled && !hasScrolledPastHeroTop) {
-      void tryPlayAudio();
+      void tryPlayWithAudio();
     } else {
       clearQueuedAudioResume();
-      fadeAudioTo(0, AUDIO_FADE_DURATION_MS, { pauseAtEnd: true });
+      video.muted = true;
+      fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
     }
 
     return () => {
       cancelled = true;
     };
-  }, [clearQueuedAudioResume, fadeAudioTo, hasScrolledPastHeroTop, isHeroAudioEnabled, isHeroMediaPlaying]);
+  }, [
+    clearQueuedAudioResume,
+    fadeVideoVolumeTo,
+    hasScrolledPastHeroTop,
+    isHeroAudioEnabled,
+    isHeroMediaPlaying,
+  ]);
 
   useEffect(() => {
     return () => {
-      stopAudioFade();
+      stopVolumeFade();
       clearQueuedAudioResume();
     };
-  }, [clearQueuedAudioResume, stopAudioFade]);
+  }, [clearQueuedAudioResume, stopVolumeFade]);
 
   return (
     <section className="relative overflow-hidden bg-[#1a2a1a]">
-      <audio ref={audioRef} src={HERO_AUDIO_SRC} autoPlay loop preload="auto" muted />
-
       <div className="absolute inset-0 z-0">
         <div
           className="absolute inset-0"
