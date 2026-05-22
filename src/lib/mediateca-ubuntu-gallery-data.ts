@@ -2,9 +2,7 @@ import type { PalenkeGalleryMedia } from "@/lib/palenke-gallery-media";
 import type { ViewerRole } from "@/lib/mock-data";
 
 export const MEDIATECA_UBUNTU_CATEGORIES = [
-  { id: "todas", label: "Todas las colecciones" },
-  { id: "cc-los-cimarrones", label: "C.C. LOS CIMARRONES" },
-  { id: "cc-capitania", label: "C.C. CAPITANIA" },
+  { id: "todas", label: "Todas las categorías" },
 ] as const;
 
 export type MediatecaUbuntuCategoryId = (typeof MEDIATECA_UBUNTU_CATEGORIES)[number]["id"];

@@ -1,4 +1,5 @@
 import type { DocumentRecord } from "@/lib/mock-data";
+import type { PalenkeGalleryMedia } from "@/lib/palenke-gallery-media";
 
 export type BibliotecaAiCitation = {
   documentId: string;
@@ -169,6 +170,90 @@ export function runBibliotecaAiSearch(documents: DocumentRecord[], query: string
       summary,
       keyPoints,
       citations,
+    },
+  };
+}
+
+export type MediatecaGalleryAiAnswer = {
+  summary: string;
+  keyPoints: string[];
+};
+
+function mediaKindSearchLabel(kind: PalenkeGalleryMedia["kind"]) {
+  if (kind === "video") return "video";
+  if (kind === "audio") return "audio";
+  return "imagen fotografia";
+}
+
+function scoreGalleryMedia(items: PalenkeGalleryMedia[], query: string) {
+  const tokens = tokenize(query);
+  const scored = items.map((item) => {
+    if (tokens.length === 0) {
+      return { item, score: 0 };
+    }
+
+    const titleHits = countTokenHits(tokens, item.title);
+    const typeHits = countTokenHits(tokens, item.type);
+    const sectionHits = countTokenHits(tokens, item.section);
+    const territoryHits = countTokenHits(tokens, item.territory);
+    const councilHits = countTokenHits(tokens, item.council);
+    const descriptionHits = countTokenHits(tokens, item.description);
+    const kindHits = countTokenHits(tokens, mediaKindSearchLabel(item.kind));
+
+    let score =
+      titleHits * 7 +
+      typeHits * 5 +
+      sectionHits * 4 +
+      territoryHits * 4 +
+      councilHits * 3 +
+      kindHits * 3 +
+      descriptionHits * 2;
+
+    if (tokens.some((token) => token === String(item.year))) {
+      score += 2;
+    }
+
+    return { item, score };
+  });
+
+  const ranked = scored.toSorted((left, right) => {
+    if (right.score !== left.score) {
+      return right.score - left.score;
+    }
+    return right.item.year - left.item.year;
+  });
+
+  return { ranked, tokens };
+}
+
+export function runMediatecaGallerySearch(items: PalenkeGalleryMedia[], query: string) {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
+    return {
+      rankedItems: items,
+      answer: null as MediatecaGalleryAiAnswer | null,
+    };
+  }
+
+  const { ranked } = scoreGalleryMedia(items, trimmedQuery);
+  const matchedItems = ranked.filter((entry) => entry.score > 0);
+  const rankedItems = ranked.map((entry) => entry.item);
+
+  const topItems = (matchedItems.length > 0 ? matchedItems : ranked).slice(0, 3);
+  const summary =
+    matchedItems.length > 0
+      ? `Encontré ${matchedItems.length} pieza${matchedItems.length === 1 ? "" : "s"} relacionada${matchedItems.length === 1 ? "" : "s"} con “${trimmedQuery}”. Priorizo tipo, territorio y descripción.`
+      : `No encontré coincidencias directas para “${trimmedQuery}”. Te muestro las piezas más recientes de la mediateca.`;
+
+  const keyPoints = topItems.map(
+    ({ item }) => `${item.type} · ${item.territory} (${item.year})`,
+  );
+
+  return {
+    rankedItems,
+    answer: {
+      summary,
+      keyPoints,
     },
   };
 }

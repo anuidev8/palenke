@@ -13,14 +13,12 @@ export function LoUltimoListRow({ item, href, compact = false }: LoUltimoListRow
   const dateLabel = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(
     new Date(item.publishedAt),
   );
-
-  return (
-    <Link
-      href={href}
-      className={`group flex items-start gap-4 transition hover:bg-[#f8f5f2] ${
-        compact ? "px-4 py-3.5 sm:px-5 sm:py-4" : "px-5 py-4"
-      }`}
-    >
+  const isExternal = /^https?:\/\//i.test(href);
+  const className = `group flex items-start gap-4 transition hover:bg-[#f8f5f2] ${
+    compact ? "px-4 py-3.5 sm:px-5 sm:py-4" : "px-5 py-4"
+  }`;
+  const content = (
+    <>
       {item.coverImageUrl ? (
         <div
           className={`relative shrink-0 overflow-hidden rounded-xl border border-[#e8dfd3] bg-[#f0eae0] ${
@@ -66,6 +64,20 @@ export function LoUltimoListRow({ item, href, compact = false }: LoUltimoListRow
         className="mt-1 h-4 w-4 shrink-0 text-[#7a756e] transition group-hover:translate-x-0.5 group-hover:text-[#2e7d32]"
         aria-hidden="true"
       />
+    </>
+  );
+
+  if (isExternal) {
+    return (
+      <a href={href} className={className}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {content}
     </Link>
   );
 }

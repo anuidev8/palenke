@@ -2,4 +2,4 @@
 export const GOBIERNO_PROPIO_HERO_VIDEO_SRC =
   "/videos/gobierno-propio-presentacion-hero.mp4";
 
-export const GOBIERNO_PROPIO_HERO_VIDEO_DURATION = "0:08";
+export const GOBIERNO_PROPIO_HERO_VIDEO_DURATION = "6:26";

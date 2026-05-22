@@ -34,6 +34,7 @@ export type InternalNewsItem = {
   location: string | null;
   coverImageUrl: string | null;
   galleryImageUrls?: string[];
+  externalUrl?: string | null;
   visibility: "public" | "internal";
   featured: boolean;
   publishedAt: string;
@@ -400,6 +401,7 @@ function mapInternalNewsRow(row: Record<string, unknown>): InternalNewsItem {
     category: String(row.category ?? "Actualización territorial"),
     location: row.location ? String(row.location) : null,
     coverImageUrl: row.cover_image_url ? String(row.cover_image_url) : null,
+    externalUrl: row.external_url ? String(row.external_url) : null,
     visibility: row.visibility === "internal" ? "internal" : "public",
     featured: Boolean(row.featured),
     publishedAt: String(row.published_at),

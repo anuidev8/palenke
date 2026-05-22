@@ -40,8 +40,7 @@ export default async function MediatecaUbuntuPage({
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#4a4540]">
             Archivo audiovisual comunitario con fotografías, videos, audios y entrevistas de nuestros
-            procesos territoriales — organizado por colecciones de Consejos Comunitarios y
-            encuentros del Palenke.
+            procesos territoriales y encuentros del Palenke.
           </p>
         </div>
       </section>

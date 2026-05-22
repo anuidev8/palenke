@@ -3,7 +3,7 @@ import { InstrumentDashboardGrid } from "@/components/palenke/InstrumentDashboar
 import { GovernmentFunctionsList } from "@/components/palenke/GovernmentFunctionsList";
 import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import GobiernoPropioGallerySection from "@/components/palenke/GobiernoPropioGallerySection";
-import { VideoThumbnail } from "@/components/palenke/VideoThumbnail";
+import { GobiernoPropioHeroVideo } from "@/components/palenke/GobiernoPropioHeroVideo";
 import { getVisibleGobiernoGalleryMedia } from "@/lib/gobierno-gallery-data";
 import {
   GOBIERNO_PROPIO_HERO_VIDEO_DURATION,
@@ -100,13 +100,11 @@ export default async function GobiernoPropioPage({
       {/* ── 1) GOBIERNO PROPIO + VIDEO DE PRESENTACIÓN (mismo layout que Memoria) ── */}
       <section className="bg-[#1a1a1a]">
         <div className="relative">
-          <VideoThumbnail
+          <GobiernoPropioHeroVideo
             label="Video de presentación"
             duration={GOBIERNO_PROPIO_HERO_VIDEO_DURATION}
             tag="Gobierno Propio"
             videoSrc={GOBIERNO_PROPIO_HERO_VIDEO_SRC}
-            overlayVariant="pcn-soft"
-            autoPlay
             style={{ minHeight: 480 }}
           />
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 pb-8 pt-20 lg:px-10">

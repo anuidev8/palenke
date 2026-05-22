@@ -3,12 +3,17 @@ import Link from "next/link";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { MemoriaAfroterritorialSubnav } from "@/components/palenke/MemoriaAfroterritorialSubnav";
-import { VideoThumbnail } from "@/components/palenke/VideoThumbnail";
+import { MemoriaAfroterritorialHeroVideo } from "@/components/palenke/MemoriaAfroterritorialHeroVideo";
 import {
   getVisibleMediatecaUbuntuGalleryMedia,
-  MEDIATECA_UBUNTU_CATEGORIES,
 } from "@/lib/mediateca-ubuntu-gallery-data";
-import { MEMORIA_NUESTRA_MEMORIA_IMAGE_URL } from "@/lib/memoria-afroterritorial-assets";
+import {
+  MEMORIA_AFROTERRITORIAL_HERO_AUDIO_SRC,
+  MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION,
+  MEMORIA_AFROTERRITORIAL_HERO_VIDEO_FALLBACK_SRC,
+  MEMORIA_AFROTERRITORIAL_HERO_VIDEO_SRC,
+  MEMORIA_NUESTRA_MEMORIA_IMAGE_URL,
+} from "@/lib/memoria-afroterritorial-assets";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 
@@ -36,10 +41,13 @@ export default async function MemoriaAfroterritorialPage({
       {/* ── 1) MEMORIA AFROTERRITORIAL + VIDEO DE PRESENTACIÓN ── */}
       <section className="bg-[#1a1a1a]">
         <div className="relative">
-          <VideoThumbnail
+          <MemoriaAfroterritorialHeroVideo
             label="Video de presentación"
-            duration="3:45"
+            duration={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION}
             tag="Memoria Afroterritorial"
+            videoSrc={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_SRC}
+            fallbackVideoSrc={MEMORIA_AFROTERRITORIAL_HERO_VIDEO_FALLBACK_SRC}
+            audioSrc={MEMORIA_AFROTERRITORIAL_HERO_AUDIO_SRC}
             style={{ minHeight: 480 }}
           />
           {/* Page title overlay at bottom-left */}
@@ -254,20 +262,8 @@ export default async function MemoriaAfroterritorialPage({
             <h2 className="font-display text-3xl text-[#1a1a1a] sm:text-4xl">Mediateca Ubuntu</h2>
             <p className="mt-5 text-base leading-8 text-[#4a4540]">
               Archivo audiovisual comunitario con fotografías, videos, audios y entrevistas de nuestros
-              procesos territoriales — organizado por colecciones de Consejos Comunitarios y
-              encuentros del Palenke.
+              procesos territoriales y encuentros del Palenke.
             </p>
-            <ul className="mt-6 space-y-3">
-              {MEDIATECA_UBUNTU_CATEGORIES.filter((c) => c.id !== "todas").map((collection) => (
-                <li
-                  key={collection.id}
-                  className="flex items-start gap-3 text-sm leading-6 text-[#4a4540]"
-                >
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#fbc02d]" />
-                  {collection.label}
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Right — Mediateca Ubuntu CTA card */}
@@ -320,8 +316,8 @@ export default async function MemoriaAfroterritorialPage({
                 Fotos, videos<br />y entrevistas
               </h3>
               <p className="mt-3 max-w-sm text-sm leading-6 text-white/75">
-                Colecciones de C.C. Los Cimarrones, C.C. Capitanía y registros generales del
-                Palenke — la misma galería que en Gobierno Propio.
+                Fotografías, videos y registros generales del Palenke — la misma galería que en
+                Gobierno Propio.
               </p>
               <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white">
                 Explorar Mediateca Ubuntu

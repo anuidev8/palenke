@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PageIntroOverlay } from "@/components/global/PageIntroOverlay";
 import { Callout, PageBanner, SiteLayout } from "@/components/mock/ui";
 import {
@@ -14,15 +14,15 @@ import {
 } from "@/lib/mock-data";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { isInternal, type SearchParams, withRole } from "@/lib/viewer";
-import { HeroCards } from "@/components/home/HeroCards";
 import {
   HomePoliticalOrientationAccordion,
   HomeWhoWeAreAccordion,
 } from "@/components/home/HomeInfoAccordions";
 import { getExternalEnterateNews, listLoUltimoNews } from "@/lib/content";
 import { LoUltimoListRow } from "@/components/palenke/LoUltimoListRow";
-import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 import { HomeVideoGallery } from "@/components/home/HomeVideoGallery";
+import { HomeHeroSection } from "@/components/home/HomeHeroSection";
+import { InstagramSlider } from "@/components/home/InstagramSlider";
 
 export default async function HomePage({
   searchParams,
@@ -32,10 +32,13 @@ export default async function HomePage({
   const params = await searchParams;
   const role = await getViewerRoleFromRequest(params);
   const notice = params.notice;
-  const [noticias, ultimasNoticias] = await Promise.all([
+  const [noticias, baseNews] = await Promise.all([
     getExternalEnterateNews(3),
-    listLoUltimoNews({ limit: 5 }),
+    listLoUltimoNews(),
   ]);
+  const curatedNews = baseNews.slice(0, 3);
+  const instagramNews = baseNews.filter((n) => n.externalUrl?.includes("instagram.com")).slice(0, 4);
+  const ultimasNoticias = [...curatedNews, ...instagramNews];
 
   return (
     <PageIntroOverlay
@@ -65,164 +68,7 @@ export default async function HomePage({
           ) : null
         }
       >
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-[#1a2a1a]">
-        {/* Main Background Image/Video */}
-        <div className="absolute inset-0 z-0">
-          {/* Background Moving Video */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-screen"
-          >
-            <source
-              src="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
-              type="video/mp4"
-            />
-          </video>
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "linear-gradient(135deg, rgba(26,26,26,0.95) 0%, rgba(44,62,42,0.85) 100%)",
-            }}
-          />
-        </div>
-
-        <div className="relative z-10 mx-auto flex min-h-[90vh] w-full max-w-7xl flex-col px-4 pb-6 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8 lg:pb-10 lg:pt-8">
-          {/* Masthead row */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <Link href={withRole("/", role)} className="flex items-center gap-3">
-              <Image
-                src="/brands/PALENKE.svg"
-                alt="Logo Palenke / PCN"
-                width={120}
-                height={240}
-                priority
-                className="h-20 w-auto shrink-0 object-contain sm:h-24"
-              />
-              <span className="min-w-0">
-                <span className="block font-display text-xl leading-none text-white sm:text-2xl">
-                  Palenke
-                </span>
-                <span className="mt-1 block text-[11px] font-medium uppercase tracking-[0.24em] text-white/60 sm:text-xs">
-                  Pensamiento y Territorio
-                </span>
-              </span>
-            </Link>
-
-            <form
-              action="/biblioteca"
-              className="flex w-full items-center gap-3 rounded-full border border-white/15 bg-black/20 px-4 py-2.5 backdrop-blur-md transition focus-within:border-white/35 focus-within:bg-black/30 sm:max-w-sm lg:max-w-md"
-            >
-              <Search className="h-4 w-4 shrink-0 text-white/60" aria-hidden="true" />
-              <label htmlFor="hero-search" className="sr-only">
-                Buscar en la biblioteca
-              </label>
-              <input
-                id="hero-search"
-                name="q"
-                type="search"
-                placeholder="Buscar en la biblioteca..."
-                className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/45 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="inline-flex shrink-0 items-center rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#1a1a1a] transition hover:bg-[#f0eae0]"
-              >
-                Buscar
-              </button>
-            </form>
-          </div>
-
-          {/* Top content: Two columns (Text + Presentation Video) */}
-          <div className="flex flex-1 items-center py-8 sm:py-10 lg:py-12">
-            <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center xl:gap-14">
-              {/* Left: Text & CTAs */}
-              <div className="flex flex-col items-start text-left">
-                {/* 3-color line highlight */}
-                <div className="mb-8 flex h-1 w-48 overflow-hidden rounded-full" aria-hidden="true">
-                  <span className="flex-1 bg-[#2e7d32]" />
-                  <span className="flex-1 bg-[#fbc02d]" />
-                  <span className="flex-1 bg-[#d32f2f]" />
-                </div>
-
-                <h1 className="font-display text-5xl leading-[0.95] text-white sm:text-6xl lg:text-[72px]">
-                  Nuestras Raíces,<br />Nuestro Territorio
-                </h1>
-                <p className="mt-6 max-w-xl text-base leading-7 text-white/75 sm:text-lg">
-                  Infraestructura digital para gestionar, proteger y comunicar información territorial, conocimiento propio y procesos de gobernanza del pueblo negro.
-                </p>
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <a
-                    href="https://renacientes.net"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#2e7d32] px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-green-900/20 transition hover:bg-[#1b5e20]"
-                  >
-                    Conoce Nuestra Lucha
-                  </a>
-                </div>
-              </div>
-
-              {/* Right: Presentation Video Container */}
-              <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <ExpandableVideo
-                  videoId="hero"
-                  fullSrc="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
-                >
-                  <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-black shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
-                    {/* Scale past in-file letterboxing so the card stays fully covered */}
-                    <div className="absolute inset-0 overflow-hidden">
-                      <video
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
-                      >
-                        <source
-                          src="/generated/admin/inicio-institucional-home-hero-1774050039794-video.mp4"
-                          type="video/mp4"
-                        />
-                      </video>
-                    </div>
-                    <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/10" />
-
-                    {/* Play Icon Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2e7d32] shadow-[0_0_0_8px_rgba(46,125,50,0.25)] transition-transform duration-300 group-hover:scale-110 group-hover:bg-[#1b5e20]">
-                        <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7 translate-x-0.5" aria-hidden="true">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Video Tag Label */}
-                    <div className="absolute bottom-5 left-5 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md z-10">
-                      Video de presentación
-                    </div>
-                  </div>
-                </ExpandableVideo>
-              </div>
-            </div>
-          </div>
-
-          {/* Video Cards (Inicio, Memoria, Gobierno, SCITA) */}
-          <div className="mt-auto pt-2">
-            <HeroCards role={role} />
-          </div>
-        </div>
-
-        <a
-          href="#quienes-somos"
-          aria-label="Hay más contenido. Desplazarse a la siguiente sección"
-          className="absolute bottom-3 right-1 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/65 motion-reduce:transition-none sm:bottom-4 sm:right-2 lg:bottom-5 lg:right-3"
-        >
-          <ChevronDown className="h-5 w-5 animate-bounce motion-reduce:animate-none" aria-hidden="true" />
-        </a>
-      </section>
+      <HomeHeroSection role={role} />
 
       {/* ── ¿Quiénes somos? ── */}
       <section
@@ -325,7 +171,7 @@ export default async function HomePage({
                 title: "Áreas bioculturales de conservación comunitaria",
                 description:
                   "Territorios colectivos con enfoque de pueblo negro: cartografía, acuerdos comunitarios y estrategias de conservación biocultural.",
-                href: "/gobierno-propio",
+                href: "/gobierno-propio/conservacion",
                 cta: "Explorar áreas",
               },
               {
@@ -477,13 +323,18 @@ export default async function HomePage({
             </div>
 
             <div className="divide-y divide-[#e8dfd3] overflow-hidden rounded-[28px] border border-[#e8dfd3] bg-white shadow-[0_12px_40px_rgba(26,26,26,0.04)]">
-              {ultimasNoticias.map((n) => (
-                <LoUltimoListRow
-                  key={n.id}
-                  item={n}
-                  href={withRole(`/incidencia/${n.slug}`, role)}
-                />
-              ))}
+              {curatedNews.map((n) => {
+                const href = withRole(`/incidencia/${n.slug}`, role);
+
+                return <LoUltimoListRow key={n.id} item={n} href={href} />;
+              })}
+
+              <div className="bg-[#fcfbfa] p-5 border-t border-[#e8dfd3]">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7a756e] mb-4 px-1">
+                  En Instagram
+                </p>
+                <InstagramSlider items={instagramNews} />
+              </div>
             </div>
 
             <div className="mt-4 sm:hidden">

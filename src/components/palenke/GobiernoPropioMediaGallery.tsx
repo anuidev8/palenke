@@ -231,16 +231,9 @@ function GalleryCard({
           )}
 
           <div className="mt-auto pt-10">
-            <h3
-              className={`font-display font-semibold leading-[1.12] tracking-tight text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)] ${
-                isHero ? "text-3xl sm:text-4xl lg:text-5xl" : "text-xl sm:text-2xl"
-              }`}
-            >
-              {item.title}
-            </h3>
-            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/15 pt-4">
+            <div className="flex flex-wrap items-center gap-3 border-t border-white/15 pt-4">
               <span className="text-[11px] font-medium uppercase tracking-widest text-white/60">
-                {item.year} · {item.council}
+                {item.year}
               </span>
               <button
                 type="button"
