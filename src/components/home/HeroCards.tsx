@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { withRole } from "@/lib/viewer";
@@ -32,29 +33,25 @@ export function HeroCards({
       title: "Memoria Afroterritorial",
       desc: "Archivo histórico y cultural comunitario.",
       href: "/memoria-afroterritorial",
-      video: "/videos/memoria-afroterritorial-presentacion-hero.mp4",
-      poster: "/assets/hero-cards/memoria-afroterritorial.png",
+      image: "/assets/hero-cards/memoria-afroterritorial.png",
     },
     {
       title: "Gobierno Propio",
       desc: "Instrumentos de protección y autonomía.",
       href: "/gobierno-propio",
-      video: "/videos/gobierno-propio-presentacion-hero.mp4",
-      poster: "/assets/hero-cards/gobierno-propio.png",
+      image: "/assets/hero-cards/gobierno-propio.png",
     },
     {
       title: "SCITA",
       desc: "Sistema Comunitario de Información Territorial y Ambiental.",
       href: "/scita",
-      video: "/videos/home-hero-presentacion.mp4",
-      poster: "/assets/hero-cards/scita.png",
+      image: "/assets/hero-cards/scita.png",
     },
     {
       title: "Incidencia",
       desc: "Pronunciamientos, agenda y memoria viva del territorio.",
       href: "/incidencia",
-      video: "/hero-bg.mp4",
-      poster: "/assets/hero-cards/incidencia.png",
+      image: "/assets/hero-cards/incidencia.png",
     },
   ];
 
@@ -71,17 +68,13 @@ export function HeroCards({
             href={withRole(card.href, role)}
             className="group relative flex h-40 flex-col justify-end overflow-hidden rounded-[24px] border border-white/10 bg-[#1a1a1a] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl hover:shadow-black/50 sm:h-56 sm:p-5 xl:h-60"
           >
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              poster={card.poster}
+            <Image
+              src={card.image}
+              alt={card.title}
+              fill
+              sizes="(min-width: 1280px) 24vw, (min-width: 1024px) 23vw, 48vw"
               className="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
-            >
-              <source src={card.video} type="video/mp4" />
-            </video>
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-60" />
 
             <div className="relative z-10 translate-y-2 transition-transform duration-300 group-hover:translate-y-0 sm:translate-y-4">
