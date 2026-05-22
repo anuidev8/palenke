@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { cookies } from "next/headers";
 import type { ViewerRole } from "@/lib/mock-data";
 import { resolveViewerRoleRecord } from "@/lib/auth/permissions";
 import { hasSupabasePublicConfig, hasSupabaseServiceConfig } from "@/lib/config";
@@ -14,8 +15,26 @@ export type ViewerSessionState = {
   email: string | null;
 };
 
+async function hasSupabaseAuthCookie() {
+  const cookieStore = await cookies();
+  return cookieStore
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"));
+}
+
 export const getViewerSessionState = cache(async (): Promise<ViewerSessionState> => {
   if (!hasSupabasePublicConfig()) {
+    return {
+      role: "public",
+      isAuthenticated: false,
+      isActive: false,
+      userId: null,
+      email: null,
+    };
+  }
+
+  // Avoid a Supabase round-trip for anonymous users.
+  if (!(await hasSupabaseAuthCookie())) {
     return {
       role: "public",
       isAuthenticated: false,

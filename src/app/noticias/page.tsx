@@ -46,7 +46,7 @@ export default async function NoticiasPage({
             <h2 className="mb-8 font-display text-3xl text-[#1a1a1a]">Entérate</h2>
 
             <div className="grid gap-6">
-              {externalNews.map((item) => (
+              {externalNews.map((item, index) => (
                 <article
                   key={item.id}
                   className="surface-card flex flex-col gap-4 overflow-hidden"
@@ -59,6 +59,9 @@ export default async function NoticiasPage({
                         alt={`Imagen de portada: ${item.title}`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 40vw"
+                        unoptimized
+                        priority={index < 2}
+                        loading={index < 2 ? "eager" : "lazy"}
                         className="object-cover"
                       />
                     ) : (

@@ -22,7 +22,6 @@ function clampVolume(value: number) {
 }
 
 export function HomeHeroSection({ role }: { role: ViewerRole }) {
-  const backgroundVideoRef = useRef<HTMLVideoElement>(null);
   const cardVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioFadeRafRef = useRef<number | null>(null);
@@ -120,7 +119,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   }, []);
 
   useEffect(() => {
-    const videos = [backgroundVideoRef.current, cardVideoRef.current].filter(
+    const videos = [cardVideoRef.current].filter(
       (video): video is HTMLVideoElement => Boolean(video),
     );
 
@@ -217,16 +216,6 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       <audio ref={audioRef} src={HERO_AUDIO_SRC} autoPlay loop preload="auto" muted />
 
       <div className="absolute inset-0 z-0">
-        <video
-          ref={backgroundVideoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-screen"
-        >
-          <source src={HERO_VIDEO_SRC} type="video/mp4" />
-        </video>
         <div
           className="absolute inset-0"
           style={{
@@ -320,6 +309,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                       loop
                       muted
                       playsInline
+                      preload="metadata"
                       className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
                     >
                       <source src={HERO_VIDEO_SRC} type="video/mp4" />

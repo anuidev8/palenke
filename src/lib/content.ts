@@ -85,6 +85,7 @@ type ContentDocumentRow = {
 
 const EXTERNAL_NEWS_CATEGORY_ID = 27;
 const EXTERNAL_NEWS_REVALIDATE_SECONDS = 60 * 15;
+const EXTERNAL_NEWS_FETCH_TIMEOUT_MS = 3_500;
 const externalNewsFallbackImages = [
   "/assets/hero-cards/incidencia.png",
   "/assets/hero-cards/memoria-afroterritorial.png",
@@ -233,6 +234,15 @@ function normalizeExternalImageUrl(value: unknown) {
   }
 }
 
+function createRequestTimeout(timeoutMs: number) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timeoutId),
+  };
+}
+
 function extractOgImageFromYoastHead(yoastHead: unknown) {
   if (typeof yoastHead !== "string" || !yoastHead) return null;
   const match = yoastHead.match(
@@ -298,6 +308,7 @@ function resolveExternalNewsTitle(item: Record<string, unknown>) {
 async function fetchExternalMediaImageMap(mediaIds: number[]) {
   if (!mediaIds.length) return new Map<number, string>();
 
+  const timeout = createRequestTimeout(EXTERNAL_NEWS_FETCH_TIMEOUT_MS);
   try {
     const response = await fetch(
       `https://renacientes.net/wp-json/wp/v2/media?include=${mediaIds.join(",")}&per_page=${Math.min(
@@ -306,6 +317,7 @@ async function fetchExternalMediaImageMap(mediaIds: number[]) {
       )}`,
       {
         next: { revalidate: EXTERNAL_NEWS_REVALIDATE_SECONDS },
+        signal: timeout.signal,
       },
     );
     if (!response.ok) return new Map<number, string>();
@@ -337,6 +349,8 @@ async function fetchExternalMediaImageMap(mediaIds: number[]) {
     return imageByMediaId;
   } catch {
     return new Map<number, string>();
+  } finally {
+    timeout.clear();
   }
 }
 
@@ -526,11 +540,13 @@ function mapDocumentToRecord(row: ContentDocumentRow): DocumentRecord {
 }
 
 export async function getExternalEnterateNews(limit = 4): Promise<ExternalNewsItem[]> {
+  const timeout = createRequestTimeout(EXTERNAL_NEWS_FETCH_TIMEOUT_MS);
   try {
     const response = await fetch(
       `https://renacientes.net/wp-json/wp/v2/posts?categories=${EXTERNAL_NEWS_CATEGORY_ID}&per_page=${Math.min(limit, 6)}&_embed=wp:featuredmedia&orderby=date&order=desc`,
       {
         next: { revalidate: EXTERNAL_NEWS_REVALIDATE_SECONDS },
+        signal: timeout.signal,
       },
     );
 
@@ -579,6 +595,8 @@ export async function getExternalEnterateNews(limit = 4): Promise<ExternalNewsIt
   } catch (error) {
     console.error("Failed to fetch external Renacientes news:", error);
     return externalNewsFallback.slice(0, limit);
+  } finally {
+    timeout.clear();
   }
 }
 

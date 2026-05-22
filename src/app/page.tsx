@@ -256,7 +256,7 @@ export default async function HomePage({
             </div>
 
             <div className="grid gap-5">
-              {noticias.slice(0, 2).map((n) => (
+              {noticias.slice(0, 2).map((n, index) => (
                 <article
                   key={n.id}
                   className="surface-card flex flex-col gap-4"
@@ -269,6 +269,9 @@ export default async function HomePage({
                         alt={`Imagen de portada: ${n.title}`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 40vw"
+                        unoptimized
+                        priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
                         className="object-cover"
                       />
                     ) : (

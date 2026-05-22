@@ -111,6 +111,7 @@ export function HomeVideoGallery() {
                       loop
                       muted
                       playsInline
+                      preload="metadata"
                       className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-80 transition-opacity duration-300 group-hover:opacity-95"
                     >
                       <source src={currentVideo.src} type="video/mp4" />
