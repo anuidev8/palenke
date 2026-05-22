@@ -39,7 +39,7 @@ export function GobiernoPropioHeroVideo({
   const queuedAudioResumeRef = useRef<(() => void) | null>(null);
 
   const [isMediaPlaying, setIsMediaPlaying] = useState(true);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const stopVolumeFade = useCallback(() => {
@@ -252,7 +252,7 @@ export function GobiernoPropioHeroVideo({
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
             style={{ opacity: isMediaPlaying ? 0.85 : 0.45 }}
           >

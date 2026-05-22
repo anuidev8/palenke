@@ -15,6 +15,10 @@ import {
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 
+function isSupabaseStorageAsset(url: string) {
+  return url.includes(".supabase.co/storage/v1/object/public/");
+}
+
 export default async function MemoriaAfroterritorialPage({
   searchParams,
 }: {
@@ -129,6 +133,7 @@ export default async function MemoriaAfroterritorialPage({
               className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
               sizes="(max-width: 1024px) 100vw, 50vw"
               quality={85}
+              unoptimized={isSupabaseStorageAsset(MEMORIA_NUESTRA_MEMORIA_IMAGE_URL)}
             />
             <div
               className="absolute inset-0 z-[1]"
@@ -277,6 +282,7 @@ export default async function MemoriaAfroterritorialPage({
                       fill
                       sizes="(max-width: 1024px) 50vw, 400px"
                       className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                      unoptimized={isSupabaseStorageAsset(item.posterUrl)}
                     />
                   </div>
                 ))}

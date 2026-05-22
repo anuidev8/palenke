@@ -34,6 +34,10 @@ function isDirectVideoFileUrl(url: string) {
   return false;
 }
 
+function isSupabaseStorageAsset(url: string) {
+  return url.includes(".supabase.co/storage/v1/object/public/");
+}
+
 type ExpandSource = "preview" | "collection";
 
 function layoutIdFor(source: ExpandSource, id: string, prefix: string) {
@@ -73,7 +77,8 @@ function MediaPreview({
 
   const isVideoThumb =
     item.kind === "video" && isDirectVideoFileUrl(item.mediaUrl || item.posterUrl);
-  const useOptimizedImage =
+  const isSupabaseImage = isSupabaseStorageAsset(imageSrc);
+  const useImageElement =
     !isVideoThumb &&
     (imageSrc.includes("supabase.co/storage/") ||
       imageSrc.startsWith("/") ||
@@ -92,7 +97,7 @@ function MediaPreview({
           playsInline
           preload="metadata"
         />
-      ) : useOptimizedImage ? (
+      ) : useImageElement ? (
         <Image
           src={imageSrc}
           alt=""
@@ -101,6 +106,7 @@ function MediaPreview({
           sizes={sizes}
           quality={GALLERY_IMAGE_QUALITY}
           priority={priority}
+          unoptimized={isSupabaseImage}
         />
       ) : (
         <Image
@@ -363,6 +369,7 @@ function DetailOverlay({
               sizes="(max-width: 1280px) 100vw, 1280px"
               quality={90}
               priority
+              unoptimized={isSupabaseStorageAsset(item.mediaUrl)}
             />
           ) : item.kind === "audio" ? (
             <div className="absolute inset-0">
@@ -374,6 +381,7 @@ function DetailOverlay({
                 sizes="(max-width: 1280px) 100vw, 1280px"
                 quality={85}
                 priority
+                unoptimized={Boolean(item.posterUrl && isSupabaseStorageAsset(item.posterUrl))}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/65 to-black/45" />
               <div className="relative z-10 flex h-full flex-col items-center justify-center gap-5 px-6 text-center">

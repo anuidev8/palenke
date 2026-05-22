@@ -32,28 +32,28 @@ export function HeroCards({
       title: "Memoria Afroterritorial",
       desc: "Archivo histórico y cultural comunitario.",
       href: "/memoria-afroterritorial",
-      video: "https://cdn.pixabay.com/video/2019/11/10/28906-372990424_tiny.mp4",
+      video: "/videos/memoria-afroterritorial-presentacion-hero.mp4",
       poster: "/assets/hero-cards/memoria-afroterritorial.png",
     },
     {
       title: "Gobierno Propio",
       desc: "Instrumentos de protección y autonomía.",
       href: "/gobierno-propio",
-      video: "https://cdn.pixabay.com/video/2021/08/17/85376-589953466_tiny.mp4",
+      video: "/videos/gobierno-propio-presentacion-hero.mp4",
       poster: "/assets/hero-cards/gobierno-propio.png",
     },
     {
       title: "SCITA",
       desc: "Sistema Comunitario de Información Territorial y Ambiental.",
       href: "/scita",
-      video: "https://cdn.pixabay.com/video/2020/04/18/36551-413154868_tiny.mp4",
+      video: "/videos/home-hero-presentacion.mp4",
       poster: "/assets/hero-cards/scita.png",
     },
     {
       title: "Incidencia",
       desc: "Pronunciamientos, agenda y memoria viva del territorio.",
       href: "/incidencia",
-      video: "https://cdn.pixabay.com/video/2023/10/22/185986-876934526_tiny.mp4",
+      video: "/hero-bg.mp4",
       poster: "/assets/hero-cards/incidencia.png",
     },
   ];
@@ -72,11 +72,25 @@ export function HeroCards({
             className="group relative flex h-40 flex-col justify-end overflow-hidden rounded-[24px] border border-white/10 bg-[#1a1a1a] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl hover:shadow-black/50 sm:h-56 sm:p-5 xl:h-60"
           >
             <video
-              autoPlay
               loop
               muted
               playsInline
+              preload="none"
               poster={card.poster}
+              onMouseEnter={(event) => {
+                void event.currentTarget.play().catch(() => {});
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.pause();
+                event.currentTarget.currentTime = 0;
+              }}
+              onFocus={(event) => {
+                void event.currentTarget.play().catch(() => {});
+              }}
+              onBlur={(event) => {
+                event.currentTarget.pause();
+                event.currentTarget.currentTime = 0;
+              }}
               className="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
             >
               <source src={card.video} type="video/mp4" />
