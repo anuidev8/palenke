@@ -19,10 +19,10 @@ function clampVolume(value: number) {
 export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const cardVideoRef = useRef<HTMLVideoElement>(null);
   const volumeFadeRafRef = useRef<number | null>(null);
-  const queuedAudioResumeRef = useRef<(() => void) | null>(null);
 
-  const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
-  const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(true);
+  const [hasUserActivatedMedia, setHasUserActivatedMedia] = useState(false);
+  const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(false);
+  const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(false);
   const [hasScrolledPastHeroTop, setHasScrolledPastHeroTop] = useState(false);
 
   const stopVolumeFade = useCallback(() => {
@@ -30,17 +30,6 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       cancelAnimationFrame(volumeFadeRafRef.current);
       volumeFadeRafRef.current = null;
     }
-  }, []);
-
-  const clearQueuedAudioResume = useCallback(() => {
-    const queuedResume = queuedAudioResumeRef.current;
-    if (!queuedResume || typeof window === "undefined") {
-      return;
-    }
-
-    window.removeEventListener("pointerdown", queuedResume);
-    window.removeEventListener("keydown", queuedResume);
-    queuedAudioResumeRef.current = null;
   }, []);
 
   const fadeVideoVolumeTo = useCallback(
@@ -95,14 +84,22 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       return;
     }
 
+    const markUserActivated = () => {
+      setHasUserActivatedMedia(true);
+    };
+
     const updateScrollState = () => {
       setHasScrolledPastHeroTop(window.scrollY > 24);
     };
 
+    window.addEventListener("pointerdown", markUserActivated, { passive: true });
+    window.addEventListener("keydown", markUserActivated);
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
 
     return () => {
+      window.removeEventListener("pointerdown", markUserActivated);
+      window.removeEventListener("keydown", markUserActivated);
       window.removeEventListener("scroll", updateScrollState);
     };
   }, []);
@@ -127,74 +124,22 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       return;
     }
 
-    let cancelled = false;
-
-    async function tryPlayWithAudio() {
-      const currentVideo = cardVideoRef.current;
-      if (!currentVideo) {
-        return;
-      }
-
-      try {
-        currentVideo.muted = false;
-        await currentVideo.play();
-
-        if (!cancelled) {
-          fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-        }
-      } catch {
-        if (
-          cancelled ||
-          typeof window === "undefined" ||
-          queuedAudioResumeRef.current !== null ||
-          !isHeroMediaPlaying ||
-          !isHeroAudioEnabled ||
-          hasScrolledPastHeroTop
-        ) {
-          return;
-        }
-
-        const resumeOnInteraction = async () => {
-          clearQueuedAudioResume();
-
-          if (!isHeroMediaPlaying || !isHeroAudioEnabled || hasScrolledPastHeroTop) {
-            return;
-          }
-
-          const resumedVideo = cardVideoRef.current;
-          if (!resumedVideo) {
-            return;
-          }
-
-          try {
-            resumedVideo.muted = false;
-            await resumedVideo.play();
-            fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-          } catch {
-            // Browser still blocked playback. User can tap the audio toggle again.
-          }
-        };
-
-        queuedAudioResumeRef.current = resumeOnInteraction;
-        window.addEventListener("pointerdown", resumeOnInteraction, { once: true });
-        window.addEventListener("keydown", resumeOnInteraction, { once: true });
-      }
-    }
-
-    if (isHeroMediaPlaying && isHeroAudioEnabled && !hasScrolledPastHeroTop) {
-      void tryPlayWithAudio();
+    if (
+      isHeroMediaPlaying &&
+      isHeroAudioEnabled &&
+      !hasScrolledPastHeroTop &&
+      hasUserActivatedMedia
+    ) {
+      video.muted = false;
+      void video.play().catch(() => {});
+      fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
     } else {
-      clearQueuedAudioResume();
       video.muted = true;
       fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
     }
-
-    return () => {
-      cancelled = true;
-    };
   }, [
-    clearQueuedAudioResume,
     fadeVideoVolumeTo,
+    hasUserActivatedMedia,
     hasScrolledPastHeroTop,
     isHeroAudioEnabled,
     isHeroMediaPlaying,
@@ -203,9 +148,8 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   useEffect(() => {
     return () => {
       stopVolumeFade();
-      clearQueuedAudioResume();
     };
-  }, [clearQueuedAudioResume, stopVolumeFade]);
+  }, [stopVolumeFade]);
 
   return (
     <section className="relative overflow-hidden bg-[#1a2a1a]">
@@ -299,7 +243,6 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                   <div className="absolute inset-0 overflow-hidden">
                     <video
                       ref={cardVideoRef}
-                      autoPlay
                       loop
                       muted
                       playsInline
@@ -343,7 +286,10 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
         <div className="flex flex-col items-end gap-2">
           <button
             type="button"
-            onClick={() => setIsHeroAudioEnabled((prev) => !prev)}
+            onClick={() => {
+              setHasUserActivatedMedia(true);
+              setIsHeroAudioEnabled((prev) => !prev);
+            }}
             aria-label={isHeroAudioEnabled ? "Silenciar sonido ambiente" : "Activar sonido ambiente"}
             aria-pressed={isHeroAudioEnabled}
             className={`inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition ${
@@ -361,7 +307,10 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
 
           <button
             type="button"
-            onClick={() => setIsHeroMediaPlaying((prev) => !prev)}
+            onClick={() => {
+              setHasUserActivatedMedia(true);
+              setIsHeroMediaPlaying((prev) => !prev);
+            }}
             aria-label={isHeroMediaPlaying ? "Pausar video y sonido" : "Reanudar video y sonido"}
             aria-pressed={isHeroMediaPlaying}
             className={`inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition ${
