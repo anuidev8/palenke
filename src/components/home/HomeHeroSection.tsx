@@ -22,7 +22,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const queuedAudioResumeRef = useRef<(() => void) | null>(null);
 
   const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
-  const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(false);
+  const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(true);
   const [hasScrolledPastHeroTop, setHasScrolledPastHeroTop] = useState(false);
 
   const stopVolumeFade = useCallback(() => {
