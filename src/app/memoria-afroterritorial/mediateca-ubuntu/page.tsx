@@ -39,8 +39,12 @@ export default async function MediatecaUbuntuPage({
             Mediateca Ubuntu
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[#4a4540]">
-            Archivo audiovisual comunitario con fotografías, videos, audios y entrevistas de nuestros
-            procesos territoriales y encuentros del Palenke.
+            La Mediateca Ubuntu es el archivo vivo de memoria audiovisual del Palenke, encargado de
+            custodiar fotografías, videos, audios, entrevistas y relatos comunitarios que documentan
+            los procesos territoriales, organizativos y espirituales del pueblo negro. Su función es
+            preservar la memoria colectiva, fortalecer la formación política y garantizar que la voz,
+            la imagen y el conocimiento de la comunidad circulen con dignidad, consentimiento y
+            autonomía.
           </p>
         </div>
       </section>
