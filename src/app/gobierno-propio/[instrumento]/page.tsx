@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock, Shield } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
@@ -12,6 +12,7 @@ import { canDownloadDocument } from "@/lib/mock-data";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRequestState } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
+import { SubmoduleOptionsColumn } from "@/components/palenke/SubmoduleOptionsColumn";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
 
@@ -144,6 +145,72 @@ const instrumentos = {
     librarySection: "Protección hídrica",
     accessLevel: "admin",
   },
+  "seguridad-juridica": {
+    title: "Seguridad jurídica de la tierra",
+    eyebrow: "Módulo especial",
+    icon: Shield,
+    color: "#2e7d32",
+    lightBg: "#d8f3dc",
+    imageUrl: resolvePlaceholderImage("seguridad-juridica"),
+    definition:
+      "En este módulo encontrarás información sobre fortalecimiento organizativo, género, protección y saneamiento, titulación y ampliación de territorios colectivos.",
+    context:
+      "Su propósito es aportar al gobierno propio, la autonomía comunitaria y la defensa integral del territorio, entendido como espacio de vida, memoria, cultura y permanencia del Pueblo Negro.\n\nAlgunos contenidos serán de acceso público y otros tendrán acceso restringido mediante usuario, contraseña o solicitud previa, para proteger la información sensible y la soberanía de datos de las comunidades.",
+    keyPoints: [
+      "Fortalecimiento organizativo y de capacidades",
+      "Perspectiva de género en la gobernanza",
+      "Protección, linderos y saneamiento territorial",
+      "Titulación y ampliación de territorios colectivos",
+    ],
+    submodules: [
+      {
+        id: "fortalecimiento",
+        title: "Fortalecimiento",
+        bullets: [
+          "Fortalecimiento organizativo y político",
+          "Capacitación en gobernanza autónoma",
+        ],
+        color: "#2e7d32",
+        lightBg: "#f1f8e9",
+        href: "/gobierno-propio/seguridad-juridica?submodulo=fortalecimiento",
+      },
+      {
+        id: "genero",
+        title: "Género",
+        bullets: [
+          "Género e inclusión en la gobernanza de tierras",
+          "Participación de mujeres y jóvenes",
+        ],
+        color: "#e65100",
+        lightBg: "#fff3e0",
+        href: "/gobierno-propio/seguridad-juridica?submodulo=genero",
+      },
+      {
+        id: "proteccion",
+        title: "Protección y saneamiento",
+        bullets: [
+          "Protección de linderos ancestrales",
+          "Saneamiento físico y jurídico de tierras",
+        ],
+        color: "#00838f",
+        lightBg: "#e0f7fa",
+        href: "/gobierno-propio/seguridad-juridica?submodulo=proteccion",
+      },
+      {
+        id: "titulacion",
+        title: "Titulación y ampliación",
+        bullets: [
+          "Titulación colectiva de tierras",
+          "Procesos de ampliación de territorios",
+        ],
+        color: "#1565c0",
+        lightBg: "#e3f2fd",
+        href: "/gobierno-propio/seguridad-juridica?submodulo=titulacion",
+      },
+    ],
+    librarySection: "Seguridad jurídica de la tierra",
+    accessLevel: "admin",
+  },
 } as const;
 
 type InstrumentoSlug = keyof typeof instrumentos;
@@ -264,6 +331,101 @@ function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): 
   };
 }
 
+// ─── Mock Documents for Seguridad Jurídica ───────────────────────────────────
+
+const MOCK_SEGURIDAD_JURIDICA_DOCS: (DisplayDoc & { submodule: string })[] = [
+  {
+    id: "sj-diego-luis",
+    title: "CC Diego Luis Cordoba",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2023",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/CC Diego Luis Cordoba.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/CC Diego Luis Cordoba.pdf",
+    submodule: "titulacion",
+  },
+  {
+    id: "sj-martin-luther",
+    title: "CC Martin Luther King",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2023",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/CC Martin Luther King.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/CC Martin Luther King.pdf",
+    submodule: "fortalecimiento",
+  },
+  {
+    id: "sj-nelson-mandela",
+    title: "CC Nelson Mandela",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2023",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/CC Nelson Mandela.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/CC Nelson Mandela.pdf",
+    submodule: "genero",
+  },
+  {
+    id: "sj-acta-linderos-diego",
+    title: "Acta de Actualización de Linderos - Diego Luis Cordoba",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2024",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Actualización de Linderos - Diego Luis Cordoba.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Actualización de Linderos - Diego Luis Cordoba.pdf",
+    submodule: "proteccion",
+  },
+  {
+    id: "sj-acta-asamblea-king",
+    title: "Acta de Asamblea de Fortalecimiento - Martin Luther King",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2024",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Asamblea de Fortalecimiento - Martin Luther King.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Asamblea de Fortalecimiento - Martin Luther King.pdf",
+    submodule: "fortalecimiento",
+  },
+  {
+    id: "sj-acta-eleccion-mandela",
+    title: "Acta de Elección de Junta - Nelson Mandela",
+    section: "Seguridad jurídica de la tierra",
+    type: "Documento",
+    territory: "Municipio de Miraflores, Departamento del Guaviare",
+    year: "2024",
+    visibility: "internal",
+    action: "file",
+    fileLabel: "Descargar",
+    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Elección de Junta - Nelson Mandela.pdf",
+    usesSignedUrl: false,
+    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Elección de Junta - Nelson Mandela.pdf",
+    submodule: "fortalecimiento",
+  },
+];
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function InstrumentoPage({
@@ -295,9 +457,20 @@ export default async function InstrumentoPage({
     : null;
 
   const tableDbDocs = dbDocs.filter((d) => d.visibility !== "public");
-  const displayDocs: DisplayDoc[] = usesSupabaseDocs
+  let displayDocs: DisplayDoc[] = usesSupabaseDocs
     ? tableDbDocs.map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
     : [];
+
+  const activeSubmodule = typeof sp.submodulo === "string" ? sp.submodulo : undefined;
+
+  if (instrumentoKey === "seguridad-juridica") {
+    // Fill with high-fidelity mock documents
+    const rawMockDocs = MOCK_SEGURIDAD_JURIDICA_DOCS;
+    displayDocs = activeSubmodule
+      ? rawMockDocs.filter((d) => d.submodule === activeSubmodule)
+      : rawMockDocs;
+  }
+
   const grantedDocIds = sessionState.isAuthenticated
     ? Array.from(
         await listGrantedDocumentIdsForViewer({
@@ -480,22 +653,32 @@ export default async function InstrumentoPage({
 
             {/* Right: Key points & actions (Sticky Sidebar) */}
             <div className="sticky top-24 bg-white rounded-[32px] p-8 sm:p-10 border border-[#e8dfd3] shadow-md">
-              <p className="eyebrow text-[#4a4540] mb-4">ALCANCE</p>
-              <h3 className="font-display text-2xl text-[#1a1a1a] mb-8">Lo que cubre este instrumento</h3>
-              
-              <ul className="space-y-6">
-                {inst.keyPoints.map((point, i) => (
-                  <li key={point} className="flex items-start gap-4">
-                    <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
-                      style={{ background: inst.lightBg, color: inst.color }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <p className="mt-1 text-[15px] leading-relaxed text-[#4a4540]">{point}</p>
-                  </li>
-                ))}
-              </ul>
+              {"submodules" in inst ? (
+                <>
+                  <p className="eyebrow text-[#4a4540] mb-4">SUBMÓDULOS</p>
+                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-8">Líneas de trabajo</h3>
+                  <SubmoduleOptionsColumn items={inst.submodules as any} role={role} />
+                </>
+              ) : (
+                <>
+                  <p className="eyebrow text-[#4a4540] mb-4">ALCANCE</p>
+                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-8">Lo que cubre este instrumento</h3>
+                  
+                  <ul className="space-y-6">
+                    {inst.keyPoints.map((point, i) => (
+                      <li key={point} className="flex items-start gap-4">
+                        <span
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
+                          style={{ background: inst.lightBg, color: inst.color }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p className="mt-1 text-[15px] leading-relaxed text-[#4a4540]">{point}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -525,6 +708,36 @@ export default async function InstrumentoPage({
               </p>
             </div>
           </div>
+
+          {activeSubmodule && (
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-2xl bg-stone-50 border border-[#e8dfd3] shadow-sm animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-3.5 h-3.5 rounded-full" 
+                  style={{ 
+                    backgroundColor: 
+                      instrumentoKey === "seguridad-juridica" 
+                        ? ((inst as any).submodules || []).find((s: any) => s.id === activeSubmodule)?.color ?? inst.color 
+                        : inst.color 
+                  }} 
+                />
+                <p className="text-sm font-semibold text-[#1a1a1a]">
+                  Filtrado por submódulo:{" "}
+                  <span className="font-bold">
+                    {instrumentoKey === "seguridad-juridica"
+                      ? ((inst as any).submodules || []).find((s: any) => s.id === activeSubmodule)?.title ?? activeSubmodule
+                      : activeSubmodule}
+                  </span>
+                </p>
+              </div>
+              <Link
+                href={withRole(`/gobierno-propio/${instrumento}`, role)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-[#e8dfd3] px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2] shadow-xs shrink-0"
+              >
+                Limpiar filtro
+              </Link>
+            </div>
+          )}
 
           <DocumentTree 
             docs={displayDocs} 

@@ -78,6 +78,19 @@ const instruments = [
     imageUrl: "/assets/placeholders/proteccion-hidrica.png",
     fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
   },
+  {
+    id: "seguridad-juridica",
+    title: "Seguridad jurídica de la tierra",
+    bullets: [
+      "Fortalecimiento organizativo, género, protección y saneamiento",
+      "Titulación y ampliación de territorios colectivos",
+    ],
+    color: "#2e7d32", // Forest Green (Security/Land)
+    lightBg: "#d8f3dc",
+    href: "/gobierno-propio/seguridad-juridica",
+    imageUrl: "/assets/placeholders/seguridad-juridica.png",
+    fallbackImageUrl: "/assets/placeholders/seguridad-juridica.svg",
+  },
 ];
 
 export default async function GobiernoPropioPage({

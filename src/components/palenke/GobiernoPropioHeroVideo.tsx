@@ -318,7 +318,7 @@ export function GobiernoPropioHeroVideo({
           <Maximize2 className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <button
+      {/*   <button
           type="button"
           onClick={(event) => {
             event.stopPropagation();
@@ -329,7 +329,7 @@ export function GobiernoPropioHeroVideo({
           className={controlButtonClass(isAudioEnabled)}
         >
           {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-        </button>
+        </button> */}
 
         <button
           type="button"

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, BookOpen, Scale, Leaf, Gavel, Droplets, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, FileText, BookOpen, Scale, Leaf, Gavel, Droplets, ChevronDown, ChevronUp, Shield } from "lucide-react";
 import { useState } from "react";
 import type { ElementType } from "react";
 
@@ -25,6 +25,7 @@ const ICONS: Record<string, ElementType> = {
   conservacion: Leaf,
   etnodesarrollo: Gavel,
   "proteccion-hidrica": Droplets,
+  "seguridad-juridica": Shield,
 };
 
 interface Props {

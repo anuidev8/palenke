@@ -60,7 +60,9 @@ function buildTree(docs: DisplayDoc[]): TreeNode[] {
       segments = [councilName, doc.title];
     } else {
       const parts = doc.storagePath.split("/").filter(Boolean);
-      if (parts.length > 2) {
+      if (parts[0] === "seguridad-juridica") {
+        segments = parts.slice(1);
+      } else if (parts.length > 2) {
         // e.g. ["reglamentos", "cc-foo", "subfolder?", "file.pdf"]
         // Replace the "cc-foo" slug with the properly formatted territory name
         segments = [councilName, ...parts.slice(2)];
