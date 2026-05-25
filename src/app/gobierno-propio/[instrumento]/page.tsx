@@ -464,8 +464,8 @@ export default async function InstrumentoPage({
   const activeSubmodule = typeof sp.submodulo === "string" ? sp.submodulo : undefined;
 
   if (instrumentoKey === "seguridad-juridica") {
-    // Fill with high-fidelity mock documents (passed unfiltered to enable instant client-side tab switching)
-    displayDocs = MOCK_SEGURIDAD_JURIDICA_DOCS as any;
+    // Keep empty for now as requested
+    displayDocs = [];
   }
 
   const grantedDocIds = sessionState.isAuthenticated
