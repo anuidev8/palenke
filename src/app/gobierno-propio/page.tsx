@@ -9,8 +9,9 @@ import {
   GOBIERNO_PROPIO_HERO_VIDEO_DURATION,
   GOBIERNO_PROPIO_HERO_VIDEO_SRC,
 } from "@/lib/gobierno-propio-assets";
+import Link from "next/link";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
-import { type SearchParams } from "@/lib/viewer";
+import { type SearchParams, withRole } from "@/lib/viewer";
 
 const instruments = [
   {
@@ -77,19 +78,6 @@ const instruments = [
     href: "/gobierno-propio/proteccion-hidrica",
     imageUrl: "/assets/placeholders/proteccion-hidrica.png",
     fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
-  },
-  {
-    id: "seguridad-juridica",
-    title: "Seguridad jurídica de la tierra",
-    bullets: [
-      "Fortalecimiento organizativo, género, protección y saneamiento",
-      "Titulación y ampliación de territorios colectivos",
-    ],
-    color: "#2e7d32", // Forest Green (Security/Land)
-    lightBg: "#d8f3dc",
-    href: "/gobierno-propio/seguridad-juridica",
-    imageUrl: "/assets/placeholders/seguridad-juridica.png",
-    fallbackImageUrl: "/assets/placeholders/seguridad-juridica.svg",
   },
 ];
 
@@ -196,12 +184,123 @@ export default async function GobiernoPropioPage({
         </div>
       </section>
 
+      {/* ── 4) CTA SEGURIDAD JURÍDICA DE LA TIERRA ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#1b431c] via-[#245226] to-[#0f2a10] py-20 px-4 sm:px-6 lg:px-8 text-white border-y border-[#123013]">
+        {/* Glowing gradients & Organic lines */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#3c853e]/20 to-transparent blur-[120px]" />
+          <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-t from-[#2e7d32]/30 to-transparent blur-[100px]" />
+          
+          {/* Topographic Lines Overlay */}
+          <svg 
+            className="absolute right-[5%] bottom-[5%] w-[450px] h-[450px] opacity-[0.06] rotate-12 text-[#8ce08e]" 
+            viewBox="0 0 100 100" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="1.5"
+          >
+            <path d="M 0 50 Q 25 30 50 50 T 100 50" />
+            <path d="M 0 60 Q 25 40 50 60 T 100 60" />
+            <path d="M 0 70 Q 25 50 50 70 T 100 70" />
+            <circle cx="50" cy="50" r="20" strokeDasharray="3 3" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
+            {/* Left Content */}
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8ce08e] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#8ce08e]"></span>
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#8ce08e]">
+                  Módulo Especial Destacado
+                </span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight">
+                Seguridad jurídica <br />de la tierra y el territorio
+              </h2>
+              <p className="text-lg text-white/80 leading-relaxed max-w-2xl">
+                La protección jurídica de los territorios colectivos es el pilar del gobierno propio, la autonomía comunitaria y la defensa integral del espacio de vida, memoria y cultura del Pueblo Negro.
+              </p>
+              <p className="text-base text-white/70 max-w-xl">
+                Accede a documentos especializados sobre linderos ancestrales, titulación colectiva, equidad de género en gobernanza, y fortalecimiento organizativo con control de acceso soberano de datos.
+              </p>
+              
+              <div className="pt-4">
+                <Link
+                  href={withRole("/gobierno-propio/seguridad-juridica", role)}
+                  className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-[#1b431c] shadow-lg transition-all duration-300 hover:bg-[#ebf5ec] hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#1b431c]/20"
+                >
+                  <span>Ingresar al módulo de Seguridad Jurídica</span>
+                  <svg 
+                    className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Panel / Preview Feature Cards */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8ce08e]/20 text-[#8ce08e]">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Fortalecimiento</h3>
+                <p className="text-sm text-white/70 leading-relaxed">Capacitación organizativa y política en gobernanza autónoma territorial.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8ce08e]/20 text-[#8ce08e]">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Género e Inclusión</h3>
+                <p className="text-sm text-white/70 leading-relaxed">Participación activa de mujeres y jóvenes en decisiones de tierras.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8ce08e]/20 text-[#8ce08e]">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Protección y Saneamiento</h3>
+                <p className="text-sm text-white/70 leading-relaxed">Defensa de linderos ancestrales y saneamiento físico-jurídico.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8ce08e]/20 text-[#8ce08e]">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Titulación y Ampliación</h3>
+                <p className="text-sm text-white/70 leading-relaxed">Titulación colectiva del territorio y ampliación de límites ancestrales.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Galería audiovisual de Gobierno Propio ── */}
-      <section className="border-t border-[#e8dfd3] bg-[#f7f3ed] px-4 py-14 sm:px-6 lg:px-8">
+     {/*  <section className="border-t border-[#e8dfd3] bg-[#f7f3ed] px-4 py-14 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <GobiernoPropioGallerySection items={galleryMedia} />
         </div>
-      </section>
+      </section> */}
 
       <OrientationNetworkSection />
     </SiteLayout>

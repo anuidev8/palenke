@@ -39,6 +39,12 @@ const CATEGORIES = [
     dir: "cc-capitania",
     sourceDir: "C.C. CAPITANIA -20260512T195612Z-3-001/C.C. CAPITANIA",
   },
+  {
+    id: "cc-diego-luis-cordoba",
+    label: "C.C. DIEGO LUIS CORDOBA",
+    dir: "cc-diego-luis-cordoba",
+    sourceDir: "C.C. DIEGO LUIS CORDOBA.-20260512T200501Z-3-001/C.C. DIEGO LUIS CORDOBA",
+  },
 ];
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
@@ -116,6 +122,7 @@ const MONTHS_ES = [
 function categoryPlaceName(categoryId) {
   if (categoryId === "cc-los-cimarrones") return "C.C. Los Cimarrones";
   if (categoryId === "cc-capitania") return "C.C. Capitanía";
+  if (categoryId === "cc-diego-luis-cordoba") return "C.C. Diego Luis Córdoba";
   return "colección general";
 }
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import fs from "fs";
 import path from "path";
-import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock, Shield } from "lucide-react";
+import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock, Shield, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
@@ -464,11 +464,8 @@ export default async function InstrumentoPage({
   const activeSubmodule = typeof sp.submodulo === "string" ? sp.submodulo : undefined;
 
   if (instrumentoKey === "seguridad-juridica") {
-    // Fill with high-fidelity mock documents
-    const rawMockDocs = MOCK_SEGURIDAD_JURIDICA_DOCS;
-    displayDocs = activeSubmodule
-      ? rawMockDocs.filter((d) => d.submodule === activeSubmodule)
-      : rawMockDocs;
+    // Fill with high-fidelity mock documents (passed unfiltered to enable instant client-side tab switching)
+    displayDocs = MOCK_SEGURIDAD_JURIDICA_DOCS as any;
   }
 
   const grantedDocIds = sessionState.isAuthenticated
@@ -489,6 +486,7 @@ export default async function InstrumentoPage({
     : false;
   const showScitaAreasBoard = SCITA_AREAS_BOARD_INSTRUMENTS.has(instrumentoKey);
   const scitaAreasHref = withRole("/scita?tablero=conservacion", role);
+  const hasSubmodules = "submodules" in inst;
 
   return (
     <SiteLayout
@@ -501,15 +499,28 @@ export default async function InstrumentoPage({
     >
       {/* ── Hero with Background Image ── */}
       <section className="relative w-full h-[55vh] min-h-[500px] flex items-end pb-32 bg-[#1a1a1a]">
-        {/* Immersive Background Image */}
-        {inst.imageUrl && (
-          <Image
-            src={inst.imageUrl}
-            alt={inst.title}
-            fill
-            className="object-cover"
-            priority
-          />
+        {/* Immersive Background Image or Video */}
+        {instrumentoKey === "seguridad-juridica" ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover opacity-85"
+          >
+            <source src="/videos/justicia-libertad.mp4" type="video/mp4" />
+          </video>
+        ) : (
+          inst.imageUrl && (
+            <Image
+              src={inst.imageUrl}
+              alt={inst.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          )
         )}
         
         {/* Gradient Overlays for Readability and Mood */}
@@ -549,91 +560,114 @@ export default async function InstrumentoPage({
       </section>
 
       {/* ── Main Content Area (Overlapping) ── */}
-      <section className="relative z-20 -mt-20 bg-[#fcfaf7] rounded-t-[40px] px-4 pt-16 pb-14 sm:px-6 lg:px-8 border-b border-[#e8dfd3] shadow-[0_-12px_40px_rgba(0,0,0,0.1)]">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-[1fr_400px] gap-12 lg:gap-16 items-start">
+      <section className="relative z-20 -mt-20 bg-[#fcfaf7] rounded-t-[40px] px-4 pt-16 pb-14 sm:px-6 lg:px-8 border-b border-[#e8dfd3] shadow-[0_-12px_40px_rgba(0,0,0,0.1)] overflow-hidden">
+        {/* Dribbble-style Afro Abstract Background Graphics */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Topographic organic afro-territorial lines - using dynamic instrument brand color */}
+          <svg 
+            className="absolute -top-[10%] -right-[5%] w-[800px] h-[800px] rotate-[15deg] transition-all duration-1000" 
+            style={{ color: `${inst.color}` }}
+            opacity="0.04"
+            viewBox="0 0 400 400" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="5" 
+            strokeLinecap="round" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M 50 200 Q 100 100 200 200 T 350 200" />
+            <path d="M 50 230 Q 100 130 200 230 T 350 230" />
+            <path d="M 50 260 Q 100 160 200 260 T 350 260" />
+            <path d="M 50 290 Q 100 190 200 290 T 350 290" />
+            <path d="M 50 320 Q 100 220 200 320 T 350 320" />
+            <circle cx="200" cy="200" r="100" strokeWidth="3" strokeDasharray="8 8" />
+            <circle cx="200" cy="200" r="140" strokeWidth="2" />
+          </svg>
+
+          {/* Abstract solid shapes representing earth and roots */}
+          <svg 
+            className="absolute -bottom-12 -left-12 w-[480px] h-[480px]" 
+            style={{ color: `${inst.color}` }}
+            opacity="0.03"
+            fill="currentColor" 
+            viewBox="0 0 200 200" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M0 200 L 200 200 L 200 100 Q 150 50 100 100 T 0 100 Z" />
+            <circle cx="50" cy="150" r="20" fill="#fcfaf7" />
+            <circle cx="150" cy="150" r="10" fill="#fcfaf7" />
+          </svg>
+
+          {/* Warm energetic glows based on instrument color */}
+          <div 
+            className="absolute bottom-0 right-1/3 w-[500px] h-[500px] rounded-full blur-[130px] opacity-25" 
+            style={{ background: `radial-gradient(circle, ${inst.color} 0%, transparent 70%)` }}
+          />
+          <div 
+            className="absolute top-10 left-12 w-[350px] h-[350px] rounded-full blur-[110px] opacity-15" 
+            style={{ background: `radial-gradient(circle, ${inst.color} 0%, transparent 70%)` }}
+          />
+          
+          {/* Very faint tribal pattern mask */}
+          <div className="absolute inset-0 opacity-[0.015] mix-blend-multiply" style={{ backgroundImage: "radial-gradient(#1a1a1a 2px, transparent 2px)", backgroundSize: "32px 32px" }} />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className={hasSubmodules ? "w-full" : "grid lg:grid-cols-[1fr_420px] gap-12 lg:gap-16 items-start"}>
             
             {/* Left: Definition & Context */}
-            <div className="space-y-8">
+            <div className={hasSubmodules ? "space-y-10 w-full" : "space-y-10"}>
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#e8dfd3] shadow-sm mb-6">
-                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: inst.color }} />
-                  <span className="text-xs font-bold tracking-widest uppercase text-[#4a4540]">
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white border border-[#e8dfd3] shadow-[0_2px_8px_rgba(0,0,0,0.02)] mb-6 transition-all duration-300 hover:border-[#d6c7b9]">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: inst.color }}></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: inst.color }}></span>
+                  </span>
+                  <span className="text-xs font-bold tracking-widest uppercase text-[#5a5550]">
                     Definición y propósito
                   </span>
                 </div>
                 
-                <h2 className="font-display text-3xl sm:text-4xl text-[#1a1a1a] mb-6">¿Qué es este instrumento?</h2>
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-[#1a1a1a] mb-6 tracking-tight">¿Qué es este instrumento?</h2>
                 <div className="prose prose-lg max-w-none text-[#4a4540]">
-                  <p className="font-medium text-[#1a1a1a] text-xl leading-relaxed mb-6">{inst.definition}</p>
-                  <p className="text-lg leading-relaxed">{inst.context}</p>
+                  <p className="font-medium text-[#1a1a1a] text-xl lg:text-2xl leading-relaxed mb-6 border-l-4 pl-4" style={{ borderColor: inst.color }}>
+                    {inst.definition}
+                  </p>
+                  <p className="text-lg leading-relaxed text-[#5a5550]">{inst.context}</p>
                 </div>
               </div>
 
-              {/* Base Document Box (Enhanced UI) */}
-              <div className="mt-12 relative overflow-hidden rounded-[24px] border border-[#e8dfd3] bg-white p-8 shadow-sm transition-shadow hover:shadow-md group">
-                <div 
-                  className="absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-10 blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-150" 
-                  style={{ background: inst.color }} 
-                />
-                
-                <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center">
-                  <div
-                    className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] shadow-inner border border-black/5"
-                    style={{ background: inst.lightBg, color: inst.color }}
-                  >
-                    <FileText className="h-8 w-8" />
+              {"submodules" in inst ? (
+                <div className="pt-8 border-t border-[#e8dfd3]/60 w-full relative">
+                  <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#f4f1ec] border border-[#e8dfd3] mb-5">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: inst.color }} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#5a5550]">SUBMÓDULOS</span>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-display text-2xl text-[#1a1a1a] mb-2">Documento base metodológico</h3>
-                    <p className="text-base text-[#4a4540] leading-relaxed">
-                      {baseSupabaseDoc
-                        ? "Documento de referencia cargado en la base de datos para este instrumento."
-                        : "Guía general y estructura modelo (sin información específica de Consejos). Acceso público."}
-                    </p>
-                  </div>
-                  <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:items-end">
-                    {baseSupabaseDoc ? (
-                      canDownloadBaseSupabaseDoc ? (
-                        <LoadingDownloadButton
-                          href={baseSupabaseDoc.url}
-                          label="Descargar documento"
-                          className="inline-flex shrink-0 items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition hover:opacity-90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                          style={{ background: inst.color }}
-                        />
-                      ) : (
-                        <Link
-                          href={requestHref}
-                          className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f8f5f2] px-7 py-3.5 text-sm font-bold text-[#1a1a1a] hover:bg-[#f0ebe4]"
-                        >
-                          Solicitar acceso
-                        </Link>
-                      )
-                    ) : (
-                      <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#e8dfd3] bg-[#f4f1ec] px-7 py-3.5 text-sm font-bold text-[#7a756e]">
-                        Documento pendiente de carga
-                      </span>
-                    )}
-                  </div>
+                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-6 font-semibold tracking-tight">Líneas de trabajo</h3>
+                  <SubmoduleOptionsColumn items={inst.submodules as any} role={role} layout="horizontal" />
                 </div>
-              </div>
+              ) : null}
 
               {showScitaAreasBoard ? (
-                <div className="relative mt-6 overflow-hidden rounded-[24px] border border-[#e8dfd3] bg-white p-8 shadow-sm transition-shadow hover:shadow-md group">
+                <div 
+                  className="relative mt-6 overflow-hidden rounded-[28px] border bg-white p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-500 hover:shadow-[0_15px_40px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
+                  style={{ borderColor: `${inst.color}25` }}
+                >
                   <div
-                    className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-10 blur-3xl transition-transform duration-700 group-hover:scale-150"
+                    className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-10 blur-3xl transition-transform duration-1000 group-hover:scale-150"
                     style={{ background: inst.color }}
                   />
-                  <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center">
+                  <div className="relative z-10 flex flex-col gap-8 sm:flex-row sm:items-center">
                     <div
-                      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] border border-black/5 shadow-inner"
-                      style={{ background: inst.lightBg, color: inst.color }}
+                      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[22px] border border-black/5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] transition-transform duration-500 group-hover:-rotate-3"
+                      style={{ background: `linear-gradient(135deg, ${inst.lightBg}, ${inst.lightBg}aa)`, color: inst.color }}
                     >
                       <LayoutDashboard className="h-8 w-8" aria-hidden="true" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="mb-2 font-display text-2xl text-[#1a1a1a]">Tablero de áreas en SCITA</h3>
-                      <p className="text-base leading-relaxed text-[#4a4540]">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#8a8074] mb-1 block">Monitoreo Territorial</span>
+                      <h3 className="mb-2 font-display text-2xl text-[#1a1a1a] font-semibold">Tablero de áreas en SCITA</h3>
+                      <p className="text-base leading-relaxed text-[#5a5045]">
                         Visualiza el estado de las áreas de conservación comunitaria, ecosistemas estratégicos y
                         señales de presión ambiental en el territorio.
                       </p>
@@ -652,34 +686,29 @@ export default async function InstrumentoPage({
             </div>
 
             {/* Right: Key points & actions (Sticky Sidebar) */}
-            <div className="sticky top-24 bg-white rounded-[32px] p-8 sm:p-10 border border-[#e8dfd3] shadow-md">
-              {"submodules" in inst ? (
-                <>
-                  <p className="eyebrow text-[#4a4540] mb-4">SUBMÓDULOS</p>
-                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-8">Líneas de trabajo</h3>
-                  <SubmoduleOptionsColumn items={inst.submodules as any} role={role} />
-                </>
-              ) : (
-                <>
-                  <p className="eyebrow text-[#4a4540] mb-4">ALCANCE</p>
-                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-8">Lo que cubre este instrumento</h3>
-                  
-                  <ul className="space-y-6">
-                    {inst.keyPoints.map((point, i) => (
-                      <li key={point} className="flex items-start gap-4">
-                        <span
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm"
-                          style={{ background: inst.lightBg, color: inst.color }}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <p className="mt-1 text-[15px] leading-relaxed text-[#4a4540]">{point}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
+            {!hasSubmodules ? (
+              <div className="sticky top-24 bg-white/90 backdrop-blur-md rounded-[36px] p-8 sm:p-10 border border-[#e8dfd3] shadow-[0_12px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500">
+                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#f4f1ec] border border-[#e8dfd3] mb-5">
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: inst.color }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#5a5550]">ALCANCE</span>
+                </div>
+                <h3 className="font-display text-3xl text-[#1a1a1a] mb-8 font-semibold tracking-tight">Lo que cubre</h3>
+                
+                <ul className="space-y-6">
+                  {inst.keyPoints.map((point, i) => (
+                    <li key={point} className="flex items-start gap-4 group/point">
+                      <span
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold shadow-sm transition-transform duration-300 group-hover/point:scale-110"
+                        style={{ background: `linear-gradient(135deg, ${inst.lightBg}, ${inst.lightBg}aa)`, color: inst.color }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="mt-1 text-[15px] leading-relaxed text-[#4a4540] transition-colors duration-200 group-hover/point:text-black">{point}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
@@ -709,36 +738,6 @@ export default async function InstrumentoPage({
             </div>
           </div>
 
-          {activeSubmodule && (
-            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-2xl bg-stone-50 border border-[#e8dfd3] shadow-sm animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-3.5 h-3.5 rounded-full" 
-                  style={{ 
-                    backgroundColor: 
-                      instrumentoKey === "seguridad-juridica" 
-                        ? ((inst as any).submodules || []).find((s: any) => s.id === activeSubmodule)?.color ?? inst.color 
-                        : inst.color 
-                  }} 
-                />
-                <p className="text-sm font-semibold text-[#1a1a1a]">
-                  Filtrado por submódulo:{" "}
-                  <span className="font-bold">
-                    {instrumentoKey === "seguridad-juridica"
-                      ? ((inst as any).submodules || []).find((s: any) => s.id === activeSubmodule)?.title ?? activeSubmodule
-                      : activeSubmodule}
-                  </span>
-                </p>
-              </div>
-              <Link
-                href={withRole(`/gobierno-propio/${instrumento}`, role)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-[#e8dfd3] px-4 py-2 text-xs font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2] shadow-xs shrink-0"
-              >
-                Limpiar filtro
-              </Link>
-            </div>
-          )}
-
           <DocumentTree 
             docs={displayDocs} 
             role={role} 
@@ -748,6 +747,8 @@ export default async function InstrumentoPage({
             instrumento={instrumento}
             instrumentTitle={inst.title}
             accessLevel={accessLevel}
+            submodules={"submodules" in inst ? (inst.submodules as any) : undefined}
+            initialSubmodule={activeSubmodule}
           />
 
           {dbMode === "query-error" ? (

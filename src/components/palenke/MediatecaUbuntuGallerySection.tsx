@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Search, Sparkles, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Search, X } from "lucide-react";
 import GobiernoPropioMediaGallery from "@/components/palenke/GobiernoPropioMediaGallery";
 import type {
   PalenkeGalleryMedia,
@@ -110,13 +110,6 @@ export default function MediatecaUbuntuGallerySection({
           }}
           className="rounded-[22px] border border-[#d9cfbe] bg-white p-4 shadow-[0_8px_22px_rgba(13,31,10,0.05)] sm:p-5"
         >
-          <label
-            htmlFor="mediateca-search"
-            className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#5a554d]"
-          >
-            <Sparkles className="h-4 w-4 text-[#2e7d32]" aria-hidden="true" />
-            Búsqueda inteligente
-          </label>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative min-w-0 flex-1">
               <Search
@@ -128,9 +121,9 @@ export default function MediatecaUbuntuGallerySection({
                 type="search"
                 value={searchDraft}
                 onChange={(event) => setSearchDraft(event.target.value)}
-                placeholder="Busca por territorio, tipo, año o tema…"
+                placeholder="Búsqueda inteligente"
+                aria-label="Búsqueda inteligente"
                 className="input-shell w-full pl-10"
-                aria-describedby="mediateca-search-hint"
               />
             </div>
             <button
@@ -150,9 +143,6 @@ export default function MediatecaUbuntuGallerySection({
               </button>
             ) : null}
           </div>
-          <p id="mediateca-search-hint" className="mt-2 text-sm text-[#7a756e]">
-            Prioriza coincidencias en tipo de medio, territorio, consejo y descripción.
-          </p>
         </form>
 
         {searchAnswer ? (

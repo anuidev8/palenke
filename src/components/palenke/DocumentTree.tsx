@@ -368,6 +368,8 @@ export function DocumentTree({
   instrumento,
   instrumentTitle,
   accessLevel,
+  submodules,
+  initialSubmodule,
 }: {
   docs: DisplayDoc[];
   role: ViewerRole;
@@ -377,23 +379,31 @@ export function DocumentTree({
   instrumento?: string;
   instrumentTitle?: string;
   accessLevel?: "admin" | "coordination";
+  submodules?: readonly { id: string; title: string; color: string; lightBg: string; }[];
+  initialSubmodule?: string;
 }) {
+  const [activeSubmodule, setActiveSubmodule] = useState<string | null>(initialSubmodule || null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<DisplayDoc | null>(null);
   const grantedDocIdSet = useMemo(() => new Set(grantedDocIds), [grantedDocIds]);
 
-  const tree = useMemo(() => buildTree(docs), [docs]);
+  const filteredDocs = useMemo(() => {
+    if (!activeSubmodule) return docs;
+    return docs.filter((doc: any) => doc.submodule === activeSubmodule);
+  }, [docs, activeSubmodule]);
+
+  const tree = useMemo(() => buildTree(filteredDocs), [filteredDocs]);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return null;
     const query = searchQuery.toLowerCase();
-    return docs.filter(doc => 
+    return filteredDocs.filter(doc => 
       doc.title.toLowerCase().includes(query) || 
       doc.territory.toLowerCase().includes(query)
     );
-  }, [docs, searchQuery]);
+  }, [filteredDocs, searchQuery]);
 
   const currentNode = useMemo(() => {
     let node: TreeNode = { name: "root", path: "", type: "folder", children: tree };
@@ -404,6 +414,11 @@ export function DocumentTree({
     }
     return node;
   }, [tree, currentPath]);
+
+  const handleSelectSubmodule = (subId: string | null) => {
+    setActiveSubmodule(subId);
+    setCurrentPath([]);
+  };
 
   if (docs.length === 0) {
     return (
@@ -442,6 +457,57 @@ export function DocumentTree({
         />
         
         <div className="relative z-10">
+          {/* Submodule tabs selector */}
+          {submodules && submodules.length > 0 && (
+            <div className="mb-6">
+              <p className="text-xs font-bold text-[#7a756e] uppercase tracking-[0.15em] mb-3">
+                Submódulos / Líneas de trabajo
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleSelectSubmodule(null)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all relative overflow-hidden shadow-xs border ${
+                    activeSubmodule === null
+                      ? "bg-[#1a1a1a] text-white border-black"
+                      : "bg-[#fcfaf7] text-[#4a4540] border-[#e8dfd3] hover:bg-[#f4f1ec]"
+                  }`}
+                >
+                  {activeSubmodule === null && (
+                    <motion.span
+                      layoutId="activeSubmoduleGlow"
+                      className="absolute inset-0 bg-white/10"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">Todos los documentos</span>
+                </button>
+                {submodules.map((sub) => {
+                  const isActive = activeSubmodule === sub.id;
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={() => handleSelectSubmodule(sub.id)}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all relative overflow-hidden shadow-xs border"
+                      style={{
+                        backgroundColor: isActive ? sub.color : "#fcfaf7",
+                        color: isActive ? "#ffffff" : "#4a4540",
+                        borderColor: isActive ? sub.color : "#e8dfd3",
+                      }}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeSubmoduleGlow"
+                          className="absolute inset-0 bg-white/10"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                      <span className="relative z-10">{sub.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-[#7a756e]" />
