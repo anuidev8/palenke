@@ -129,6 +129,31 @@ const SCITA_DASHBOARD_FALLBACK: ScitaDashboardRecord[] = [
     sortOrder: 21,
   },
   {
+    id: "fallback-caracterizacion-hidrico-internal",
+    moduleKey: "conservacion",
+    title: "Caracterización – Recurso Hídrico (ZC-SA)",
+    shortLabel: "Recurso hídrico",
+    description:
+      "Caracterización hidrológica y seguimiento de recurso hídrico en la zona de conservación (uso interno).",
+    detailDescription:
+      "Tablero interno de caracterización del recurso hídrico en el ámbito ZC-SA. Consolida indicadores, puntos de monitoreo y lecturas territoriales para acompañamiento técnico del equipo Palenke y aliados autorizados.",
+    detailBullets: [
+      "Acceso restringido (PRIVADO): usuarios internos y administradores.",
+      "Cruce sugerido: áreas de conservación, cuencas y reportes de campo hidráulicos.",
+      "No compartir capturas ni enlaces fuera del equipo autorizado.",
+    ],
+    iframeTitle: "I_Caracterizacion - Recurso Hidrico ZC SA",
+    embedUrl:
+      "https://app.powerbi.com/view?r=eyJrIjoiZWQwN2I2ZTktZTg5OC00ODdjLTgxOTAtMDk2NTk4MjI5ZGRiIiwidCI6ImNlODUzNmFiLWYzOTktNGZiYS04MWQ1LTgwZDc0ZWVlOTk5ZCIsImMiOjR9",
+    embedWidth: DEFAULT_EMBED_WIDTH,
+    embedHeight: DEFAULT_EMBED_HEIGHT,
+    footerCropPx: DEFAULT_POWERBI_FOOTER_PX,
+    iconSrc: "/assets/scita/icons/icon-conservacion.png",
+    visibility: "internal",
+    status: "active",
+    sortOrder: 22,
+  },
+  {
     id: "fallback-titulacion-public",
     moduleKey: "titulacion",
     title: "Titulación Colectiva De Comunidades Negras",
@@ -238,56 +263,48 @@ function mapScitaDashboardRow(row: Record<string, unknown>): ScitaDashboardRecor
   };
 }
 
-function scitaDashboardKey(dashboard: Pick<ScitaDashboardRecord, "moduleKey" | "visibility">) {
-  return `${dashboard.moduleKey}:${dashboard.visibility}`;
-}
-
 function sortScitaDashboards(dashboards: ScitaDashboardRecord[]) {
   return dashboards.toSorted(
     (a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "es"),
   );
 }
 
-/** Fills missing module+visibility slots from fallback when DB seed is incomplete. */
+/** Adds fallback rows when the DB seed lacks a board (matched by iframe title). */
+function mergeScitaDashboardsWithFallback(fromDb: ScitaDashboardRecord[], fallback: ScitaDashboardRecord[]) {
+  const byId = new Map<string, ScitaDashboardRecord>();
+  const dbIframeTitles = new Set<string>();
+
+  for (const row of fromDb) {
+    byId.set(row.id, row);
+    dbIframeTitles.add(row.iframeTitle);
+  }
+
+  for (const row of fallback) {
+    if (!dbIframeTitles.has(row.iframeTitle)) {
+      byId.set(row.id, row);
+    }
+  }
+
+  return sortScitaDashboards(Array.from(byId.values()));
+}
+
 function mergeActiveScitaDashboards(
   fromDb: ScitaDashboardRecord[],
   role: ViewerRole,
 ): ScitaDashboardRecord[] {
   const includeInternal = isInternalRole(role);
+  const activeFromDb = fromDb.filter((row) => {
+    if (row.status !== "active") return false;
+    if (!includeInternal && row.visibility === "internal") return false;
+    return true;
+  });
   const fallbackActive = filterScitaDashboardsForRole(SCITA_DASHBOARD_FALLBACK, role);
-  const byKey = new Map<string, ScitaDashboardRecord>();
 
-  for (const row of fromDb) {
-    if (row.status !== "active") continue;
-    if (!includeInternal && row.visibility === "internal") continue;
-    byKey.set(scitaDashboardKey(row), row);
-  }
-
-  for (const row of fallbackActive) {
-    const key = scitaDashboardKey(row);
-    if (!byKey.has(key)) {
-      byKey.set(key, row);
-    }
-  }
-
-  return sortScitaDashboards(Array.from(byKey.values()));
+  return mergeScitaDashboardsWithFallback(activeFromDb, fallbackActive);
 }
 
 function mergeScitaDashboardCatalogAdmin(fromDb: ScitaDashboardRecord[]) {
-  const byKey = new Map<string, ScitaDashboardRecord>();
-
-  for (const row of fromDb) {
-    byKey.set(scitaDashboardKey(row), row);
-  }
-
-  for (const row of SCITA_DASHBOARD_FALLBACK) {
-    const key = scitaDashboardKey(row);
-    if (!byKey.has(key)) {
-      byKey.set(key, row);
-    }
-  }
-
-  return sortScitaDashboards(Array.from(byKey.values()));
+  return mergeScitaDashboardsWithFallback(fromDb, SCITA_DASHBOARD_FALLBACK);
 }
 
 export function filterScitaDashboardsForRole(
