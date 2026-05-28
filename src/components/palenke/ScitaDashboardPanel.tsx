@@ -11,7 +11,7 @@ import {
   ChevronRight,
   ExternalLink,
   Globe,
-  HelpCircle,
+  Info,
   Lock,
   Maximize2,
   Minimize2,
@@ -29,6 +29,31 @@ import { isInternal } from "@/lib/viewer";
 export type ScitaDashboardId = ScitaDashboardRecord["moduleKey"];
 
 const DEFAULT_POWERBI_FOOTER_PX = 56;
+
+const SCITA_METHODOLOGICAL_NOTICE =
+  "La Plataforma Palenque actúa únicamente como medio de visualización de información geográfica proveniente del geovisor técnico del proyecto. Los mapas presentados tienen carácter técnico y referencial, y no constituyen cartografía oficial ni delimitaciones jurídicas.";
+
+function ScitaMethodologicalNoticeBody({
+  variant,
+}: {
+  variant: "banner" | "footer";
+}) {
+  const labelClass =
+    variant === "banner"
+      ? "font-semibold text-amber-100"
+      : "font-semibold text-[#5c4218]";
+  const bodyClass =
+    variant === "banner"
+      ? "text-[15px] leading-relaxed text-white/92 sm:text-base"
+      : "text-sm leading-relaxed text-[#3d3528] sm:text-[15px]";
+
+  return (
+    <p className={bodyClass}>
+      <span className={labelClass}>Aviso metodológico: </span>
+      {SCITA_METHODOLOGICAL_NOTICE}
+    </p>
+  );
+}
 
 export type ScitaDashboardPanelProps = {
   dashboards: ScitaDashboardRecord[];
@@ -343,6 +368,7 @@ export function ScitaDashboardPanel({
   const [visibilityTab, setVisibilityTab] = useState<BoardVisibilityTab>("public");
   const [activeId, setActiveId] = useState(() => dashboards[0]?.id ?? "");
   const [showBannerDetails, setShowBannerDetails] = useState(false);
+  const [showMethodologicalNotice, setShowMethodologicalNotice] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
@@ -501,6 +527,10 @@ export function ScitaDashboardPanel({
       window.removeEventListener("resize", updateSurfaceHeight);
     };
   }, [isExpanded, reportAspectRatio]);
+
+  useEffect(() => {
+    setShowMethodologicalNotice(false);
+  }, [activeId]);
 
   useEffect(() => {
     if (!isExpanded || typeof window === "undefined") return;
@@ -694,21 +724,61 @@ export function ScitaDashboardPanel({
                 aria-hidden
               />
               <div className="relative z-10 w-full max-w-[980px]">
-                <button
-                  type="button"
-                  onClick={() => setShowBannerDetails((value) => !value)}
-                  aria-expanded={showBannerDetails}
-                  aria-controls={`scita-banner-details-${active.id}`}
-                  className="inline-flex items-center gap-3 rounded-full border border-white/35 bg-black/30 px-4 py-2 text-left text-white backdrop-blur-sm transition hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e251a]"
-                >
-                  <span className="font-display text-[clamp(1.2rem,2.1vw,1.8rem)] font-semibold uppercase leading-tight tracking-[0.04em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
-                    {active.title}
-                  </span>
-                  <ChevronDown
-                    className={`h-5 w-5 shrink-0 transition-transform ${showBannerDetails ? "rotate-180" : "rotate-0"}`}
-                    aria-hidden
-                  />
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowBannerDetails((value) => !value)}
+                    aria-expanded={showBannerDetails}
+                    aria-controls={`scita-banner-details-${active.id}`}
+                    className="inline-flex items-center gap-3 rounded-full border border-white/35 bg-black/30 px-4 py-2 text-left text-white backdrop-blur-sm transition hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e251a]"
+                  >
+                    <span className="font-display text-[clamp(1.2rem,2.1vw,1.8rem)] font-semibold uppercase leading-tight tracking-[0.04em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
+                      {active.title}
+                    </span>
+                    <ChevronDown
+                      className={`h-5 w-5 shrink-0 transition-transform ${showBannerDetails ? "rotate-180" : "rotate-0"}`}
+                      aria-hidden
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMethodologicalNotice((value) => !value)}
+                    aria-expanded={showMethodologicalNotice}
+                    aria-controls={`scita-methodological-notice-${active.id}`}
+                    aria-label={
+                      showMethodologicalNotice
+                        ? "Ocultar aviso metodológico"
+                        : "Ver aviso metodológico"
+                    }
+                    title="Aviso metodológico"
+                    className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/90 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e251a] sm:h-12 sm:w-12 ${
+                      showMethodologicalNotice
+                        ? "border-amber-200/70 bg-[#f0d49a] text-[#3d2e12] shadow-[0_0_0_2px_rgba(251,191,36,0.35)]"
+                        : "border-amber-300/55 bg-[#e8c98a]/95 text-[#3d2e12] hover:bg-[#f0d49a]"
+                    }`}
+                  >
+                    <Info className="h-5 w-5" aria-hidden />
+                  </button>
+                </div>
+
+                <AnimatePresence initial={false}>
+                  {showMethodologicalNotice ? (
+                    <motion.div
+                      id={`scita-methodological-notice-${active.id}`}
+                      key={`scita-methodological-notice-${active.id}`}
+                      initial={{ height: 0, opacity: 0, y: -8 }}
+                      animate={{ height: "auto", opacity: 1, y: 0 }}
+                      exit={{ height: 0, opacity: 0, y: -8 }}
+                      transition={{ duration: 0.28, ease: panelEase }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-3 max-w-[92ch] rounded-xl border border-amber-300/35 bg-black/40 px-4 py-3 backdrop-blur-sm">
+                        <ScitaMethodologicalNoticeBody variant="banner" />
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
 
                 <AnimatePresence initial={false}>
                   {showBannerDetails ? (
@@ -794,20 +864,19 @@ export function ScitaDashboardPanel({
           </motion.div>
 
           {!isExpanded ? (
-            <motion.div
+            <motion.aside
               layout
-              className="mt-3 hidden shrink-0 items-center justify-between gap-3 rounded-2xl border border-[#d8d1bc]/80 bg-[#f0ede4] px-4 py-3 md:flex sm:px-5"
+              role="note"
+              aria-label="Aviso metodológico"
+              className="mt-3 flex shrink-0 items-start gap-3 rounded-2xl border border-[#e8c98a]/55 bg-gradient-to-br from-[#faf4e6] to-[#f3e6c8] px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:gap-3.5 sm:px-5 sm:py-4"
             >
-              <p className="text-sm text-[#3d5248]">Guía rápida para leer los tableros territoriales.</p>
-              <button
-                type="button"
-                onClick={() => setGuideOpen(true)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#8b7355]/40 bg-[#e8c98a] px-4 py-2 text-sm font-semibold text-[#1a2418] transition hover:bg-[#f0d49a]"
-              >
-                <HelpCircle className="h-4 w-4" aria-hidden />
-                Ver pasos
-              </button>
-            </motion.div>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a24d]/45 bg-[#e8c98a] text-[#3d2e12] sm:h-10 sm:w-10">
+                <Info className="h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <ScitaMethodologicalNoticeBody variant="footer" />
+              </div>
+            </motion.aside>
           ) : null}
         </motion.div>
       </motion.div>
