@@ -31,25 +31,11 @@ export type ScitaDashboardId = ScitaDashboardRecord["moduleKey"];
 const DEFAULT_POWERBI_FOOTER_PX = 56;
 
 const SCITA_METHODOLOGICAL_NOTICE =
-  "La Plataforma Palenque actúa únicamente como medio de visualización de información geográfica proveniente del geovisor técnico del proyecto. Los mapas presentados tienen carácter técnico y referencial, y no constituyen cartografía oficial ni delimitaciones jurídicas.";
+  "La Plataforma Palenque actúa como medio de visualización de la información territorial, ambiental, geográfica, espacial de los procesos de acompañamiento que hace el PCN en diferentes territorios.";
 
-function ScitaMethodologicalNoticeBody({
-  variant,
-}: {
-  variant: "banner" | "footer";
-}) {
-  const labelClass =
-    variant === "banner"
-      ? "font-semibold text-amber-100"
-      : "font-semibold text-[#5c4218]";
-  const bodyClass =
-    variant === "banner"
-      ? "text-[15px] leading-relaxed text-white/92 sm:text-base"
-      : "text-sm leading-relaxed text-[#3d3528] sm:text-[15px]";
-
+function ScitaMethodologicalNoticeBody() {
   return (
-    <p className={bodyClass}>
-      <span className={labelClass}>Aviso metodológico: </span>
+    <p className="text-[15px] leading-relaxed text-white/92 sm:text-base">
       {SCITA_METHODOLOGICAL_NOTICE}
     </p>
   );
@@ -774,7 +760,7 @@ export function ScitaDashboardPanel({
                       className="overflow-hidden"
                     >
                       <div className="mt-3 max-w-[92ch] rounded-xl border border-amber-300/35 bg-black/40 px-4 py-3 backdrop-blur-sm">
-                        <ScitaMethodologicalNoticeBody variant="banner" />
+                        <ScitaMethodologicalNoticeBody />
                       </div>
                     </motion.div>
                   ) : null}
@@ -863,21 +849,6 @@ export function ScitaDashboardPanel({
             </AnimatePresence>
           </motion.div>
 
-          {!isExpanded ? (
-            <motion.aside
-              layout
-              role="note"
-              aria-label="Aviso metodológico"
-              className="mt-3 flex shrink-0 items-start gap-3 rounded-2xl border border-[#e8c98a]/55 bg-gradient-to-br from-[#faf4e6] to-[#f3e6c8] px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:gap-3.5 sm:px-5 sm:py-4"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a24d]/45 bg-[#e8c98a] text-[#3d2e12] sm:h-10 sm:w-10">
-                <Info className="h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
-              </span>
-              <div className="min-w-0">
-                <ScitaMethodologicalNoticeBody variant="footer" />
-              </div>
-            </motion.aside>
-          ) : null}
         </motion.div>
       </motion.div>
 

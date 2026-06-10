@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 import { EmptyState, SiteLayout } from "@/components/mock/ui";
-import BibliotecaAiSearchPanel from "@/components/palenke/BibliotecaAiSearchPanel";
 import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
+import BibliotecaSearchBar from "@/components/palenke/BibliotecaSearchBar";
 import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
 import { getNormativaDocumentRecords } from "@/lib/content";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
@@ -94,7 +94,6 @@ export default async function BibliotecaPage({
   const params = await searchParams;
   const role = await getViewerRoleFromRequest(params);
   const filters = parseFilters(params);
-  const initialSearchQuery = getFirstParam(params.aiq) ?? "";
   const page = Math.max(1, Number(getFirstParam(params.page) ?? "1"));
 
   const visibleDocumentsBase = getVisibleDocuments(role);
@@ -231,69 +230,19 @@ export default async function BibliotecaPage({
 
       <div className="mx-auto w-full max-w-7xl px-4 pb-44 pt-8 sm:px-6 lg:px-8">
         {/* ── Filter bar ── */}
-        <form
-          action="/biblioteca"
-          className="mb-6 flex flex-wrap items-end gap-3 rounded-[28px] border border-[#e8dfd3] bg-white px-5 py-4"
-        >
-
-          <div className="flex min-w-[220px] flex-1 flex-col gap-1.5">
-            <label htmlFor="q" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
-              Buscar
-            </label>
-            <input
-              id="q"
-              name="q"
-              type="search"
-              defaultValue={filters.query}
-              placeholder="Buscar por título o palabra clave…"
-              className="input-shell"
-            />
-          </div>
-
-          {filters.sections.map((section) => (
-            <input key={section} type="hidden" name="section" value={section} />
-          ))}
-          {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="f-territory" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
-              Territorio
-            </label>
-            <select id="f-territory" name="territory" defaultValue={filters.territory} className="input-shell">
-              <option value="">Todos</option>
-              {territories.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="f-year" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7a756e]">
-              Año
-            </label>
-            <select id="f-year" name="year" defaultValue={filters.year} className="input-shell">
-              <option value="">Todos</option>
-              {years.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="inline-flex h-[44px] items-center rounded-full bg-[#1a1a1a] px-5 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
-            >
-              Buscar
-            </button>
-            <Link
-              href={withRole("/biblioteca", role)}
-              className="inline-flex h-[44px] items-center rounded-full border border-[#e8dfd3] px-5 text-sm font-medium text-[#4a4540] transition hover:bg-[#f0eae0]"
-            >
-              Limpiar
-            </Link>
-          </div>
-        </form>
+        <div className="mb-6">
+          <BibliotecaSearchBar
+            role={role}
+            query={filters.query}
+            sections={filters.sections}
+            territory={filters.territory}
+            year={filters.year}
+            type={filters.type}
+            years={years}
+            territories={territories}
+            showNormativaKeywords={sectionActive === NORMATIVA_SECTION}
+          />
+        </div>
 
         {/* ── Result count ── */}
         {results.length > 0 ? (

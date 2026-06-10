@@ -1,3 +1,4 @@
+import { searchDocuments } from "@/lib/biblioteca-search";
 import type { DashboardRecord, DocumentRecord } from "@/lib/mock-data";
 
 export type LibraryFilters = {
@@ -15,13 +16,7 @@ export type DashboardFilters = {
 };
 
 export function filterDocuments(documents: DocumentRecord[], filters: LibraryFilters) {
-  return documents.filter((document) => {
-    const matchesQuery =
-      !filters.query ||
-      `${document.title} ${document.description} ${document.keywords.join(" ")}`
-        .toLowerCase()
-        .includes(filters.query.toLowerCase());
-
+  const filtered = documents.filter((document) => {
     const matchesSection =
       filters.sections.length === 0 || filters.sections.includes(document.section);
 
@@ -30,15 +25,14 @@ export function filterDocuments(documents: DocumentRecord[], filters: LibraryFil
     const matchesYear = !filters.year || String(document.year) === filters.year;
     const matchesGender = !filters.genderOnly || document.genderFocus;
 
-    return (
-      matchesQuery &&
-      matchesSection &&
-      matchesTerritory &&
-      matchesType &&
-      matchesYear &&
-      matchesGender
-    );
+    return matchesSection && matchesTerritory && matchesType && matchesYear && matchesGender;
   });
+
+  if (!filters.query.trim()) {
+    return filtered;
+  }
+
+  return searchDocuments(filtered, filters.query).map((result) => result.document);
 }
 
 export function filterDashboards(dashboards: DashboardRecord[], filters: DashboardFilters) {

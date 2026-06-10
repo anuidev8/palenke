@@ -1,4 +1,5 @@
 import type { DocumentRecord } from "@/lib/mock-data";
+import { searchDocuments } from "@/lib/biblioteca-search";
 import type { PalenkeGalleryMedia } from "@/lib/palenke-gallery-media";
 
 export type BibliotecaAiCitation = {
@@ -137,13 +138,11 @@ export function runBibliotecaAiSearch(documents: DocumentRecord[], query: string
     };
   }
 
-  const { ranked, tokens } = scoreDocuments(documents, trimmedQuery);
-  const matchedDocuments = ranked.filter((item) => item.score > 0);
-  const rankedDocuments = (matchedDocuments.length > 0 ? ranked : ranked.toSorted((a, b) => b.document.year - a.document.year)).map(
-    (item) => item.document,
-  );
-
-  const topDocuments = (matchedDocuments.length > 0 ? matchedDocuments : ranked).slice(0, 3);
+  const searchResults = searchDocuments(documents, trimmedQuery);
+  const rankedDocuments = searchResults.map((result) => result.document);
+  const matchedDocuments = searchResults.filter((result) => result.score > 0);
+  const tokens = tokenize(trimmedQuery);
+  const topDocuments = matchedDocuments.slice(0, 3);
   const citations: BibliotecaAiCitation[] = topDocuments.map(({ document }) => ({
     documentId: document.id,
     title: document.title,
