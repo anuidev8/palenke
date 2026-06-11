@@ -65,8 +65,26 @@ export function ScitaGeovisor({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [hasConsent, setHasConsent] = useState(true);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Read consent from sessionStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const consent = sessionStorage.getItem("palenke_geoportal_consent");
+      if (!consent) {
+        setHasConsent(false);
+      }
+    }
+  }, []);
+
+  const handleAcceptConsent = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("palenke_geoportal_consent", "granted");
+      setHasConsent(true);
+    }
+  };
 
   const enterFullScreen = useCallback(async () => {
     setIsFullScreen(true);
@@ -123,6 +141,65 @@ export function ScitaGeovisor({
   return (
     <section className={isFullScreen ? "" : "w-full max-w-none px-0 py-3 sm:py-4"}>
       <div ref={containerRef} className={containerClass}>
+        {!hasConsent && (
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#1a1510]/80 p-4 backdrop-blur-xl sm:p-6 md:p-8">
+            <div className="relative max-w-2xl w-full overflow-hidden rounded-3xl border border-white/10 bg-[#2c241e]/90 p-6 text-white shadow-2xl backdrop-blur-md transition-all duration-300 md:p-8 flex flex-col items-center text-center">
+              {/* Decorative radial gradient background inside the card */}
+              <div className="absolute -left-16 -top-16 h-32 w-32 rounded-full bg-[#cda84f]/20 blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-16 -right-16 h-32 w-32 rounded-full bg-[#2e7d32]/20 blur-2xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#cda84f] to-[#2e7d32] p-0.5 shadow-lg shadow-[#2e7d32]/20">
+                  <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#1a1510]">
+                    <Compass className="h-7 w-7 text-[#cda84f]" />
+                  </div>
+                </div>
+
+                <h3 className="mb-2 text-xl font-bold tracking-tight text-stone-100 sm:text-2xl">
+                  Aviso de Consentimiento Territorial de Geovisualización
+                </h3>
+                
+                <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#cda84f]">
+                  Ley 1581 de 2012 · Habeas Data Comunitario
+                </p>
+
+                <div className="mb-6 space-y-3.5 rounded-2xl bg-stone-900/50 p-4 text-left text-xs leading-relaxed text-stone-300 border border-stone-850">
+                  <p>
+                    Este visor contiene información geográfica y cartográfica sensible correspondiente a los territorios colectivos y ancestrales de las comunidades negras, afrocolombianas, raizales y palenqueras articuladas al Proceso de Comunidades Negras (PCN).
+                  </p>
+                  <p>
+                    De conformidad con la Ley 1581 de 2012 (Habeas Data) y los mandatos de gobernanza propia, el acceso y uso de estos mapas y tableros estadísticos está restringido a fines informativos, de consulta comunitaria, académicos o de gestión interna, prohibiéndose su explotación comercial o difusión no autorizada.
+                  </p>
+                  <p className="font-semibold text-stone-200">
+                    Al presionar &quot;Aceptar y Cargar GeoVisor&quot;, usted declara y acepta que:
+                  </p>
+                  <ul className="list-disc pl-4 space-y-1.5 text-stone-300">
+                    <li>Reconoce la autonomía, propiedad colectiva e inmutabilidad de los datos territoriales aquí presentados.</li>
+                    <li>Se compromete a mantener estricta confidencialidad sobre la información cartográfica de custodia comunitaria.</li>
+                    <li>Acepta que la custodia técnica reside en la Coordinación de Plataforma Palenke y que cualquier uso indebido será reportado ante autoridades propias y ordinarias.</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleAcceptConsent}
+                    className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#2e7d32] to-[#1b5e20] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#1b5e20]/30 transition duration-200 hover:scale-[1.02] hover:from-[#388e3c] hover:to-[#2e7d32] active:scale-95"
+                  >
+                    Aceptar y Cargar GeoVisor
+                  </button>
+                  <a
+                    href="/gobierno-propio"
+                    className="inline-flex items-center justify-center rounded-xl border border-stone-700 bg-stone-900/30 px-5 py-3 text-sm font-medium text-stone-400 transition hover:bg-stone-800/50 hover:text-stone-300 active:scale-95"
+                  >
+                    Regresar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {mobileSidebarOpen ? (
           <button
             type="button"

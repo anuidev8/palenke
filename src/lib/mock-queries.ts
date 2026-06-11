@@ -8,6 +8,7 @@ export type LibraryFilters = {
   type: string;
   year: string;
   genderOnly: boolean;
+  topics: string[];
 };
 
 export type DashboardFilters = {
@@ -25,7 +26,16 @@ export function filterDocuments(documents: DocumentRecord[], filters: LibraryFil
     const matchesYear = !filters.year || String(document.year) === filters.year;
     const matchesGender = !filters.genderOnly || document.genderFocus;
 
-    return matchesSection && matchesTerritory && matchesType && matchesYear && matchesGender;
+    const matchesTopics = !filters.topics || filters.topics.length === 0 || filters.topics.some((topic) => {
+      const normalizedTopic = topic.toLowerCase();
+      return (
+        document.keywords.some((kw) => kw.toLowerCase() === normalizedTopic) ||
+        document.title.toLowerCase().includes(normalizedTopic) ||
+        document.description.toLowerCase().includes(normalizedTopic)
+      );
+    });
+
+    return matchesSection && matchesTerritory && matchesType && matchesYear && matchesGender && matchesTopics;
   });
 
   if (!filters.query.trim()) {

@@ -5,8 +5,10 @@ import { Callout, StatusPill } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
 import {
   getAccessRequestByIdWithMeta,
+  maskNationalId,
   type AccessRequestsDataMode,
 } from "@/lib/access-requests";
+import { RevealNationalId } from "@/components/palenke/RevealNationalId";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 import { emailRequestedDocument, rejectRequest } from "./actions";
 
@@ -148,9 +150,9 @@ export default async function AdminSolicitudDetailPage({
           <p>
             <strong>Nombre:</strong> {request.full_name}
           </p>
-          <p>
-            <strong>Cédula:</strong> {request.national_id}
-          </p>
+          <div className="md:col-span-2 bg-[color:var(--sand-light)]/30 p-1.5 rounded-2xl max-w-sm">
+            <RevealNationalId requestId={request.id} maskedId={maskNationalId(request.national_id)} />
+          </div>
           <p>
             <strong>Email:</strong> {request.email}
           </p>

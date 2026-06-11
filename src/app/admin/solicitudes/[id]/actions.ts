@@ -325,3 +325,44 @@ export async function emailRequestedDocument(id: string) {
     throw error;
   }
 }
+
+export async function revealNationalIdAction(id: string) {
+  await assertAdmin();
+
+  if (!hasSupabaseServiceConfig()) {
+    const { getAccessRequestById } = await import("@/lib/access-requests");
+    const req = await getAccessRequestById(id);
+    if (!req) {
+      return { success: false, error: "Solicitud no encontrada" };
+    }
+
+    await logAdminActivity({
+      kind: "access_review",
+      title: `Visualizó cédula de ${req.full_name} (Contingencia)`,
+      section: "Solicitudes",
+      entityType: "access_request",
+      entityId: req.id,
+      occurredAt: new Date().toISOString(),
+    });
+
+    return { success: true, nationalId: req.national_id };
+  }
+
+  try {
+    const req = await getRequestById(id);
+
+    await logAdminActivity({
+      kind: "access_review",
+      title: `Visualizó cédula del solicitante ${req.full_name}`,
+      section: "Solicitudes",
+      entityType: "access_request",
+      entityId: req.id,
+      occurredAt: new Date().toISOString(),
+    });
+
+    return { success: true, nationalId: req.national_id };
+  } catch (error: any) {
+    return { success: false, error: error?.message ?? "Error al revelar el documento" };
+  }
+}
+

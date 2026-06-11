@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { type ViewerRole, canDownloadDocument } from "@/lib/mock-data";
 import { withRole } from "@/lib/viewer";
+import { getDocumentTypeVisual } from "@/lib/document-type-display";
+import { DocumentResourceIcon } from "@/components/palenke/DocumentResourceIcon";
 
 export type DocumentVisibility = "public" | "internal" | "sensitive";
 
@@ -35,6 +37,14 @@ export type DisplayDoc = {
   usesSignedUrl: boolean;
   storagePath?: string | null;
   previewHref?: string;
+  author?: string;
+  theme?: string;
+  summary?: string;
+  catalogId?: string;
+  format?: string;
+  keywords?: string[];
+  subtheme?: string;
+  submodule?: string;
 };
 
 type TreeNode = {
@@ -198,6 +208,7 @@ function FileCard({
   const hasAccess = canDownloadDocument(role, doc.visibility) || hasGrant;
   const showApprovalMessage = doc.visibility === "sensitive";
   const showLoginCta = !isAuthenticated || doc.visibility !== "sensitive";
+  const typeVisual = getDocumentTypeVisual(doc.type);
 
   return (
     <motion.div
@@ -214,23 +225,8 @@ function FileCard({
           style={{ backgroundColor: color }} 
         />
         
-        {/* Modern Mac-style File Icon */}
-        <div className="relative w-10 h-[52px] mb-5 transition-transform group-hover:scale-105 z-10">
-          {/* File Base */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#f8f5f2] to-[#e8dfd3] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-white/50 overflow-hidden">
-            {/* Horizontal lines to mock text */}
-            <div className="absolute top-4 left-2 w-5 h-[1.5px] bg-black/10 rounded-full" />
-            <div className="absolute top-[22px] left-2 w-4 h-[1.5px] bg-black/10 rounded-full" />
-            <div className="absolute top-[28px] left-2 w-[18px] h-[1.5px] bg-black/10 rounded-full" />
-            <div className="absolute top-[34px] left-2 w-3 h-[1.5px] bg-black/10 rounded-full" />
-            
-            {/* PDF Tag */}
-            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 bg-[#d32f2f] text-white text-[7px] font-black px-1 py-0.5 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.1)] leading-none">
-              PDF
-            </div>
-          </div>
-          {/* Folded Corner */}
-          <div className="absolute top-0 right-0 w-4 h-4 bg-gradient-to-bl from-transparent via-[#fcfaf7] to-[#e8dfd3] border-b border-l border-white/40 shadow-sm rounded-bl-lg" />
+        <div className="mb-5">
+          <DocumentResourceIcon type={doc.type} />
         </div>
         
         <h3 className="font-bold text-[#1a1a1a] text-xl leading-tight mb-4 line-clamp-3 relative z-10" title={doc.title}>
@@ -241,8 +237,14 @@ function FileCard({
           <p className="text-sm font-bold text-[#4a4540] mb-1.5 line-clamp-1" title={doc.territory}>{doc.territory}</p>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#7a756e] uppercase tracking-wider">{doc.year}</span>
-            <span className="text-[#d1ccc5]">•</span>
-            <span className="text-xs font-bold text-[#7a756e] uppercase tracking-wider">{doc.type}</span>
+            {typeVisual.footerLabel ? (
+              <>
+                <span className="text-[#d1ccc5]">•</span>
+                <span className="text-xs font-bold text-[#7a756e] uppercase tracking-wider">
+                  {typeVisual.footerLabel}
+                </span>
+              </>
+            ) : null}
           </div>
         </div>
       </div>
@@ -326,6 +328,7 @@ export function DocumentTree({
   submodules,
   initialSubmodule,
   requireSubmoduleFilter = false,
+  hideSearch = false,
 }: {
   docs: DisplayDoc[];
   role: ViewerRole;
@@ -338,6 +341,7 @@ export function DocumentTree({
   submodules?: readonly { id: string; title: string; color: string; lightBg: string; }[];
   initialSubmodule?: string;
   requireSubmoduleFilter?: boolean;
+  hideSearch?: boolean;
 }) {
   const router = useRouter();
   const [activeSubmodule, setActiveSubmodule] = useState<string | null>(initialSubmodule || null);
@@ -486,27 +490,29 @@ export function DocumentTree({
               </div>
             </div>
           )}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-[#7a756e]" />
+          {!hideSearch ? (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-[#7a756e]" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar por título o territorio..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-12 pr-12 py-4 bg-[#fcfaf7] border border-[#e8dfd3] rounded-2xl text-[#1a1a1a] placeholder-[#7a756e] focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all font-medium text-base shadow-inner"
+                style={{ '--tw-ring-color': hexToRgba(color, 0.5) } as React.CSSProperties}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-5 flex items-center text-[#7a756e] hover:text-[#1a1a1a] transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Buscar por título o territorio..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-12 pr-12 py-4 bg-[#fcfaf7] border border-[#e8dfd3] rounded-2xl text-[#1a1a1a] placeholder-[#7a756e] focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all font-medium text-base shadow-inner"
-              style={{ '--tw-ring-color': hexToRgba(color, 0.5) } as React.CSSProperties}
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-5 flex items-center text-[#7a756e] hover:text-[#1a1a1a] transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
-          </div>
+          ) : null}
 
           {/* Breadcrumbs */}
           {!searchResults && (

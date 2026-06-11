@@ -4,6 +4,7 @@ import { EmptyState, SiteLayout } from "@/components/mock/ui";
 import BibliotecaDocGrid from "@/components/palenke/BibliotecaDocGrid";
 import BibliotecaSearchBar from "@/components/palenke/BibliotecaSearchBar";
 import BibliotecaMemoriaGrid from "@/components/palenke/BibliotecaMemoriaGrid";
+import BibliotecaFilterSummary from "@/components/palenke/BibliotecaFilterSummary";
 import { getNormativaDocumentRecords } from "@/lib/content";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import {
@@ -83,6 +84,7 @@ function parseFilters(params: SearchParams): LibraryFilters {
     type: getFirstParam(params.type) ?? "",
     year: getFirstParam(params.year) ?? "",
     genderOnly: getFirstParam(params.gender) === "1",
+    topics: getMultiParam(params.topic),
   };
 }
 
@@ -238,18 +240,23 @@ export default async function BibliotecaPage({
             territory={filters.territory}
             year={filters.year}
             type={filters.type}
+            topics={filters.topics}
             years={years}
             territories={territories}
             showNormativaKeywords={sectionActive === NORMATIVA_SECTION}
           />
         </div>
 
-        {/* ── Result count ── */}
-        {results.length > 0 ? (
-          <p className="mb-4 text-sm text-[#7a756e]">
-            Mostrando {pageStart + 1}–{pageEnd} de {totalCount} documento{totalCount !== 1 ? "s" : ""}
-          </p>
-        ) : null}
+        {/* ── Results summary and interactive pills ── */}
+        <div className="mb-6">
+          <BibliotecaFilterSummary
+            role={role}
+            filters={filters}
+            totalCount={totalCount}
+            pageStart={pageStart}
+            pageEnd={pageEnd}
+          />
+        </div>
 
         {/* ── Document grid ── */}
         {pageResults.length > 0 ? (
@@ -335,6 +342,9 @@ function buildActiveFilters(filters: LibraryFilters, role: "public" | "internal"
       active.push({ label: filters[key], href: withRole("/biblioteca", role, buildFilters({ ...filters, [key]: "" })) });
     }
   }
+  for (const topic of filters.topics) {
+    active.push({ label: topic, href: withRole("/biblioteca", role, buildFilters({ ...filters, topics: filters.topics.filter((t) => t !== topic) })) });
+  }
   if (filters.genderOnly) {
     active.push({ label: "Con enfoque de género", href: withRole("/biblioteca", role, buildFilters({ ...filters, genderOnly: false })) });
   }
@@ -349,5 +359,6 @@ function buildFilters(filters: LibraryFilters) {
     type: filters.type || undefined,
     year: filters.year || undefined,
     gender: filters.genderOnly ? "1" : undefined,
+    topic: filters.topics.length > 0 ? filters.topics : undefined,
   };
 }

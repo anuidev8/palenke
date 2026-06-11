@@ -2275,12 +2275,12 @@ export const geoportalCopy = {
 };
 
 export const policyItems = [
-  "Responsable del tratamiento: Palenke de Pensamiento y Cuidadores del Territorio / PCN.",
-  "Datos recopilados: nombre, correo electrónico y metadatos mínimos para gestionar cuentas autenticadas.",
-  "Finalidad: habilitar el acceso a contenidos internos y la administración de la plataforma.",
-  "Derechos del titular: acceso, corrección, actualización y supresión de datos personales.",
-  "Canal de contacto: datos@palenke.org para solicitudes relacionadas con tratamiento y privacidad.",
-  "Fecha de vigencia de este mockup: 11 de marzo de 2026.",
+  "Responsable del Tratamiento: Proceso de Comunidades Negras (PCN), Palenke de Pensamiento y Cuidadores del Territorio, junto con su operador técnico Corporación Agencia Afrocolombiana Hileros.",
+  "Datos Recopilados y Tratados: Datos personales generales (nombre completo, correo electrónico, cédula de ciudadanía) y datos personales sensibles de origen étnico u organizativo (consejo comunitario, afiliación organizativa), cuya entrega es de carácter meramente facultativo (opcional).",
+  "Finalidad del Cuidado Colectivo: Validar la identidad de los solicitantes, acreditar el vínculo de confianza territorial de cara a las comunidades de origen, llevar registro y auditoría de accesos a instrumentos colectivos protegidos, y evitar la explotación extractiva o comercial de la información.",
+  "Derechos de los Titulares (Art. 8 Ley 1581): Conocer, actualizar, rectificar o solicitar la supresión de sus datos personales, así como revocar el consentimiento del tratamiento en cualquier momento.",
+  "Canal de Atención de Habeas Data: El titular de los datos puede ejercer sus derechos de consulta, rectificación o supresión enviando una solicitud al correo electrónico oficial: datos@palenke.org.",
+  "Políticas de Seguridad y Auditoría: La plataforma emplea enmascaramiento activo de identificadores en paneles administrativos y registra un historial de auditoría inmutable de accesos para salvaguardar la soberanía tecnológica de nuestros territorios."
 ];
 
 export const adminQuickStats = [

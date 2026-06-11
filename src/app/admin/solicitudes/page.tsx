@@ -8,6 +8,8 @@ import {
   formatInstrumentLabel,
   getAccessRequestFilterOptionsWithMeta,
   listAccessRequestsWithMeta,
+  maskNationalId,
+  formatIdWithDots,
   type AccessLevel,
   type AccessRequestsDataMode,
   type AccessRequestStatus,
@@ -138,7 +140,7 @@ export default async function AdminSolicitudesPage({
         rows={requests.map((request) => [
           <div key="name" className="flex flex-col gap-0.5">
             <span className="font-medium text-[color:var(--forest)]">{request.full_name}</span>
-            <span className="text-xs text-[color:var(--muted)]">{request.national_id}</span>
+            <span className="text-xs text-[color:var(--muted)]">{formatIdWithDots(maskNationalId(request.national_id))}</span>
           </div>,
           <span key="document">{request.document_title ?? "No especificado"}</span>,
           <span key="instrument" className="chip">

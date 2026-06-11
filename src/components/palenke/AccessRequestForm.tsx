@@ -45,6 +45,8 @@ export function AccessRequestForm({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsDetails, setShowTermsDetails] = useState(false);
 
   function getFieldErrorMessage(field: keyof FormValues, fallback?: string) {
     const map: Record<keyof FormValues, string> = {
@@ -72,6 +74,12 @@ export function AccessRequestForm({
     event.preventDefault();
     setErrorMessage(null);
     setFieldErrors({});
+
+    if (!acceptedTerms) {
+      setErrorMessage("Debes aceptar la autorización de tratamiento de datos personales para enviar la solicitud.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -248,17 +256,19 @@ export function AccessRequestForm({
 
           <label className="grid gap-2">
             <span className="text-sm font-semibold text-[#1a1a1a]">
-              Consejo comunitario / institución<span className="ml-1 text-[#b91c1c]">*</span>
+              Consejo comunitario / institución <span className="text-xs font-normal text-[#7a756e]">(facultativo)</span>
             </span>
             <input
               name="community"
               type="text"
-              required
               minLength={2}
               value={values.community}
               onChange={(event) => updateValue("community", event.target.value)}
               className="w-full rounded-[14px] border border-[#e8dfd3] px-4 py-3 text-sm text-[#1a1a1a] placeholder:text-[#bab4ac] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
             />
+            <p className="text-[11px] text-[#7a756e] leading-relaxed">
+              Tu territorio u organización de procedencia. Aunque el suministro es opcional, constituye el criterio técnico esencial para verificar tu identidad y vínculo colectivo.
+            </p>
             {fieldErrors.community ? (
               <p className="text-xs font-medium text-[#b91c1c]">{fieldErrors.community}</p>
             ) : null}
@@ -291,7 +301,9 @@ export function AccessRequestForm({
           </label>
 
           <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[#1a1a1a]">Afiliación a PCN/Hileros</span>
+            <span className="text-sm font-semibold text-[#1a1a1a]">
+              Afiliación a PCN/Hileros <span className="text-xs font-normal text-[#7a756e]">(facultativo)</span>
+            </span>
             <select
               name="pcn_affiliation"
               value={values.pcn_affiliation}
@@ -299,14 +311,73 @@ export function AccessRequestForm({
               className="w-full rounded-[14px] border border-[#e8dfd3] bg-white px-4 py-3 text-sm text-[#1a1a1a] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
             >
               <option value="">Seleccionar</option>
-              <option value="Yes">Sí</option>
-              <option value="No">No</option>
-              <option value="Allied organization">Organización aliada</option>
+              <option value="Yes">Sí, pertenezco al Proceso de Comunidades Negras o Hileros</option>
+              <option value="No">No pertenezco formalmente</option>
+              <option value="Allied organization">Pertenezco a una organización aliada</option>
             </select>
+            <p className="text-[11px] text-[#7a756e] leading-relaxed">
+              Si perteneces o tienes vínculo de trabajo organizativo. Esta información de carácter sensible es facultativa y nos asiste en agilizar los procesos de validación comunitaria.
+            </p>
             {fieldErrors.pcn_affiliation ? (
               <p className="text-xs font-medium text-[#b91c1c]">{fieldErrors.pcn_affiliation}</p>
             ) : null}
           </label>
+        </div>
+      </div>
+
+      <div className="mb-6 overflow-hidden rounded-[28px] bg-[#fcfaf7] border border-[#e8dfd3] p-7 shadow-sm transition-all duration-300">
+        <div className="flex items-start gap-3">
+          <input
+            id="terms-checkbox"
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-[#e8dfd3] text-[#2e7d32] focus:ring-[#2e7d32]/20"
+          />
+          <label htmlFor="terms-checkbox" className="text-sm leading-relaxed text-[#5a554e] select-none">
+            He leído y acepto la{" "}
+            <button
+              type="button"
+              onClick={() => setShowTermsDetails(!showTermsDetails)}
+              className="font-semibold text-[#2e7d32] underline hover:text-[#1b5e20] focus:outline-none transition-colors"
+            >
+              Autorización de Tratamiento de Datos Personales
+            </button>
+            , y comprendo que el suministro de mis datos sensibles es facultativo.
+          </label>
+        </div>
+
+        {/* Sliding terms details accordion */}
+        <div
+          className={`grid transition-all duration-500 ease-in-out ${
+            showTermsDetails ? "grid-rows-[1fr] opacity-100 mt-5" : "grid-rows-[0fr] opacity-0 mt-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="rounded-2xl bg-white p-5 border border-[#e8dfd3]/60 text-xs text-[#5a554e] leading-relaxed max-h-[300px] overflow-y-auto custom-scrollbar">
+              <h4 className="font-bold text-sm text-[#1a1a1a] mb-3 uppercase tracking-wide">
+                AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES SENSIBLES (LEY 1581 DE 2012)
+              </h4>
+              <p className="mb-3">
+                En cumplimiento de la Ley 1581 de 2012 de Colombia y sus decretos reglamentarios, al diligenciar este formulario autorizas de manera previa, libre, expresa e informada a <strong>Palenke de Pensamiento y Cuidadores del Territorio / PCN</strong> y a su operador técnico <strong>Corporación Agencia Afrocolombiana Hileros</strong>, para recolectar, almacenar y tratar tus datos personales, incluyendo aquellos de carácter sensible.
+              </p>
+              <h5 className="font-semibold text-[#1a1a1a] mt-3 mb-1.5">Declaro que he sido informado de lo siguiente:</h5>
+              <ol className="list-decimal pl-4 mb-3 gap-2 flex flex-col">
+                <li>
+                  <strong>Datos Sensibles:</strong> El suministro de la información relacionada con mi Cédula de ciudadanía, Consejo Comunitario de origen y Afiliación organizativa a PCN/Hileros es de carácter <strong>facultativo (opcional)</strong>. No estoy obligado a entregar esta información sensible; sin embargo, comprendo que estos datos constituyen los <strong>criterios técnicos esenciales</strong> utilizados por la Coordinación de Palenke para verificar mi identidad y mi vínculo territorial antes de conceder acceso a los instrumentos colectivos protegidos.
+                </li>
+                <li>
+                  <strong>Finalidad del Tratamiento:</strong> Mis datos serán tratados exclusivamente para: (a) Validar y registrar la solicitud de acceso a documentos protegidos; (b) Comunicar decisiones de aprobación o rechazo de solicitudes; (c) Llevar una trazabilidad y auditoría de los accesos a la información territorial colectiva; y (d) Proteger la soberanía digital de los territorios frente a usos extractivos o comerciales de la información.
+                </li>
+                <li>
+                  <strong>Derechos del Titular:</strong> Tengo derecho a conocer, actualizar, rectificar y solicitar la supresión de mis datos personales, así como a revocar esta autorización en cualquier momento mediante comunicación al correo electrónico <strong>datos@palenke.org</strong>.
+                </li>
+              </ol>
+              <p className="mt-3 text-[11px] border-t border-[#e8dfd3]/60 pt-3 text-[#7a756e]">
+                Al marcar la casilla de aceptación, manifiesto que conozco y acepto la Política de Tratamiento de Datos Personales completa, disponible para consulta en el portal web: https://palenke.org/politica-de-datos.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

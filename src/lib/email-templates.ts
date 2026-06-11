@@ -68,6 +68,16 @@ export function signedUrlEmailHtml(signedUrl: string, expiry: string) {
     <h2>Enlace temporal de descarga</h2>
     <p>Este enlace estará disponible por ${escapeHtml(expiry)}.</p>
     <p><a href="${escapeHtml(signedUrl)}">Descargar documento</a></p>
+    <div style="margin-top: 25px; padding: 15px; border-left: 4px solid #c29d38; background-color: #fdfaf4; font-size: 11px; color: #4e4a42; line-height: 1.5;">
+      <strong>⚠️ Compromiso de Confidencialidad y Uso Territorial</strong><br/>
+      Estás descargando un documento de propiedad colectiva de las comunidades negras. Al hacer uso de este archivo, te comprometes a:
+      <ul style="margin: 5px 0; padding-left: 15px;">
+        <li>Usar el material únicamente para fines formativos, de gestión comunitaria o de defensa legal de los territorios colectivos.</li>
+        <li><strong>No distribuir, publicar en redes sociales ni compartir</strong> este archivo con personas externas a las comunidades sin autorización escrita de la Coordinación General de Palenke o del Consejo Comunitario de origen.</li>
+        <li>Evitar el uso comercial, académico extractivo o corporativo de la información ambiental y tradicional contenida en este instrumento.</li>
+      </ul>
+      Este documento cuenta con trazabilidad de acceso digital. El uso inadecuado o la distribución indebida de este material atenta contra el principio de cuidado colectivo y la seguridad territorial de nuestras comunidades.
+    </div>
   `;
 }
 
@@ -81,6 +91,16 @@ export function requestedDocumentEmailHtml(
     <p>Te compartimos el enlace temporal para el documento <strong>${escapeHtml(documentTitle)}</strong>.</p>
     <p>Este enlace estará disponible por ${escapeHtml(expiry)}.</p>
     <p><a href="${escapeHtml(signedUrl)}">Descargar documento</a></p>
+    <div style="margin-top: 25px; padding: 15px; border-left: 4px solid #c29d38; background-color: #fdfaf4; font-size: 11px; color: #4e4a42; line-height: 1.5;">
+      <strong>⚠️ Compromiso de Confidencialidad y Uso Territorial</strong><br/>
+      Estás descargando un documento de propiedad colectiva de las comunidades negras. Al hacer uso de este archivo, te comprometes a:
+      <ul style="margin: 5px 0; padding-left: 15px;">
+        <li>Usar el material únicamente para fines formativos, de gestión comunitaria o de defensa legal de los territorios colectivos.</li>
+        <li><strong>No distribuir, publicar en redes sociales ni compartir</strong> este archivo con personas externas a las comunidades sin autorización escrita de la Coordinación General de Palenke o del Consejo Comunitario de origen.</li>
+        <li>Evitar el uso comercial, académico extractivo o corporativo de la información ambiental y tradicional contenida en este instrumento.</li>
+      </ul>
+      Este documento cuenta con trazabilidad de acceso digital. El uso inadecuado o la distribución indebida de este material atenta contra el principio de cuidado colectivo y la seguridad territorial de nuestras comunidades.
+    </div>
   `;
 }
 

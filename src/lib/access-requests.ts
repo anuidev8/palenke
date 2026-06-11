@@ -358,3 +358,34 @@ export async function countPendingAccessRequests() {
 
   return count ?? 0;
 }
+
+export function maskNationalId(id: string | null | undefined): string {
+  if (!id) return "";
+  const cleaned = id.trim();
+  if (cleaned.length === 0) return "";
+  const len = cleaned.length;
+  if (len <= 4) {
+    return cleaned[0] + "*".repeat(len - 1);
+  }
+  const visibleCount = Math.max(1, Math.floor(len * 0.4));
+  const maskedCount = len - visibleCount;
+  return cleaned.slice(0, visibleCount) + "*".repeat(maskedCount);
+}
+
+export function formatIdWithDots(id: string | null | undefined): string {
+  if (!id) return "";
+  const cleaned = id.trim();
+  if (cleaned.length === 0) return "";
+  const chars = cleaned.split("");
+  const result: string[] = [];
+  let count = 0;
+  for (let i = chars.length - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 === 0) {
+      result.unshift(".");
+    }
+    result.unshift(chars[i]);
+    count++;
+  }
+  return result.join("");
+}
+

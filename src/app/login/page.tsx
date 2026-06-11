@@ -55,14 +55,28 @@ export default async function LoginPage({
             ) : null}
           </div>
 
-          <p className="text-sm leading-6 text-[color:var(--muted-strong)]">
-            No se aceptan registros públicos. Las cuentas son gestionadas por la coordinación del
-            Palenke.
-          </p>
+          <div className="rounded-2xl border border-[color:var(--sand-strong)] bg-[color:var(--sand-light)] p-5.5 space-y-3.5 shadow-sm text-xs leading-relaxed text-[color:var(--forest)] select-none">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-white/80 text-[color:var(--gold-strong)] border border-[color:var(--sand-strong)]">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </span>
+              <h4 className="font-bold text-sm tracking-wide text-[color:var(--forest)] uppercase">
+                Aviso de Privacidad y Acceso Interno
+              </h4>
+            </div>
+            <p className="font-medium text-[color:var(--forest)]/90">
+              El ingreso a este sistema está reservado exclusivamente para los integrantes de la Coordinación de Palenke, equipos técnicos de Hileros y personas autorizadas de los Consejos Comunitarios.
+            </p>
+            <p className="text-[color:var(--muted-strong)] leading-relaxed">
+              Tus credenciales de acceso son estrictamente personales e intransferibles. Cada sesión de usuario y acción administrativa es registrada y auditada en el sistema para salvaguardar la soberanía y seguridad digital de nuestros territorios colectivos. Si presentas inconvenientes para acceder o requieres una cuenta, ponte en contacto con el administrador técnico de tu zona.
+            </p>
+          </div>
 
           <p className="text-xs leading-6 text-[color:var(--muted)]">
             Al iniciar sesión aceptas nuestra{" "}
-            <Link href={withRole("/politica-de-datos", role)} className="underline">
+            <Link href={withRole("/politica-de-datos", role)} className="underline font-semibold text-[color:var(--forest)] hover:text-[color:var(--gold-strong)] transition-colors">
               Política de tratamiento de datos
             </Link>
             .

@@ -13,6 +13,7 @@ import {
   listInstrumentDocuments,
   type GobiernoPropioDocumentRow,
 } from "@/lib/gobierno-propio-documents";
+import { listAccessRequests, maskNationalId, formatIdWithDots } from "@/lib/access-requests";
 import {
   getSeguridadJuridicaDocumentBySlug,
   listSeguridadJuridicaDocuments,
@@ -22,6 +23,14 @@ import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRequestState } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 import { SubmoduleOptionsColumn } from "@/components/palenke/SubmoduleOptionsColumn";
+import { SeguridadJuridicaSearchBar } from "@/components/palenke/SeguridadJuridicaSearchBar";
+import { SeguridadJuridicaFilterSummary } from "@/components/palenke/SeguridadJuridicaFilterSummary";
+import {
+  filterSeguridadJuridicaDocuments,
+  getSeguridadJuridicaFacetOptions,
+  parseSeguridadJuridicaFilters,
+  type SeguridadJuridicaFilterableDoc,
+} from "@/lib/seguridad-juridica-filters";
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
 
@@ -339,10 +348,11 @@ function toDisplayDocFromCatalog(
   doc: GobiernoPropioDocumentRow,
   section: string,
   instrumento: string,
-): DisplayDoc & { submodule?: string; previewHref?: string } {
+): SeguridadJuridicaFilterableDoc {
   const hasDirectPublicPath = doc.visibility === "public" && Boolean(doc.storage_path?.startsWith("/"));
   const usesSignedUrl = !hasDirectPublicPath;
   const slug = doc.slug ?? doc.id;
+  const catalogId = slug.match(/^(\d+)/)?.[1] ?? doc.id;
 
   return {
     id: doc.id,
@@ -362,6 +372,13 @@ function toDisplayDocFromCatalog(
     storagePath: doc.storage_path,
     submodule: doc.submodule ?? undefined,
     previewHref: `/gobierno-propio/${instrumento}/${slug}`,
+    author: doc.author ?? undefined,
+    theme: doc.theme ?? undefined,
+    summary: doc.summary ?? undefined,
+    catalogId,
+    format: doc.format ?? undefined,
+    keywords: doc.keywords ?? undefined,
+    subtheme: doc.subtheme ?? undefined,
   };
 }
 
@@ -405,6 +422,12 @@ export default async function InstrumentoPage({
 
   if (!(instrumento in instrumentos)) notFound();
   const instrumentoKey = instrumento as InstrumentoSlug;
+
+  const showAdminSection = role === "admin" || role === "internal";
+  const pendingRequests = showAdminSection
+    ? await listAccessRequests({ instrument_slug: instrumentoKey, status: "pending" })
+    : [];
+
   const inst = instrumentos[instrumentoKey];
   const Icon = inst.icon;
   const { mode: dbMode, docs: dbDocs, catalogDocs } = await listSupabaseInstrumentDocs(instrumentoKey);
@@ -431,11 +454,31 @@ export default async function InstrumentoPage({
         ? sp.submodulo
         : undefined;
 
+  const seguridadJuridicaFilters =
+    instrumentoKey === "seguridad-juridica" ? parseSeguridadJuridicaFilters(sp) : null;
+
   if (instrumentoKey === "seguridad-juridica" && catalogDocs.length > 0) {
     displayDocs = catalogDocs.map((doc) =>
       toDisplayDocFromCatalog(doc, inst.librarySection, instrumentoKey),
     );
   }
+
+  const seguridadJuridicaSubmoduleDocs =
+    instrumentoKey === "seguridad-juridica" && activeSubmodule
+      ? (displayDocs as SeguridadJuridicaFilterableDoc[]).filter(
+          (doc) => doc.submodule === activeSubmodule,
+        )
+      : (displayDocs as SeguridadJuridicaFilterableDoc[]);
+
+  const seguridadJuridicaFacetOptions =
+    instrumentoKey === "seguridad-juridica"
+      ? getSeguridadJuridicaFacetOptions(seguridadJuridicaSubmoduleDocs)
+      : null;
+
+  const filteredDisplayDocs =
+    instrumentoKey === "seguridad-juridica" && seguridadJuridicaFilters
+      ? filterSeguridadJuridicaDocuments(seguridadJuridicaSubmoduleDocs, seguridadJuridicaFilters)
+      : displayDocs;
 
   const grantedDocIds = sessionState.isAuthenticated
     ? Array.from(
@@ -753,8 +796,28 @@ export default async function InstrumentoPage({
             </div>
           ) : null}
 
+          {instrumentoKey === "seguridad-juridica" && seguridadJuridicaFilters && seguridadJuridicaFacetOptions ? (
+            <div className="mb-8 space-y-6 rounded-[32px] border border-[#e8dfd3] bg-[#fcfaf7] p-6 shadow-sm sm:p-8">
+              <SeguridadJuridicaSearchBar
+                role={role}
+                instrumento={instrumentoKey}
+                submodulo={activeSubmodule ?? SEGURIDAD_JURIDICA_DEFAULT_SUBMODULE}
+                accentColor={inst.color}
+                filters={seguridadJuridicaFilters}
+                facets={seguridadJuridicaFacetOptions}
+              />
+              <SeguridadJuridicaFilterSummary
+                role={role}
+                instrumento={instrumentoKey}
+                submodulo={activeSubmodule ?? SEGURIDAD_JURIDICA_DEFAULT_SUBMODULE}
+                filters={seguridadJuridicaFilters}
+                totalCount={filteredDisplayDocs.length}
+              />
+            </div>
+          ) : null}
+
           <DocumentTree 
-            docs={displayDocs} 
+            docs={filteredDisplayDocs} 
             role={role} 
             isAuthenticated={isAuthenticated}
             grantedDocIds={grantedDocIds}
@@ -765,12 +828,139 @@ export default async function InstrumentoPage({
             submodules={"submodules" in inst ? (inst.submodules as any) : undefined}
             initialSubmodule={activeSubmodule}
             requireSubmoduleFilter={instrumentoKey === "seguridad-juridica"}
+            hideSearch={instrumentoKey === "seguridad-juridica"}
           />
 
           {dbMode === "query-error" ? (
             <p className="mt-4 text-sm text-[#9c5d00]">
               No se pudo consultar la base de datos para este instrumento.
             </p>
+          ) : null}
+
+          {pendingRequests && pendingRequests.length > 0 ? (
+            <div className="mt-16 rounded-[28px] border border-amber-250 bg-[#fdfaf2] p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-amber-100 pb-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-850 border border-amber-200">
+                    <Shield className="h-6 w-6 text-[#b45309]" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-150 px-2 py-0.5 rounded-full border border-amber-200">
+                        Panel de Coordinación
+                      </span>
+                      <span className="flex h-2 w-2 rounded-full bg-amber-600 animate-pulse" />
+                    </div>
+                    <h3 className="font-display text-xl sm:text-2xl text-[#1a1a1a] mt-1 font-semibold">
+                      Solicitudes pendientes de aprobación ({pendingRequests.length})
+                    </h3>
+                    <p className="mt-1 text-xs text-stone-600">
+                      Como administrador o coordinador, puedes revisar y aprobar estas solicitudes para otorgar acceso a los documentos protegidos de este instrumento.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href={withRole("/admin/solicitudes", role)}
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-stone-900 hover:bg-stone-800 px-5 py-2.5 text-xs font-bold text-white shadow-md transition active:scale-95"
+                >
+                  Ver todas las solicitudes
+                </Link>
+              </div>
+
+              <div className="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                {/* Mobile version: card stack */}
+                <div className="block md:hidden divide-y divide-stone-100">
+                  {pendingRequests.map((req) => (
+                    <div key={req.id} className="p-4 flex flex-col gap-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-stone-900 leading-snug">{req.full_name}</p>
+                          <p className="text-xs text-stone-500">{req.email}</p>
+                        </div>
+                        <span className="text-[11px] font-mono text-stone-600 bg-stone-100 px-2 py-0.5 rounded">
+                          {formatIdWithDots(maskNationalId(req.national_id))}
+                        </span>
+                      </div>
+                      
+                      {req.motivation && (
+                        <div className="rounded-lg bg-stone-50 p-2.5 text-xs text-stone-600 border border-stone-100 leading-relaxed">
+                          <p className="font-semibold text-stone-500 mb-0.5 uppercase tracking-wider text-[9px]">Motivación:</p>
+                          {req.motivation}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between mt-1 text-xs text-stone-500">
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-stone-400" />
+                          {new Date(req.created_at).toLocaleDateString("es-CO", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <Link
+                          href={withRole(`/admin/solicitudes/${req.id}`, role)}
+                          className="inline-flex items-center justify-center rounded-lg border border-stone-250 bg-white px-3 py-1 text-xs font-bold text-[#2e7d32] hover:bg-stone-50"
+                        >
+                          Revisar
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop version: table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-stone-50 border-b border-stone-200 text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                        <th className="px-6 py-3.5">Solicitante</th>
+                        <th className="px-6 py-3.5">Cédula</th>
+                        <th className="px-6 py-3.5">Fecha de Solicitud</th>
+                        <th className="px-6 py-3.5">Motivación / Justificación</th>
+                        <th className="px-6 py-3.5 text-right">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100 text-stone-700">
+                      {pendingRequests.map((req) => (
+                        <tr key={req.id} className="hover:bg-stone-50/50 transition">
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-stone-900">{req.full_name}</span>
+                              <span className="text-xs text-stone-500">{req.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 font-mono text-xs text-stone-600">
+                            {formatIdWithDots(maskNationalId(req.national_id))}
+                          </td>
+                          <td className="px-6 py-4 text-xs text-stone-500">
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="h-3.5 w-3.5 text-stone-400" />
+                              {new Date(req.created_at).toLocaleDateString("es-CO", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 max-w-xs truncate text-xs text-stone-600" title={req.motivation}>
+                            {req.motivation}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <Link
+                              href={withRole(`/admin/solicitudes/${req.id}`, role)}
+                              className="inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-[#1b5e20] transition hover:bg-stone-50 hover:border-stone-300"
+                            >
+                              Revisar
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           ) : null}
         </div>
       </section>

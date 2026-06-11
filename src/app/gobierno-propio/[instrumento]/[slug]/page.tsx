@@ -18,6 +18,7 @@ import {
 } from "@/lib/seguridad-juridica-catalog";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRequestState } from "@/lib/viewer-server";
+import { getDocumentTypeVisual } from "@/lib/document-type-display";
 import { type SearchParams, withRole } from "@/lib/viewer";
 
 const INSTRUMENT_LABELS: Record<string, string> = {
@@ -121,6 +122,7 @@ export default async function GobiernoPropioDocumentPage({ params, searchParams 
   const downloadHref = `/api/documents/${document.id}/signed-url?mode=redirect`;
   const instrumentLabel = INSTRUMENT_LABELS[instrumento] ?? instrumento;
   const submoduleLabel = document.submodule ? SUBMODULE_LABELS[document.submodule] : null;
+  const documentTypeLabel = getDocumentTypeVisual(document.document_type).footerLabel;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -187,9 +189,9 @@ export default async function GobiernoPropioDocumentPage({ params, searchParams 
                     {submoduleLabel}
                   </span>
                 ) : null}
-                {document.document_type ? (
+                {documentTypeLabel ? (
                   <span className="rounded-full bg-[#e3f2fd] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#1565c0]">
-                    {document.document_type}
+                    {documentTypeLabel}
                   </span>
                 ) : null}
               </div>

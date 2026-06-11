@@ -9,6 +9,7 @@
     "lint": "eslint",
     "generate:hero-posters": "node scripts/generate-hero-card-posters.mjs",
     "generate:hero-poster": "node scripts/generate-hero-card-posters.mjs",
+    "generate:home-hero-video": "node scripts/generate-home-hero-video.mjs",
     "sync:plan-instrumentos-storage": "node scripts/upload-plan-instrumentos-storage.mjs",
     "sync:plan-instrumentos-storage:dry": "node scripts/upload-plan-instrumentos-storage.mjs --dry-run",
     "sync:plan-instrumentos-storage:verify": "node scripts/upload-plan-instrumentos-storage.mjs --verify",
@@ -22,7 +23,10 @@
     "sync:seguridad-juridica-storage:dry": "node scripts/upload-seguridad-juridica-storage.mjs --dry-run",
     "sync:seguridad-juridica-storage:verify": "node scripts/upload-seguridad-juridica-storage.mjs --verify",
     "sync:seguridad-juridica-documents": "node scripts/sync-seguridad-juridica-documents.mjs",
-    "sync:seguridad-juridica-documents:dry": "node scripts/sync-seguridad-juridica-documents.mjs --dry-run"
+    "sync:seguridad-juridica-documents:dry": "node scripts/sync-seguridad-juridica-documents.mjs --dry-run",
+    "sync:rutas-metodologicas": "node scripts/sync-rutas-metodologicas.mjs",
+    "sync:rutas-metodologicas:dry": "node scripts/sync-rutas-metodologicas.mjs --dry-run",
+    "sync:rutas-metodologicas:verify": "node scripts/sync-rutas-metodologicas.mjs --verify"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
