@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ChevronRight, 
@@ -11,9 +12,11 @@ import {
   Folder as FolderIcon,
   Search,
   Home,
-  X
+  X,
+  Eye,
 } from "lucide-react";
 import { type ViewerRole, canDownloadDocument } from "@/lib/mock-data";
+import { withRole } from "@/lib/viewer";
 
 export type DocumentVisibility = "public" | "internal" | "sensitive";
 
@@ -32,6 +35,7 @@ export type DisplayDoc = {
   sourceUrl?: string;
   usesSignedUrl: boolean;
   storagePath?: string | null;
+  previewHref?: string;
 };
 
 type TreeNode = {
@@ -304,7 +308,16 @@ function FileCard({
             ) : null}
           </div>
         ) : (
-          <>
+          <div className="flex flex-col gap-2">
+            {doc.previewHref && hasAccess ? (
+              <a
+                href={doc.previewHref}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8dfd3] bg-white px-4 py-3 text-sm font-bold text-[#1a1a1a] transition hover:bg-[#f8f5f2]"
+              >
+                <Eye className="h-4 w-4" aria-hidden="true" />
+                Ver documento
+              </a>
+            ) : null}
             {doc.action === "file" ? (
               <a
                 href={doc.url}
@@ -350,7 +363,7 @@ function FileCard({
                 {doc.fileLabel}
               </a>
             ) : null}
-          </>
+          </div>
         )}
       </div>
     </motion.div>
@@ -370,6 +383,7 @@ export function DocumentTree({
   accessLevel,
   submodules,
   initialSubmodule,
+  requireSubmoduleFilter = false,
 }: {
   docs: DisplayDoc[];
   role: ViewerRole;
@@ -381,13 +395,25 @@ export function DocumentTree({
   accessLevel?: "admin" | "coordination";
   submodules?: readonly { id: string; title: string; color: string; lightBg: string; }[];
   initialSubmodule?: string;
+  requireSubmoduleFilter?: boolean;
 }) {
+  const router = useRouter();
   const [activeSubmodule, setActiveSubmodule] = useState<string | null>(initialSubmodule || null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<DisplayDoc | null>(null);
   const grantedDocIdSet = useMemo(() => new Set(grantedDocIds), [grantedDocIds]);
+
+  useEffect(() => {
+    setActiveSubmodule(initialSubmodule || null);
+    setCurrentPath([]);
+  }, [initialSubmodule]);
+
+  const activeSubmoduleLabel = useMemo(() => {
+    if (!activeSubmodule) return null;
+    return submodules?.find((sub) => sub.id === activeSubmodule)?.title ?? activeSubmodule;
+  }, [activeSubmodule, submodules]);
 
   const filteredDocs = useMemo(() => {
     if (!activeSubmodule) return docs;
@@ -416,9 +442,15 @@ export function DocumentTree({
   }, [tree, currentPath]);
 
   const handleSelectSubmodule = (subId: string | null) => {
+    if (requireSubmoduleFilter && instrumento && subId) {
+      router.push(withRole(`/gobierno-propio/${instrumento}?submodulo=${subId}`, role));
+      return;
+    }
     setActiveSubmodule(subId);
     setCurrentPath([]);
   };
+
+  const showFlatSubmoduleView = Boolean(activeSubmodule && !searchQuery.trim());
 
   if (docs.length === 0) {
     return (
@@ -437,14 +469,16 @@ export function DocumentTree({
     setCurrentPath(currentPath.slice(0, idx + 1));
   };
 
-  const itemsToRender = searchResults !== null 
-    ? searchResults.map(doc => ({ type: "file" as const, doc, key: doc.id }))
-    : currentNode.children.map(child => ({ 
-        type: child.type, 
-        node: child, 
-        doc: child.doc,
-        key: child.path 
-      }));
+  const itemsToRender = searchResults !== null
+    ? searchResults.map((doc) => ({ type: "file" as const, doc, key: doc.id }))
+    : showFlatSubmoduleView
+      ? filteredDocs.map((doc) => ({ type: "file" as const, doc, key: doc.id }))
+      : currentNode.children.map((child) => ({
+          type: child.type,
+          node: child,
+          doc: child.doc,
+          key: child.path,
+        }));
 
   return (
     <div className="flex flex-col gap-8">
@@ -459,28 +493,30 @@ export function DocumentTree({
         <div className="relative z-10">
           {/* Submodule tabs selector */}
           {submodules && submodules.length > 0 && (
-            <div className="mb-6">
+            <div className="mb-6 lg:hidden">
               <p className="text-xs font-bold text-[#7a756e] uppercase tracking-[0.15em] mb-3">
                 Submódulos / Líneas de trabajo
               </p>
               <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleSelectSubmodule(null)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all relative overflow-hidden shadow-xs border ${
-                    activeSubmodule === null
-                      ? "bg-[#1a1a1a] text-white border-black"
-                      : "bg-[#fcfaf7] text-[#4a4540] border-[#e8dfd3] hover:bg-[#f4f1ec]"
-                  }`}
-                >
-                  {activeSubmodule === null && (
-                    <motion.span
-                      layoutId="activeSubmoduleGlow"
-                      className="absolute inset-0 bg-white/10"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10">Todos los documentos</span>
-                </button>
+                {!requireSubmoduleFilter ? (
+                  <button
+                    onClick={() => handleSelectSubmodule(null)}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all relative overflow-hidden shadow-xs border ${
+                      activeSubmodule === null
+                        ? "bg-[#1a1a1a] text-white border-black"
+                        : "bg-[#fcfaf7] text-[#4a4540] border-[#e8dfd3] hover:bg-[#f4f1ec]"
+                    }`}
+                  >
+                    {activeSubmodule === null && (
+                      <motion.span
+                        layoutId="activeSubmoduleGlow"
+                        className="absolute inset-0 bg-white/10"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">Todos los documentos</span>
+                  </button>
+                ) : null}
                 {submodules.map((sub) => {
                   const isActive = activeSubmodule === sub.id;
                   return (
@@ -533,13 +569,21 @@ export function DocumentTree({
           {/* Breadcrumbs */}
           {!searchResults && (
             <div className="flex items-center gap-2 mt-6 overflow-x-auto pb-2 scrollbar-hide">
-              <button 
+              <button
                 onClick={() => setCurrentPath([])}
-                className={`flex items-center gap-1.5 transition-colors font-medium px-3 py-1.5 rounded-lg ${currentPath.length === 0 ? 'bg-[#f4f1ec] text-[#1a1a1a]' : 'hover:bg-[#f4f1ec] text-[#7a756e] hover:text-[#1a1a1a]'}`}
+                className={`flex items-center gap-1.5 transition-colors font-medium px-3 py-1.5 rounded-lg ${currentPath.length === 0 && !showFlatSubmoduleView ? "bg-[#f4f1ec] text-[#1a1a1a]" : "hover:bg-[#f4f1ec] text-[#7a756e] hover:text-[#1a1a1a]"}`}
               >
                 <Home className="w-4 h-4" />
                 <span>Inicio</span>
               </button>
+              {showFlatSubmoduleView && activeSubmoduleLabel ? (
+                <>
+                  <ChevronRight className="w-4 h-4 text-[#d1ccc5] shrink-0" />
+                  <span className="whitespace-nowrap font-medium px-3 py-1.5 rounded-lg bg-[#f4f1ec] text-[#1a1a1a]">
+                    {activeSubmoduleLabel}
+                  </span>
+                </>
+              ) : null}
               {currentPath.map((segment, idx) => (
                 <React.Fragment key={idx}>
                   <ChevronRight className="w-4 h-4 text-[#d1ccc5] shrink-0" />

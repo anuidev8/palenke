@@ -17,7 +17,12 @@
     "verify:plan-instrumentos-admin-actions-e2e": "node scripts/verify-plan-instrumentos-admin-actions-e2e.mjs",
     "sync:mediateca-ubuntu-storage": "node scripts/sync-mediateca-ubuntu-storage.mjs",
     "sync:mediateca-ubuntu-storage:dry": "node scripts/sync-mediateca-ubuntu-storage.mjs --dry-run",
-    "upload:mediateca-category": "node scripts/upload-mediateca-category.mjs"
+    "upload:mediateca-category": "node scripts/upload-mediateca-category.mjs",
+    "sync:seguridad-juridica-storage": "node scripts/upload-seguridad-juridica-storage.mjs",
+    "sync:seguridad-juridica-storage:dry": "node scripts/upload-seguridad-juridica-storage.mjs --dry-run",
+    "sync:seguridad-juridica-storage:verify": "node scripts/upload-seguridad-juridica-storage.mjs --verify",
+    "sync:seguridad-juridica-documents": "node scripts/sync-seguridad-juridica-documents.mjs",
+    "sync:seguridad-juridica-documents:dry": "node scripts/sync-seguridad-juridica-documents.mjs --dry-run"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
@@ -30,6 +35,7 @@
     "powerbi-client": "^2.23.10",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-pdf": "^10.4.1",
     "recharts": "^3.8.1",
     "resend": "^6.9.4",
     "zod": "^4.3.6"

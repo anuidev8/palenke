@@ -9,6 +9,17 @@ import { SiteLayout } from "@/components/mock/ui";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { listGrantedDocumentIdsForViewer } from "@/lib/document-access";
 import { canDownloadDocument } from "@/lib/mock-data";
+import {
+  formatDocumentTerritory,
+  formatDocumentYear,
+  listInstrumentDocuments,
+  type GobiernoPropioDocumentRow,
+} from "@/lib/gobierno-propio-documents";
+import {
+  getSeguridadJuridicaDocumentBySlug,
+  listSeguridadJuridicaDocuments,
+  listSeguridadJuridicaSlugs,
+} from "@/lib/seguridad-juridica-catalog";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRequestState } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
@@ -241,6 +252,7 @@ const dbInstrumentMap: Partial<Record<InstrumentoSlug, string>> = {
   "planes-uso": "planes-uso",
   etnodesarrollo: "etnodesarrollo",
   conservacion: "conservacion",
+  "seguridad-juridica": "seguridad-juridica",
 };
 
 function isMissingTableError(error: unknown) {
@@ -280,11 +292,20 @@ function formatDocYear(doc: SupabaseInstrumentDoc) {
 async function listSupabaseInstrumentDocs(instrumento: InstrumentoSlug) {
   const mapped = dbInstrumentMap[instrumento];
   if (!mapped) {
-    return { mode: "not-mapped" as const, docs: [] as SupabaseInstrumentDoc[] };
+    return { mode: "not-mapped" as const, docs: [] as SupabaseInstrumentDoc[], catalogDocs: [] as GobiernoPropioDocumentRow[] };
+  }
+
+  if (instrumento === "seguridad-juridica") {
+    const catalogResult = await listSeguridadJuridicaDocuments();
+    return {
+      mode: catalogResult.mode,
+      docs: [] as SupabaseInstrumentDoc[],
+      catalogDocs: catalogResult.docs,
+    };
   }
 
   if (!hasSupabaseServiceConfig()) {
-    return { mode: "missing-config" as const, docs: [] as SupabaseInstrumentDoc[] };
+    return { mode: "missing-config" as const, docs: [] as SupabaseInstrumentDoc[], catalogDocs: [] as GobiernoPropioDocumentRow[] };
   }
 
   const supabase = createSupabaseService();
@@ -298,15 +319,45 @@ async function listSupabaseInstrumentDocs(instrumento: InstrumentoSlug) {
     .order("created_at", { ascending: false });
 
   if (error && isMissingTableError(error)) {
-    return { mode: "missing-table" as const, docs: [] as SupabaseInstrumentDoc[] };
+    return { mode: "missing-table" as const, docs: [] as SupabaseInstrumentDoc[], catalogDocs: [] as GobiernoPropioDocumentRow[] };
   }
 
   if (error) {
     console.error(`Failed to load documents for instrumento=${instrumento}:`, error);
-    return { mode: "query-error" as const, docs: [] as SupabaseInstrumentDoc[] };
+    return { mode: "query-error" as const, docs: [] as SupabaseInstrumentDoc[], catalogDocs: [] as GobiernoPropioDocumentRow[] };
   }
 
-  return { mode: "supabase" as const, docs: (data ?? []) as SupabaseInstrumentDoc[] };
+  return { mode: "supabase" as const, docs: (data ?? []) as SupabaseInstrumentDoc[], catalogDocs: [] as GobiernoPropioDocumentRow[] };
+}
+
+function toDisplayDocFromCatalog(
+  doc: GobiernoPropioDocumentRow,
+  section: string,
+  instrumento: string,
+): DisplayDoc & { submodule?: string; previewHref?: string } {
+  const hasDirectPublicPath = doc.visibility === "public" && Boolean(doc.storage_path?.startsWith("/"));
+  const usesSignedUrl = !hasDirectPublicPath;
+  const slug = doc.slug ?? doc.id;
+
+  return {
+    id: doc.id,
+    title: doc.title,
+    section,
+    type: doc.document_type ?? "Documento",
+    council: doc.council ?? undefined,
+    territory: formatDocumentTerritory(doc),
+    year: formatDocumentYear(doc),
+    visibility: doc.visibility,
+    action: "file",
+    fileLabel: "Descargar",
+    url: hasDirectPublicPath
+      ? (doc.storage_path as string)
+      : `/api/documents/${doc.id}/signed-url?mode=redirect`,
+    usesSignedUrl,
+    storagePath: doc.storage_path,
+    submodule: doc.submodule ?? undefined,
+    previewHref: `/gobierno-propio/${instrumento}/${slug}`,
+  };
 }
 
 function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): DisplayDoc {
@@ -331,102 +382,7 @@ function toDisplayDocFromSupabase(doc: SupabaseInstrumentDoc, section: string): 
   };
 }
 
-// ─── Mock Documents for Seguridad Jurídica ───────────────────────────────────
-
-const MOCK_SEGURIDAD_JURIDICA_DOCS: (DisplayDoc & { submodule: string })[] = [
-  {
-    id: "sj-diego-luis",
-    title: "CC Diego Luis Cordoba",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2023",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/CC Diego Luis Cordoba.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/CC Diego Luis Cordoba.pdf",
-    submodule: "titulacion",
-  },
-  {
-    id: "sj-martin-luther",
-    title: "CC Martin Luther King",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2023",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/CC Martin Luther King.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/CC Martin Luther King.pdf",
-    submodule: "fortalecimiento",
-  },
-  {
-    id: "sj-nelson-mandela",
-    title: "CC Nelson Mandela",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2023",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/CC Nelson Mandela.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/CC Nelson Mandela.pdf",
-    submodule: "genero",
-  },
-  {
-    id: "sj-acta-linderos-diego",
-    title: "Acta de Actualización de Linderos - Diego Luis Cordoba",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2024",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Actualización de Linderos - Diego Luis Cordoba.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Actualización de Linderos - Diego Luis Cordoba.pdf",
-    submodule: "proteccion",
-  },
-  {
-    id: "sj-acta-asamblea-king",
-    title: "Acta de Asamblea de Fortalecimiento - Martin Luther King",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2024",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Asamblea de Fortalecimiento - Martin Luther King.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Asamblea de Fortalecimiento - Martin Luther King.pdf",
-    submodule: "fortalecimiento",
-  },
-  {
-    id: "sj-acta-eleccion-mandela",
-    title: "Acta de Elección de Junta - Nelson Mandela",
-    section: "Seguridad jurídica de la tierra",
-    type: "Documento",
-    territory: "Municipio de Miraflores, Departamento del Guaviare",
-    year: "2024",
-    visibility: "internal",
-    action: "file",
-    fileLabel: "Descargar",
-    url: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Elección de Junta - Nelson Mandela.pdf",
-    usesSignedUrl: false,
-    storagePath: "/seguridad-juridica/ACTAS-DE-ACTUALIZACION/Acta de Elección de Junta - Nelson Mandela.pdf",
-    submodule: "fortalecimiento",
-  },
-];
-
-// ─── Page ────────────────────────────────────────────────────────────────────
+const SEGURIDAD_JURIDICA_DEFAULT_SUBMODULE = "fortalecimiento";
 
 export default async function InstrumentoPage({
   params,
@@ -446,7 +402,7 @@ export default async function InstrumentoPage({
   const instrumentoKey = instrumento as InstrumentoSlug;
   const inst = instrumentos[instrumentoKey];
   const Icon = inst.icon;
-  const { mode: dbMode, docs: dbDocs } = await listSupabaseInstrumentDocs(instrumentoKey);
+  const { mode: dbMode, docs: dbDocs, catalogDocs } = await listSupabaseInstrumentDocs(instrumentoKey);
   const usesSupabaseDocs = dbMode === "supabase";
 
   const baseSupabaseDbDoc = usesSupabaseDocs
@@ -457,15 +413,23 @@ export default async function InstrumentoPage({
     : null;
 
   const tableDbDocs = dbDocs.filter((d) => d.visibility !== "public");
-  let displayDocs: DisplayDoc[] = usesSupabaseDocs
+  let displayDocs: (DisplayDoc & { submodule?: string; previewHref?: string })[] = usesSupabaseDocs
     ? tableDbDocs.map((doc) => toDisplayDocFromSupabase(doc, inst.librarySection))
     : [];
 
-  const activeSubmodule = typeof sp.submodulo === "string" ? sp.submodulo : undefined;
+  const activeSubmodule =
+    instrumentoKey === "seguridad-juridica"
+      ? typeof sp.submodulo === "string"
+        ? sp.submodulo
+        : SEGURIDAD_JURIDICA_DEFAULT_SUBMODULE
+      : typeof sp.submodulo === "string"
+        ? sp.submodulo
+        : undefined;
 
-  if (instrumentoKey === "seguridad-juridica") {
-    // Keep empty for now as requested
-    displayDocs = [];
+  if (instrumentoKey === "seguridad-juridica" && catalogDocs.length > 0) {
+    displayDocs = catalogDocs.map((doc) =>
+      toDisplayDocFromCatalog(doc, inst.librarySection, instrumentoKey),
+    );
   }
 
   const grantedDocIds = sessionState.isAuthenticated
@@ -638,13 +602,24 @@ export default async function InstrumentoPage({
               </div>
 
               {"submodules" in inst ? (
-                <div className="pt-8 border-t border-[#e8dfd3]/60 w-full relative">
+                <div
+                  className={`pt-8 border-t border-[#e8dfd3]/60 w-full relative${
+                    instrumentoKey === "seguridad-juridica" ? " hidden lg:block" : ""
+                  }`}
+                >
                   <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#f4f1ec] border border-[#e8dfd3] mb-5">
                     <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: inst.color }} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-[#5a5550]">SUBMÓDULOS</span>
                   </div>
                   <h3 className="font-display text-2xl text-[#1a1a1a] mb-6 font-semibold tracking-tight">Líneas de trabajo</h3>
-                  <SubmoduleOptionsColumn items={inst.submodules as any} role={role} layout="horizontal" />
+                  <SubmoduleOptionsColumn
+                    items={inst.submodules as any}
+                    role={role}
+                    layout="horizontal"
+                    mode="filter"
+                    activeId={activeSubmodule}
+                    filterBasePath={`/gobierno-propio/${instrumentoKey}`}
+                  />
                 </div>
               ) : null}
 
@@ -716,27 +691,62 @@ export default async function InstrumentoPage({
       {/* ── Documentos / Biblioteca ── */}
       <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
-            <div>
-              {isPublic ? (
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-[#b45309] mb-4 border border-orange-200">
-                  <Lock className="w-3.5 h-3.5" />
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    {accessLevel === "coordination" ? "Validación de coordinación" : "Validación administrativa"}
-                  </span>
-                </div>
-              ) : (
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e3f2fd] text-[#1565c0] mb-4">
-                  <Lock className="w-3.5 h-3.5" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Acceso verificado</span>
-                </div>
-              )}
-              <h2 className="font-display text-3xl text-[#1a1a1a]">Archivo de documentos</h2>
-              <p className="mt-2 text-[#4a4540] text-lg">
-                Explora los instrumentos y herramientas de gobierno propio de los Consejos Comunitarios.
-              </p>
+          {instrumentoKey !== "seguridad-juridica" ? (
+            <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
+              <div>
+                {isPublic ? (
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-[#b45309] mb-4 border border-orange-200">
+                    <Lock className="w-3.5 h-3.5" />
+                    <span className="text-xs font-bold uppercase tracking-wider">
+                      {accessLevel === "coordination" ? "Validación de coordinación" : "Validación administrativa"}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e3f2fd] text-[#1565c0] mb-4">
+                    <Lock className="w-3.5 h-3.5" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Acceso verificado</span>
+                  </div>
+                )}
+                <h2 className="font-display text-3xl text-[#1a1a1a]">Archivo de documentos</h2>
+                <p className="mt-2 text-[#4a4540] text-lg">
+                  Explora los instrumentos y herramientas de gobierno propio de los Consejos Comunitarios.
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          {baseSupabaseDoc && canDownloadBaseSupabaseDoc ? (
+            <div
+              className="mb-10 overflow-hidden rounded-[28px] border bg-[#fcfaf7] p-6 sm:p-8"
+              style={{ borderColor: `${inst.color}30` }}
+            >
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] border border-black/5"
+                    style={{ background: `linear-gradient(135deg, ${inst.lightBg}, ${inst.lightBg}aa)`, color: inst.color }}
+                  >
+                    <FileText className="h-7 w-7" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-[#8a8074]">
+                      Documento público
+                    </p>
+                    <h3 className="font-display text-xl text-[#1a1a1a] sm:text-2xl">{baseSupabaseDoc.title}</h3>
+                    <p className="mt-2 text-sm text-[#5a5045]">
+                      Presentación metodológica general del instrumento. Disponible para descarga sin acceso restringido.
+                    </p>
+                  </div>
+                </div>
+                <LoadingDownloadButton
+                  href={baseSupabaseDoc.url}
+                  label="Descargar presentación"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
+                  style={{ background: inst.color }}
+                />
+              </div>
+            </div>
+          ) : null}
 
           <DocumentTree 
             docs={displayDocs} 
@@ -749,6 +759,7 @@ export default async function InstrumentoPage({
             accessLevel={accessLevel}
             submodules={"submodules" in inst ? (inst.submodules as any) : undefined}
             initialSubmodule={activeSubmodule}
+            requireSubmoduleFilter={instrumentoKey === "seguridad-juridica"}
           />
 
           {dbMode === "query-error" ? (
