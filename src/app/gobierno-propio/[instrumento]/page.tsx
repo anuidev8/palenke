@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import fs from "fs";
-import path from "path";
 import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock, Shield, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
@@ -27,9 +25,16 @@ import { SubmoduleOptionsColumn } from "@/components/palenke/SubmoduleOptionsCol
 
 // ─── Instrument catalogue ────────────────────────────────────────────────────
 
+const PLACEHOLDER_PNG_IDS = new Set([
+  "conservacion",
+  "etnodesarrollo",
+  "planes-uso",
+  "proteccion-hidrica",
+  "reglamentos",
+]);
+
 function resolvePlaceholderImage(id: string) {
-  const pngFile = path.join(process.cwd(), "public", "assets", "placeholders", `${id}.png`);
-  if (fs.existsSync(pngFile)) {
+  if (PLACEHOLDER_PNG_IDS.has(id)) {
     return `/assets/placeholders/${id}.png`;
   }
   return `/assets/placeholders/${id}.svg`;

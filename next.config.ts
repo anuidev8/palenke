@@ -9,6 +9,25 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : null;
 
 const nextConfig: NextConfig = {
+  // Prevent large source PDFs / media from being traced into serverless functions.
+  // docs/files (~280MB) and public/videos are served from Supabase/CDN, not lambdas.
+  outputFileTracingExcludes: {
+    "/*": [
+      "./docs/**/*",
+      "./scripts/**/*",
+      "./wireframes/**/*",
+      "./images/**/*",
+      "./DOCUEMNTOS_HONONARIOS/**/*",
+      "./public/videos/**/*",
+      "./public/assets/mediateca-ubuntu/**/*",
+      "./public/generated/**/*",
+      "./**/*.docx",
+      "./**/*.mp4",
+    ],
+    "/admin/contenido-visual": ["./public/**/*"],
+    "/api/**/*": ["./docs/**/*", "./public/**/*"],
+  },
+  serverExternalPackages: ["@google/genai"],
   images: {
     // Next.js 16: quality prop must be in this list (default is only [75])
     qualities: [75, 85, 90],

@@ -1,0 +1,9 @@
+# Source PDFs synced to Supabase — not needed in the serverless runtime
+docs/files/
+
+# Local-only tooling and design artifacts
+scripts/
+wireframes/
+images/
+DOCUEMNTOS_HONONARIOS/
+*.docx
