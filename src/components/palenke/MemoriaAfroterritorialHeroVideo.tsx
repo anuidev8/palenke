@@ -4,19 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Maximize2, Video, VideoOff, Volume2, VolumeX } from "lucide-react";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
+import { useHeroAmbientAudio } from "@/lib/useHeroAmbientAudio";
 
 const TERRITORY_GREEN_OVERLAY =
   "radial-gradient(ellipse at 35% 65%, rgba(46,125,50,0.6), transparent 55%), linear-gradient(160deg, #0d1f0d 0%, #1a2a1a 100%)";
 
-const VIDEO_TARGET_VOLUME = 0.2;
-const AUDIO_FADE_DURATION_MS = 900;
-
-function clampVolume(value: number) {
-  return Math.max(0, Math.min(1, value));
-}
-
 interface MemoriaAfroterritorialHeroVideoProps {
   videoSrc: string;
+  audioSrc: string;
   fallbackVideoSrc?: string;
   duration?: string;
   tag?: string;
@@ -26,6 +21,7 @@ interface MemoriaAfroterritorialHeroVideoProps {
 
 export function MemoriaAfroterritorialHeroVideo({
   videoSrc,
+  audioSrc,
   fallbackVideoSrc,
   duration,
   tag = "Memoria Afroterritorial",
@@ -33,8 +29,6 @@ export function MemoriaAfroterritorialHeroVideo({
   style,
 }: MemoriaAfroterritorialHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const volumeFadeRafRef = useRef<number | null>(null);
-  const queuedAudioResumeRef = useRef<(() => void) | null>(null);
   const stallFallbackTimeoutRef = useRef<number | null>(null);
 
   const [isMediaPlaying, setIsMediaPlaying] = useState(true);
@@ -42,23 +36,13 @@ export function MemoriaAfroterritorialHeroVideo({
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeVideoSrc, setActiveVideoSrc] = useState(videoSrc);
 
-  const stopVolumeFade = useCallback(() => {
-    if (volumeFadeRafRef.current !== null) {
-      cancelAnimationFrame(volumeFadeRafRef.current);
-      volumeFadeRafRef.current = null;
-    }
-  }, []);
-
-  const clearQueuedAudioResume = useCallback(() => {
-    const queuedResume = queuedAudioResumeRef.current;
-    if (!queuedResume || typeof window === "undefined") {
-      return;
-    }
-
-    window.removeEventListener("pointerdown", queuedResume);
-    window.removeEventListener("keydown", queuedResume);
-    queuedAudioResumeRef.current = null;
-  }, []);
+  const audioRef = useHeroAmbientAudio({
+    audioSrc,
+    enabled: isAudioEnabled && !isExpanded,
+    paused: !isMediaPlaying,
+    targetVolume: 0.2,
+    fadeDurationMs: 900,
+  });
 
   const clearStallFallbackTimeout = useCallback(() => {
     if (stallFallbackTimeoutRef.current !== null && typeof window !== "undefined") {
@@ -66,43 +50,6 @@ export function MemoriaAfroterritorialHeroVideo({
       stallFallbackTimeoutRef.current = null;
     }
   }, []);
-
-  const fadeVideoVolumeTo = useCallback(
-    (target: number, durationMs: number) => {
-      const video = videoRef.current;
-      if (!video) {
-        return;
-      }
-
-      const safeTarget = clampVolume(target);
-      stopVolumeFade();
-
-      const startVolume = clampVolume(video.volume);
-      if (durationMs <= 0 || Math.abs(startVolume - safeTarget) < 0.005) {
-        video.volume = safeTarget;
-        return;
-      }
-
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        const progress = Math.min(1, (now - startTime) / durationMs);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        video.volume = clampVolume(startVolume + (safeTarget - startVolume) * eased);
-
-        if (progress < 1) {
-          volumeFadeRafRef.current = requestAnimationFrame(step);
-          return;
-        }
-
-        volumeFadeRafRef.current = null;
-        video.volume = safeTarget;
-      };
-
-      volumeFadeRafRef.current = requestAnimationFrame(step);
-    },
-    [stopVolumeFade],
-  );
 
   useEffect(() => {
     setActiveVideoSrc(videoSrc);
@@ -114,8 +61,8 @@ export function MemoriaAfroterritorialHeroVideo({
       return;
     }
 
-    video.volume = 0;
     video.muted = true;
+    video.volume = 0;
   }, []);
 
   useEffect(() => {
@@ -199,11 +146,7 @@ export function MemoriaAfroterritorialHeroVideo({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    if (isExpanded) {
+    if (!video || isExpanded) {
       return;
     }
 
@@ -215,84 +158,10 @@ export function MemoriaAfroterritorialHeroVideo({
   }, [isExpanded, isMediaPlaying]);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isExpanded) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function tryPlayWithAudio() {
-      const currentVideo = videoRef.current;
-      if (!currentVideo) {
-        return;
-      }
-
-      try {
-        currentVideo.muted = false;
-        await currentVideo.play();
-
-        if (!cancelled) {
-          fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-        }
-      } catch {
-        if (
-          cancelled ||
-          typeof window === "undefined" ||
-          queuedAudioResumeRef.current !== null ||
-          !isMediaPlaying ||
-          !isAudioEnabled
-        ) {
-          return;
-        }
-
-        const resumeOnInteraction = async () => {
-          clearQueuedAudioResume();
-
-          if (!isMediaPlaying || !isAudioEnabled || isExpanded) {
-            return;
-          }
-
-          const resumedVideo = videoRef.current;
-          if (!resumedVideo) {
-            return;
-          }
-
-          try {
-            resumedVideo.muted = false;
-            await resumedVideo.play();
-            fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-          } catch {
-            // Browser blocked playback; user can tap the audio toggle again.
-          }
-        };
-
-        queuedAudioResumeRef.current = resumeOnInteraction;
-        window.addEventListener("pointerdown", resumeOnInteraction, { once: true });
-        window.addEventListener("keydown", resumeOnInteraction, { once: true });
-      }
-    }
-
-    if (isMediaPlaying && isAudioEnabled) {
-      void tryPlayWithAudio();
-    } else {
-      clearQueuedAudioResume();
-      video.muted = true;
-      fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
-    }
-
     return () => {
-      cancelled = true;
-    };
-  }, [clearQueuedAudioResume, fadeVideoVolumeTo, isAudioEnabled, isExpanded, isMediaPlaying]);
-
-  useEffect(() => {
-    return () => {
-      stopVolumeFade();
-      clearQueuedAudioResume();
       clearStallFallbackTimeout();
     };
-  }, [clearQueuedAudioResume, clearStallFallbackTimeout, stopVolumeFade]);
+  }, [clearStallFallbackTimeout]);
 
   function handleExpandedChange(open: boolean) {
     setIsExpanded(open);
@@ -300,19 +169,11 @@ export function MemoriaAfroterritorialHeroVideo({
 
     if (open) {
       video?.pause();
-      clearQueuedAudioResume();
-      fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
       return;
     }
 
-    if (isMediaPlaying) {
-      if (video) {
-        video.muted = !isAudioEnabled;
-        void video.play().catch(() => {});
-        if (isAudioEnabled) {
-          fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-        }
-      }
+    if (isMediaPlaying && video) {
+      void video.play().catch(() => {});
     }
   }
 
@@ -325,6 +186,8 @@ export function MemoriaAfroterritorialHeroVideo({
 
   return (
     <div className="relative overflow-hidden" style={style}>
+      <audio ref={audioRef} src={audioSrc} preload="metadata" className="sr-only" />
+
       <ExpandableVideo
         videoId="memoria-afroterritorial-hero"
         fullSrc={activeVideoSrc}

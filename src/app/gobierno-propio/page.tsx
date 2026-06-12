@@ -6,6 +6,7 @@ import GobiernoPropioGallerySection from "@/components/palenke/GobiernoPropioGal
 import { GobiernoPropioHeroVideo } from "@/components/palenke/GobiernoPropioHeroVideo";
 import { getVisibleGobiernoGalleryMedia } from "@/lib/gobierno-gallery-data";
 import {
+  GOBIERNO_PROPIO_HERO_AUDIO_SRC,
   GOBIERNO_PROPIO_HERO_VIDEO_DURATION,
   GOBIERNO_PROPIO_HERO_VIDEO_SRC,
 } from "@/lib/gobierno-propio-assets";
@@ -106,6 +107,7 @@ export default async function GobiernoPropioPage({
             duration={GOBIERNO_PROPIO_HERO_VIDEO_DURATION}
             tag="Gobierno Propio"
             videoSrc={GOBIERNO_PROPIO_HERO_VIDEO_SRC}
+            audioSrc={GOBIERNO_PROPIO_HERO_AUDIO_SRC}
             style={{ minHeight: 480 }}
           />
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-6 pb-8 pt-20 lg:px-10">

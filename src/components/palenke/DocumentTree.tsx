@@ -317,7 +317,7 @@ function FileCard({
                 Ver documento
               </a>
             ) : null}
-            {doc.action === "file" ? (
+            {doc.action === "file" && !doc.previewHref ? (
               <a
                 href={doc.url}
                 onClick={handleDownload}

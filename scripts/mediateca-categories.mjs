@@ -1,0 +1,33 @@
+export const MEDIATECA_CATEGORIES = [
+  {
+    id: "areas-bioculturales-2024",
+    label: "Áreas bioculturales de conservación",
+    dir: "areas-bioculturales-2024",
+    sourceDir:
+      "CREACION SISTEMA DE AREAS BIOCULTURALES DE CONSERVACION COMUNITARIA 2024 2",
+  },
+  {
+    id: "foro-global-tierra",
+    label: "Foro Global de la Tierra",
+    dir: "foro-global-tierra",
+    sourceDir: "FORO GLOBAL DE LA TIERRA",
+  },
+  {
+    id: "instrumento-gobierno-propio",
+    label: "Instrumento de Gobierno Propio",
+    dir: "instrumento-gobierno-propio",
+    sourceDir: "INSTRUMENTO DE GOBIERNO PROPIO",
+  },
+  {
+    id: "proyectos-productivos-2024",
+    label: "Proyectos Productivos 2024",
+    dir: "proyectos-productivos-2024",
+    sourceDir: "PROYECTOS PRODUCTIVOS 2024",
+  },
+  {
+    id: "taller-genero",
+    label: "Taller de Género",
+    dir: "taller-genero",
+    sourceDir: "TALLER DE GENERO",
+  },
+];

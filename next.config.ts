@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
       "./images/**/*",
       "./DOCUEMNTOS_HONONARIOS/**/*",
       "./public/videos/**/*",
-      "./public/assets/mediateca-ubuntu/**/*",
       "./public/generated/**/*",
       "./**/*.docx",
       "./**/*.mp4",

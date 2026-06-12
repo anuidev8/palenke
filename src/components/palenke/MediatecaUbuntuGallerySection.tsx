@@ -7,7 +7,12 @@ import type {
   PalenkeGalleryMedia,
   PalenkeGalleryMediaKind,
 } from "@/lib/palenke-gallery-media";
-import { MEDIATECA_UBUNTU_CATEGORIES } from "@/lib/mediateca-ubuntu-gallery-data";
+import {
+  FORO_GLOBAL_TIERRA_SUBCATEGORIES,
+  MEDIATECA_UBUNTU_CATEGORIES,
+  type ForoGlobalTierraSubcategoryId,
+  type MediatecaUbuntuCategoryId,
+} from "@/lib/mediateca-ubuntu-gallery-data";
 import { runMediatecaGallerySearch } from "@/lib/ai-search";
 
 const MEDIA_KIND_OPTIONS: Array<{
@@ -28,6 +33,10 @@ export default function MediatecaUbuntuGallerySection({
   items: PalenkeGalleryMedia[];
 }) {
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [categoryId, setCategoryId] = useState<MediatecaUbuntuCategoryId>("todas");
+  const [subcategoryId, setSubcategoryId] = useState<"todas" | ForoGlobalTierraSubcategoryId>(
+    "todas",
+  );
   const [mediaKind, setMediaKind] = useState<"all" | PalenkeGalleryMediaKind>("all");
   const [searchDraft, setSearchDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +47,45 @@ export default function MediatecaUbuntuGallerySection({
     [items, searchQuery],
   );
 
-  const kindBaseItems = searchedItems;
+  const categoryBaseItems = useMemo(() => {
+    if (categoryId === "todas") return searchedItems;
+    return searchedItems.filter((item) => item.categoryId === categoryId);
+  }, [searchedItems, categoryId]);
+
+  const subcategoryBaseItems = useMemo(() => {
+    if (categoryId !== "foro-global-tierra" || subcategoryId === "todas") {
+      return categoryBaseItems;
+    }
+    return categoryBaseItems.filter((item) => item.subcategoryId === subcategoryId);
+  }, [categoryBaseItems, categoryId, subcategoryId]);
+
+  const kindBaseItems = subcategoryBaseItems;
+
+  const subcategoryCounts = useMemo(
+    () =>
+      categoryBaseItems.reduce(
+        (acc, item) => {
+          if (!item.subcategoryId) return acc;
+          acc[item.subcategoryId] = (acc[item.subcategoryId] ?? 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    [categoryBaseItems],
+  );
+
+  const categoryCounts = useMemo(
+    () =>
+      searchedItems.reduce(
+        (acc, item) => {
+          const key = item.categoryId ?? "todas";
+          acc[key] = (acc[key] ?? 0) + 1;
+          return acc;
+        },
+        { todas: searchedItems.length } as Record<string, number>,
+      ),
+    [searchedItems],
+  );
 
   const mediaCounts = useMemo(
     () =>
@@ -66,7 +113,13 @@ export default function MediatecaUbuntuGallerySection({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, mediaKind]);
+  }, [searchQuery, mediaKind, categoryId, subcategoryId]);
+
+  useEffect(() => {
+    if (categoryId !== "foro-global-tierra") {
+      setSubcategoryId("todas");
+    }
+  }, [categoryId]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -99,9 +152,80 @@ export default function MediatecaUbuntuGallerySection({
           </div>
         </div>
 
-        <p className="inline-flex w-fit rounded-full bg-[#2e7d32] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm">
-          {MEDIATECA_UBUNTU_CATEGORIES[0].label}
-        </p>
+        <div className="flex flex-col gap-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5a554d]">
+            Filtrar por categoría
+          </p>
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtrar por categoría">
+            {MEDIATECA_UBUNTU_CATEGORIES.map((option) => {
+              const selected = categoryId === option.id;
+              const count = categoryCounts[option.id] ?? 0;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setCategoryId(option.id)}
+                  className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
+                    selected
+                      ? "bg-[#2e7d32] text-white shadow-sm"
+                      : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
+                  }`}
+                >
+                  {option.label} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {categoryId === "foro-global-tierra" ? (
+          <div className="flex flex-col gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5a554d]">
+              Subcategoría del Foro
+            </p>
+            <div
+              className="flex flex-wrap gap-2"
+              role="tablist"
+              aria-label="Filtrar por subcategoría del Foro Global de la Tierra"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={subcategoryId === "todas"}
+                onClick={() => setSubcategoryId("todas")}
+                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
+                  subcategoryId === "todas"
+                    ? "bg-[#1a1a1a] text-white shadow-sm"
+                    : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
+                }`}
+              >
+                Todas ({categoryBaseItems.length})
+              </button>
+              {FORO_GLOBAL_TIERRA_SUBCATEGORIES.map((option) => {
+                const selected = subcategoryId === option.id;
+                const count = subcategoryCounts[option.id] ?? 0;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={selected}
+                    onClick={() => setSubcategoryId(option.id)}
+                    className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
+                      selected
+                        ? "bg-[#1a1a1a] text-white shadow-sm"
+                        : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
+                    }`}
+                  >
+                    {option.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
 
         <form
           onSubmit={(event) => {
@@ -259,12 +383,14 @@ export default function MediatecaUbuntuGallerySection({
           <p className="mt-2 text-sm leading-6">
             Prueba otra palabra en la búsqueda inteligente o cambia el tipo de medio.
           </p>
-          {searchQuery || mediaKind !== "all" ? (
+          {searchQuery || mediaKind !== "all" || categoryId !== "todas" || subcategoryId !== "todas" ? (
             <button
               type="button"
               onClick={() => {
                 clearSearch();
                 setMediaKind("all");
+                setCategoryId("todas");
+                setSubcategoryId("todas");
               }}
               className="mt-4 inline-flex rounded-full border border-[#d9cfbe] px-4 py-2 text-sm font-semibold text-[#1a1a1a] transition hover:bg-[#f7f3ed]"
             >

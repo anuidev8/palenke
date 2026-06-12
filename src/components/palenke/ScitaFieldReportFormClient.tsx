@@ -32,9 +32,14 @@ export function ScitaFieldReportFormClient({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+
+    if (!(event.currentTarget instanceof HTMLFormElement)) {
+      setError("Formulario inválido");
+      return;
+    }
 
     const formData = new FormData(event.currentTarget);
     const parsed = parseScitaFieldReportFormData(formData);

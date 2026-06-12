@@ -3,35 +3,46 @@
  * Uploads one mediateca-ubuntu category folder to Supabase and merges gallery entries.
  *
  * Usage:
- *   node scripts/upload-mediateca-category.mjs cc-diego-luis-cordoba
+ *   node scripts/upload-mediateca-category.mjs areas-bioculturales-2024 --compress
+ *   node scripts/upload-mediateca-category.mjs areas-bioculturales-2024 --source "/path/to/folder"
+ *   node scripts/upload-mediateca-category.mjs areas-bioculturales-2024 --files IMG_8740.JPG,IMG_8791.JPG
  */
 
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { createClient } from "@supabase/supabase-js";
+import { MEDIATECA_CATEGORIES } from "./mediateca-categories.mjs";
 
-const categoryId = process.argv[2];
+function readArg(flag) {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : null;
+}
+
+const args = process.argv.slice(2).filter((arg, index, argv) => {
+  if (arg.startsWith("--")) return false;
+  const prev = argv[index - 1];
+  return !(prev === "--source" || prev === "--files" || prev === "--desktop");
+});
+
+const compress = process.argv.includes("--compress");
+const categoryId = args[0];
+const sourceArg = readArg("--source");
+const filesArg = readArg("--files");
+const desktopBase = readArg("--desktop") ?? path.join(os.homedir(), "Desktop");
+
 if (!categoryId) {
-  console.error("Usage: node scripts/upload-mediateca-category.mjs <category-id>");
+  console.error(
+    "Usage: node scripts/upload-mediateca-category.mjs <category-id> [--compress] [--source <folder>] [--files a.jpg,b.jpg] [--desktop <base>]",
+  );
   process.exit(1);
 }
 
 const root = process.cwd();
-const syncScript = path.join(root, "scripts", "sync-mediateca-ubuntu-storage.mjs");
 const galleryFile = path.join(root, "src", "lib", "mediateca-ubuntu-gallery-data.ts");
-const assetsDir = path.join(root, "public", "assets", "mediateca-ubuntu", categoryId);
 const BUCKET = "mediateca-ubuntu";
-
-const CATEGORIES = [
-  { id: "all", label: "ALL", dir: "all" },
-  { id: "cc-los-cimarrones", label: "C.C. LOS CIMARRONES", dir: "cc-los-cimarrones" },
-  { id: "cc-capitania", label: "C.C. CAPITANIA", dir: "cc-capitania" },
-  {
-    id: "cc-diego-luis-cordoba",
-    label: "C.C. DIEGO LUIS CORDOBA",
-    dir: "cc-diego-luis-cordoba",
-  },
-];
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const VIDEO_EXT = new Set([".mp4", ".mov", ".webm", ".m4v"]);
@@ -121,10 +132,8 @@ const MONTHS_ES = [
 ];
 
 function categoryPlaceName(id) {
-  if (id === "cc-los-cimarrones") return "C.C. Los Cimarrones";
-  if (id === "cc-capitania") return "C.C. Capitanía";
-  if (id === "cc-diego-luis-cordoba") return "C.C. Diego Luis Córdoba";
-  return "colección general";
+  const category = MEDIATECA_CATEGORIES.find((entry) => entry.id === id);
+  return category?.label ?? "Mediateca Ubuntu";
 }
 
 function titleFromMetadata(filename, categoryId, kind, sequence) {
@@ -163,9 +172,34 @@ function serializeEntry(item) {
   return `  {\n${lines.join("\n")}\n  }`;
 }
 
+const execFileAsync = promisify(execFile);
+
+async function compressImage(filePath) {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "mediateca-"));
+  const outputPath = path.join(tempDir, `compressed${extOf(filePath) || ".jpg"}`);
+
+  await execFileAsync("sips", [
+    "-Z",
+    "1920",
+    filePath,
+    "--out",
+    outputPath,
+    "--setProperty",
+    "format",
+    "jpeg",
+    "--setProperty",
+    "formatOptions",
+    "82",
+  ]);
+
+  const buffer = await fs.readFile(outputPath);
+  await fs.rm(tempDir, { recursive: true, force: true });
+  return buffer;
+}
+
 await loadEnvLocal();
 
-const category = CATEGORIES.find((c) => c.id === categoryId);
+const category = MEDIATECA_CATEGORIES.find((c) => c.id === categoryId);
 if (!category) {
   console.error(`Unknown category: ${categoryId}`);
   process.exit(1);
@@ -182,18 +216,30 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+const assetsDir = sourceArg ?? path.join(desktopBase, category.sourceDir);
+
 let filenames;
 try {
   filenames = (await fs.readdir(assetsDir)).filter((f) => !f.startsWith("."));
 } catch {
-  console.error(`Assets folder not found: ${assetsDir}`);
+  console.error(`Source folder not found: ${assetsDir}`);
   process.exit(1);
 }
 
+const pickedFiles = filesArg
+  ? filesArg
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean)
+  : null;
+
 const mediaFiles = filenames.filter((f) => {
+  if (pickedFiles && !pickedFiles.includes(f)) return false;
   const ext = extOf(f);
   return IMAGE_EXT.has(ext) || VIDEO_EXT.has(ext);
 });
+
+console.log(`Reading from: ${assetsDir}`);
 
 if (mediaFiles.length === 0) {
   console.error(`No images/videos in ${assetsDir}`);
@@ -211,7 +257,8 @@ for (const filename of mediaFiles) {
   sequence += 1;
   const storagePath = `${category.dir}/${filename}`;
   const filePath = path.join(assetsDir, filename);
-  const fileBuffer = await fs.readFile(filePath);
+  const fileBuffer =
+    compress && kind === "image" ? await compressImage(filePath) : await fs.readFile(filePath);
 
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)
@@ -226,7 +273,7 @@ for (const filename of mediaFiles) {
   }
 
   const mediaUrl = publicObjectUrl(supabaseUrl, storagePath);
-  const posterUrl = kind === "video" ? mediaUrl : mediaUrl;
+  const posterUrl = mediaUrl;
 
   newEntries.push({
     id: `mediateca-${category.id}-${slugify(filename)}`,
@@ -261,15 +308,18 @@ for (const entry of newEntries) {
     console.error("Could not find mediatecaUbuntuGalleryMedia in gallery file");
     process.exit(1);
   }
-  const closeIndex = gallerySource.indexOf("\n] as const;", mediaStart);
-  if (closeIndex < 0) {
-    console.error("Could not find gallery array close in gallery file");
+  const openIndex = gallerySource.indexOf("[", mediaStart);
+  const closeIndex = gallerySource.indexOf("] as const;", mediaStart);
+  if (openIndex < 0 || closeIndex < 0) {
+    console.error("Could not find gallery array in gallery file");
     process.exit(1);
   }
+
+  const currentBody = gallerySource.slice(openIndex + 1, closeIndex).trim();
+  const prefix = currentBody.length > 0 ? ",\n" : "\n";
   gallerySource =
-    gallerySource.slice(0, closeIndex) + `,\n${block}` + gallerySource.slice(closeIndex);
+    gallerySource.slice(0, closeIndex) + `${prefix}${block}` + gallerySource.slice(closeIndex);
 }
 
 await fs.writeFile(galleryFile, gallerySource, "utf8");
 console.log(`Merged ${newEntries.length} entries into ${path.relative(root, galleryFile)}`);
-void syncScript;

@@ -11,8 +11,10 @@
  */
 
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { MEDIATECA_CATEGORIES } from "./mediateca-categories.mjs";
 
 const dryRun = process.argv.includes("--dry-run");
 const sourceArgIndex = process.argv.indexOf("--source");
@@ -20,32 +22,11 @@ const customSource =
   sourceArgIndex >= 0 ? process.argv[sourceArgIndex + 1] : null;
 
 const root = process.cwd();
-const assetsRoot =
-  customSource ?? path.join(root, "public", "assets", "mediateca-ubuntu");
+const assetsRoot = customSource ?? path.join(os.homedir(), "Desktop");
 const outFile = path.join(root, "src", "lib", "mediateca-ubuntu-gallery-data.ts");
 const BUCKET = "mediateca-ubuntu";
 
-const CATEGORIES = [
-  { id: "all", label: "ALL", dir: "all", sourceDir: "ALL" },
-  {
-    id: "cc-los-cimarrones",
-    label: "C.C. LOS CIMARRONES",
-    dir: "cc-los-cimarrones",
-    sourceDir: "C.C. LOS CIMARRONES",
-  },
-  {
-    id: "cc-capitania",
-    label: "C.C. CAPITANIA",
-    dir: "cc-capitania",
-    sourceDir: "C.C. CAPITANIA -20260512T195612Z-3-001/C.C. CAPITANIA",
-  },
-  {
-    id: "cc-diego-luis-cordoba",
-    label: "C.C. DIEGO LUIS CORDOBA",
-    dir: "cc-diego-luis-cordoba",
-    sourceDir: "C.C. DIEGO LUIS CORDOBA.-20260512T200501Z-3-001/C.C. DIEGO LUIS CORDOBA",
-  },
-];
+const CATEGORIES = MEDIATECA_CATEGORIES;
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const VIDEO_EXT = new Set([".mp4", ".mov", ".webm", ".m4v"]);
@@ -120,10 +101,8 @@ const MONTHS_ES = [
 ];
 
 function categoryPlaceName(categoryId) {
-  if (categoryId === "cc-los-cimarrones") return "C.C. Los Cimarrones";
-  if (categoryId === "cc-capitania") return "C.C. Capitanía";
-  if (categoryId === "cc-diego-luis-cordoba") return "C.C. Diego Luis Córdoba";
-  return "colección general";
+  const category = MEDIATECA_CATEGORIES.find((entry) => entry.id === categoryId);
+  return category?.label ?? "Mediateca Ubuntu";
 }
 
 function titleFromMetadata(filename, category, kind, sequence) {
@@ -311,6 +290,11 @@ import type { ViewerRole } from "@/lib/mock-data";
 
 export const MEDIATECA_UBUNTU_CATEGORIES = [
   { id: "todas", label: "Todas las categorías" },
+  { id: "areas-bioculturales-2024", label: "Áreas bioculturales de conservación" },
+  { id: "foro-global-tierra", label: "Foro Global de la Tierra" },
+  { id: "instrumento-gobierno-propio", label: "Instrumento de Gobierno Propio" },
+  { id: "proyectos-productivos-2024", label: "Proyectos Productivos 2024" },
+  { id: "taller-genero", label: "Taller de Género" },
 ] as const;
 
 export type MediatecaUbuntuCategoryId = (typeof MEDIATECA_UBUNTU_CATEGORIES)[number]["id"];

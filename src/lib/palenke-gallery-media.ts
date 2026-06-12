@@ -18,4 +18,6 @@ export type PalenkeGalleryMedia = {
   visibility: Visibility;
   /** Optional category slug for client-side filtering (e.g. mediateca folders) */
   categoryId?: string;
+  /** Optional subcategory slug within a parent category (e.g. foro-global-tierra) */
+  subcategoryId?: string;
 };

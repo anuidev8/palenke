@@ -7,6 +7,7 @@ import { withRole } from "@/lib/viewer";
 import type { ViewerRole } from "@/lib/mock-data";
 import { HeroCards } from "@/components/home/HeroCards";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
+import { HERO_AMBIENT_AUDIO_DURATION } from "@/lib/hero-ambient-audio";
 
 const HERO_VIDEO_SRC = "/videos/home-hero-presentacion.mp4";
 const HERO_AUDIO_TARGET_VOLUME = 0.16;
@@ -19,11 +20,20 @@ function clampVolume(value: number) {
 export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const cardVideoRef = useRef<HTMLVideoElement>(null);
   const volumeFadeRafRef = useRef<number | null>(null);
+  const isHeroMediaPlayingRef = useRef(true);
+  const isHeroAudioEnabledRef = useRef(false);
+  const hasScrolledPastHeroTopRef = useRef(false);
+  const isExpandedRef = useRef(false);
 
-  const [hasUserActivatedMedia, setHasUserActivatedMedia] = useState(false);
   const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
   const [isHeroAudioEnabled, setIsHeroAudioEnabled] = useState(false);
   const [hasScrolledPastHeroTop, setHasScrolledPastHeroTop] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  isHeroMediaPlayingRef.current = isHeroMediaPlaying;
+  isHeroAudioEnabledRef.current = isHeroAudioEnabled;
+  hasScrolledPastHeroTopRef.current = hasScrolledPastHeroTop;
+  isExpandedRef.current = isExpanded;
 
   const stopVolumeFade = useCallback(() => {
     if (volumeFadeRafRef.current !== null) {
@@ -69,87 +79,105 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
     [stopVolumeFade],
   );
 
+  const syncVideoPlayback = useCallback(
+    async (fromUserGesture = false) => {
+      const video = cardVideoRef.current;
+      if (!video || isExpandedRef.current) {
+        return;
+      }
+
+      if (!isHeroMediaPlayingRef.current) {
+        video.pause();
+        return;
+      }
+
+      const shouldPlayAudio =
+        isHeroAudioEnabledRef.current && !hasScrolledPastHeroTopRef.current;
+
+      if (shouldPlayAudio && fromUserGesture) {
+        video.muted = false;
+        await video.play().catch(() => {});
+        fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
+        return;
+      }
+
+      stopVolumeFade();
+      video.muted = true;
+      video.volume = 0;
+      await video.play().catch(() => {});
+    },
+    [fadeVideoVolumeTo, stopVolumeFade],
+  );
+
   useEffect(() => {
     const video = cardVideoRef.current;
     if (!video) {
       return;
     }
 
-    video.volume = 0;
     video.muted = true;
-  }, []);
+    video.volume = 0;
+
+    const onReady = () => {
+      void syncVideoPlayback();
+    };
+
+    video.addEventListener("canplay", onReady);
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      void syncVideoPlayback();
+    }
+
+    return () => {
+      video.removeEventListener("canplay", onReady);
+    };
+  }, [syncVideoPlayback]);
+
+  useEffect(() => {
+    void syncVideoPlayback();
+  }, [hasScrolledPastHeroTop, isHeroMediaPlaying, isExpanded, syncVideoPlayback]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    const markUserActivated = () => {
-      setHasUserActivatedMedia(true);
-    };
-
     const updateScrollState = () => {
       setHasScrolledPastHeroTop(window.scrollY > 24);
     };
 
-    window.addEventListener("pointerdown", markUserActivated, { passive: true });
-    window.addEventListener("keydown", markUserActivated);
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
 
     return () => {
-      window.removeEventListener("pointerdown", markUserActivated);
-      window.removeEventListener("keydown", markUserActivated);
       window.removeEventListener("scroll", updateScrollState);
     };
   }, []);
-
-  useEffect(() => {
-    const videos = [cardVideoRef.current].filter(
-      (video): video is HTMLVideoElement => Boolean(video),
-    );
-
-    videos.forEach((video) => {
-      if (isHeroMediaPlaying) {
-        void video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    });
-  }, [isHeroMediaPlaying]);
-
-  useEffect(() => {
-    const video = cardVideoRef.current;
-    if (!video) {
-      return;
-    }
-
-    if (
-      isHeroMediaPlaying &&
-      isHeroAudioEnabled &&
-      !hasScrolledPastHeroTop &&
-      hasUserActivatedMedia
-    ) {
-      video.muted = false;
-      void video.play().catch(() => {});
-      fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-    } else {
-      video.muted = true;
-      fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
-    }
-  }, [
-    fadeVideoVolumeTo,
-    hasUserActivatedMedia,
-    hasScrolledPastHeroTop,
-    isHeroAudioEnabled,
-    isHeroMediaPlaying,
-  ]);
 
   useEffect(() => {
     return () => {
       stopVolumeFade();
     };
   }, [stopVolumeFade]);
+
+  function handleExpandedChange(open: boolean) {
+    isExpandedRef.current = open;
+    setIsExpanded(open);
+    const video = cardVideoRef.current;
+
+    if (open) {
+      video?.pause();
+      return;
+    }
+
+    void syncVideoPlayback();
+  }
+
+  const controlButtonClass = (active: boolean) =>
+    `inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition ${
+      active
+        ? "border-white/35 bg-black/45 text-white hover:bg-black/60"
+        : "border-[#d32f2f]/55 bg-black/45 text-[#ffd5d5] hover:bg-black/60"
+    }`;
 
   return (
     <section className="relative overflow-hidden bg-[#1a2a1a]">
@@ -238,7 +266,14 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-              <ExpandableVideo videoId="hero" fullSrc={HERO_VIDEO_SRC}>
+              <ExpandableVideo
+                videoId="hero"
+                fullSrc={HERO_VIDEO_SRC}
+                expandedMuted={!isHeroAudioEnabled}
+                expandedLoop
+                open={isExpanded}
+                onOpenChange={handleExpandedChange}
+              >
                 <div className="group relative aspect-video overflow-hidden rounded-[28px] border border-white/10 bg-black shadow-2xl shadow-black/50 transition-transform duration-300 hover:scale-[1.02]">
                   <div className="absolute inset-0 overflow-hidden">
                     <video
@@ -247,16 +282,15 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="auto"
+                      src={HERO_VIDEO_SRC}
                       className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.32] object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-100"
-                    >
-                      <source src={HERO_VIDEO_SRC} type="video/mp4" />
-                    </video>
+                    />
                   </div>
 
                   <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/10" />
 
-                  <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#2e7d32] shadow-[0_0_0_8px_rgba(46,125,50,0.25)] transition-transform duration-300 group-hover:scale-110 group-hover:bg-[#1b5e20]">
                       <svg
                         viewBox="0 0 24 24"
@@ -269,8 +303,8 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
                     </div>
                   </div>
 
-                  <div className="absolute bottom-5 left-5 z-10 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md">
-                    Video de presentación
+                  <div className="pointer-events-none absolute bottom-5 left-5 z-10 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md">
+                    Video de presentación · {HERO_AMBIENT_AUDIO_DURATION}
                   </div>
                 </div>
               </ExpandableVideo>
@@ -288,16 +322,14 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
           <button
             type="button"
             onClick={() => {
-              setHasUserActivatedMedia(true);
-              setIsHeroAudioEnabled((prev) => !prev);
+              const next = !isHeroAudioEnabled;
+              isHeroAudioEnabledRef.current = next;
+              setIsHeroAudioEnabled(next);
+              void syncVideoPlayback(true);
             }}
             aria-label={isHeroAudioEnabled ? "Silenciar sonido ambiente" : "Activar sonido ambiente"}
             aria-pressed={isHeroAudioEnabled}
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition ${
-              isHeroAudioEnabled
-                ? "border-white/35 bg-black/45 text-white hover:bg-black/60"
-                : "border-[#d32f2f]/55 bg-black/45 text-[#ffd5d5] hover:bg-black/60"
-            }`}
+            className={controlButtonClass(isHeroAudioEnabled)}
           >
             {isHeroAudioEnabled ? (
               <Volume2 className="h-5 w-5" />
@@ -309,16 +341,14 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
           <button
             type="button"
             onClick={() => {
-              setHasUserActivatedMedia(true);
-              setIsHeroMediaPlaying((prev) => !prev);
+              const next = !isHeroMediaPlaying;
+              isHeroMediaPlayingRef.current = next;
+              setIsHeroMediaPlaying(next);
+              void syncVideoPlayback(true);
             }}
             aria-label={isHeroMediaPlaying ? "Pausar video y sonido" : "Reanudar video y sonido"}
             aria-pressed={isHeroMediaPlaying}
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition ${
-              isHeroMediaPlaying
-                ? "border-white/35 bg-black/45 text-white hover:bg-black/60"
-                : "border-[#d32f2f]/55 bg-black/45 text-[#ffd5d5] hover:bg-black/60"
-            }`}
+            className={controlButtonClass(isHeroMediaPlaying)}
           >
             {isHeroMediaPlaying ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
           </button>

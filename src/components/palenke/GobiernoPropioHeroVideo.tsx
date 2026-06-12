@@ -1,26 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Maximize2, Video, VideoOff, Volume2, VolumeX } from "lucide-react";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
+import { useHeroAmbientAudio } from "@/lib/useHeroAmbientAudio";
 
 const PCN_SOFT_OVERLAY =
   "radial-gradient(ellipse at 18% 82%, rgba(46,125,50,0.38), transparent 58%), radial-gradient(ellipse at 82% 18%, rgba(251,192,45,0.3), transparent 55%), radial-gradient(ellipse at 72% 72%, rgba(211,47,47,0.26), transparent 52%), linear-gradient(165deg, rgba(26,26,26,0.75) 0%, rgba(31,29,27,0.5) 50%, rgba(23,21,19,0.7) 100%)";
 
-const VIDEO_TARGET_VOLUME = 1;
-const AUDIO_FADE_DURATION_MS = 700;
-
-type FadeVideoAudioOptions = {
-  pauseAtEnd?: boolean;
-};
-
-function clampVolume(value: number) {
-  return Math.max(0, Math.min(1, value));
-}
-
 interface GobiernoPropioHeroVideoProps {
   videoSrc: string;
+  audioSrc: string;
   duration?: string;
   tag?: string;
   label?: string;
@@ -29,79 +20,25 @@ interface GobiernoPropioHeroVideoProps {
 
 export function GobiernoPropioHeroVideo({
   videoSrc,
+  audioSrc,
   duration,
   tag = "Gobierno Propio",
   label = "Video de presentación",
   style,
 }: GobiernoPropioHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const volumeFadeRafRef = useRef<number | null>(null);
-  const queuedAudioResumeRef = useRef<(() => void) | null>(null);
 
   const [isMediaPlaying, setIsMediaPlaying] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const stopVolumeFade = useCallback(() => {
-    if (volumeFadeRafRef.current !== null) {
-      cancelAnimationFrame(volumeFadeRafRef.current);
-      volumeFadeRafRef.current = null;
-    }
-  }, []);
-
-  const clearQueuedAudioResume = useCallback(() => {
-    const queuedResume = queuedAudioResumeRef.current;
-    if (!queuedResume || typeof window === "undefined") {
-      return;
-    }
-
-    window.removeEventListener("pointerdown", queuedResume);
-    window.removeEventListener("keydown", queuedResume);
-    queuedAudioResumeRef.current = null;
-  }, []);
-
-  const fadeVideoVolumeTo = useCallback(
-    (target: number, durationMs: number, options?: FadeVideoAudioOptions) => {
-      const video = videoRef.current;
-      if (!video) {
-        return;
-      }
-
-      const safeTarget = clampVolume(target);
-      stopVolumeFade();
-
-      const startVolume = clampVolume(video.volume);
-      if (durationMs <= 0 || Math.abs(startVolume - safeTarget) < 0.005) {
-        video.volume = safeTarget;
-        if (options?.pauseAtEnd && safeTarget === 0) {
-          video.pause();
-        }
-        return;
-      }
-
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        const progress = Math.min(1, (now - startTime) / durationMs);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        video.volume = clampVolume(startVolume + (safeTarget - startVolume) * eased);
-
-        if (progress < 1) {
-          volumeFadeRafRef.current = requestAnimationFrame(step);
-          return;
-        }
-
-        volumeFadeRafRef.current = null;
-        video.volume = safeTarget;
-        if (options?.pauseAtEnd && safeTarget === 0) {
-          video.pause();
-        }
-      };
-
-      volumeFadeRafRef.current = requestAnimationFrame(step);
-    },
-    [stopVolumeFade],
-  );
+  const audioRef = useHeroAmbientAudio({
+    audioSrc,
+    enabled: isAudioEnabled && !isExpanded,
+    paused: !isMediaPlaying,
+    targetVolume: 1,
+    fadeDurationMs: 700,
+  });
 
   useEffect(() => {
     const video = videoRef.current;
@@ -109,8 +46,8 @@ export function GobiernoPropioHeroVideo({
       return;
     }
 
-    video.volume = 0;
     video.muted = true;
+    video.volume = 0;
   }, []);
 
   useEffect(() => {
@@ -126,86 +63,6 @@ export function GobiernoPropioHeroVideo({
     }
   }, [isExpanded, isMediaPlaying]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isExpanded) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function tryPlayWithAudio() {
-      const currentVideo = videoRef.current;
-      if (!currentVideo) {
-        return;
-      }
-
-      try {
-        currentVideo.muted = false;
-        await currentVideo.play();
-
-        if (!cancelled) {
-          fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-        }
-      } catch {
-        if (
-          cancelled ||
-          typeof window === "undefined" ||
-          queuedAudioResumeRef.current !== null ||
-          !isMediaPlaying ||
-          !isAudioEnabled
-        ) {
-          return;
-        }
-
-        const resumeOnInteraction = async () => {
-          clearQueuedAudioResume();
-
-          if (!isMediaPlaying || !isAudioEnabled || isExpanded) {
-            return;
-          }
-
-          const resumedVideo = videoRef.current;
-          if (!resumedVideo) {
-            return;
-          }
-
-          try {
-            resumedVideo.muted = false;
-            await resumedVideo.play();
-            fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-          } catch {
-            // Browser blocked playback; user can tap audio toggle again.
-          }
-        };
-
-        queuedAudioResumeRef.current = resumeOnInteraction;
-        window.addEventListener("pointerdown", resumeOnInteraction, { once: true });
-        window.addEventListener("keydown", resumeOnInteraction, { once: true });
-      }
-    }
-
-    if (isMediaPlaying && isAudioEnabled) {
-      video.muted = true;
-      void tryPlayWithAudio();
-    } else {
-      clearQueuedAudioResume();
-      video.muted = true;
-      fadeVideoVolumeTo(0, AUDIO_FADE_DURATION_MS);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [clearQueuedAudioResume, fadeVideoVolumeTo, isAudioEnabled, isExpanded, isMediaPlaying]);
-
-  useEffect(() => {
-    return () => {
-      stopVolumeFade();
-      clearQueuedAudioResume();
-    };
-  }, [clearQueuedAudioResume, stopVolumeFade]);
-
   function handleExpandedChange(open: boolean) {
     setIsExpanded(open);
     const video = videoRef.current;
@@ -219,11 +76,7 @@ export function GobiernoPropioHeroVideo({
     }
 
     if (isMediaPlaying) {
-      video.muted = !isAudioEnabled;
       void video.play().catch(() => {});
-      if (isAudioEnabled) {
-        fadeVideoVolumeTo(VIDEO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-      }
     }
   }
 
@@ -236,6 +89,8 @@ export function GobiernoPropioHeroVideo({
 
   return (
     <div className="relative overflow-hidden" style={style}>
+      <audio ref={audioRef} src={audioSrc} preload="metadata" className="sr-only" />
+
       <ExpandableVideo
         videoId="gobierno-propio-hero"
         fullSrc={videoSrc}
@@ -318,18 +173,18 @@ export function GobiernoPropioHeroVideo({
           <Maximize2 className="h-5 w-5" aria-hidden="true" />
         </button>
 
-      {/*   <button
+        <button
           type="button"
           onClick={(event) => {
             event.stopPropagation();
             setIsAudioEnabled((prev) => !prev);
           }}
-          aria-label={isAudioEnabled ? "Silenciar audio del video" : "Activar audio del video"}
+          aria-label={isAudioEnabled ? "Silenciar sonido ambiente" : "Activar sonido ambiente"}
           aria-pressed={isAudioEnabled}
           className={controlButtonClass(isAudioEnabled)}
         >
           {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-        </button> */}
+        </button>
 
         <button
           type="button"
@@ -337,7 +192,7 @@ export function GobiernoPropioHeroVideo({
             event.stopPropagation();
             setIsMediaPlaying((prev) => !prev);
           }}
-          aria-label={isMediaPlaying ? "Pausar video" : "Reanudar video"}
+          aria-label={isMediaPlaying ? "Pausar video y sonido" : "Reanudar video y sonido"}
           aria-pressed={isMediaPlaying}
           className={controlButtonClass(isMediaPlaying)}
         >
