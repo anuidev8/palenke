@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Callout, SiteLayout } from "@/components/mock/ui";
 import { hasSupabasePublicConfig } from "@/lib/config";
-import { getViewerRoleFromRequest } from "@/lib/viewer-server";
-import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
+import { getViewerRequestState } from "@/lib/viewer-server";
+import { getFirstParam, isInternal, type SearchParams, withRole } from "@/lib/viewer";
 
 export default async function LoginPage({
   searchParams,
@@ -11,11 +12,17 @@ export default async function LoginPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const role = await getViewerRoleFromRequest(params);
+  const sessionState = await getViewerRequestState(params);
+  const role = sessionState.role;
   const state = getFirstParam(params.state);
   const redirectTo = getFirstParam(params.redirect) ?? "/studio";
   const message = getFirstParam(params.message);
   const supabaseReady = hasSupabasePublicConfig();
+
+  if (sessionState.isAuthenticated) {
+    const destination = isInternal(role) ? redirectTo : "/";
+    redirect(withRole(destination, role));
+  }
 
   const contextualMessage =
     message === "geoportal"

@@ -6,8 +6,7 @@ import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Image from "next/image";
 import { ExpandableVideo } from "./ExpandableVideo";
 
-const ORIENTACION_VIDEO =
-  "/generated/admin/inicio-institucional-home-hero-1774051114373-video.mp4";
+const ORIENTACION_VIDEO = "/videos/events-slideshow.mp4";
 
 const videos = [
   {

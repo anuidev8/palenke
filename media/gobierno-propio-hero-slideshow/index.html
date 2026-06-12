@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Gobierno Propio Hero Slideshow</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #1a2a1a;
+      }
+
+      [data-composition-id="gobierno-propio-hero"] {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #1a2a1a;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      .slide img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform-origin: center center;
+        will-change: transform;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="gobierno-propio-hero"
+      data-composition-id="gobierno-propio-hero"
+      data-start="0"
+      data-duration="12"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="slide"><img src="assets/slide-01.jpeg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-02.jpeg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-03.jpeg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-04.jpeg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-05.jpg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-06.jpg" alt="" /></div>
+      <div class="slide"><img src="assets/slide-07.jpg" alt="" /></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+
+      const DURATION = 12;
+      const FADE = 0.4;
+      const slides = gsap.utils.toArray(".slide");
+      const slideDuration = (DURATION + (slides.length - 1) * FADE) / slides.length;
+      const tl = gsap.timeline({ paused: true });
+
+      slides.forEach((slide, index) => {
+        const img = slide.querySelector("img");
+        const start = index * (slideDuration - FADE);
+        const zoomIn = index % 2 === 0;
+        const fromScale = zoomIn ? 1 : 1.1;
+        const toScale = zoomIn ? 1.1 : 1;
+
+        tl.fromTo(slide, { opacity: 0 }, { opacity: 1, duration: FADE, ease: "power2.out" }, start);
+        tl.fromTo(img, { scale: fromScale }, { scale: toScale, duration: slideDuration, ease: "none" }, start);
+
+        if (index < slides.length - 1) {
+          tl.to(slide, { opacity: 0, duration: FADE, ease: "power2.in" }, start + slideDuration - FADE);
+        }
+      });
+
+      window.__timelines["gobierno-propio-hero"] = tl;
+    </script>
+  </body>
+</html>

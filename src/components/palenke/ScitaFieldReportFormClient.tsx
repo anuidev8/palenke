@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ScitaFieldReportForm } from "@/components/palenke/ScitaFieldReportForm";
 import { normalizeViewerRole } from "@/lib/auth/permissions";
+import { appendScitaEvidenceFields, uploadScitaEvidenceDirect } from "@/lib/scita-evidence-client";
 import { parseScitaFieldReportFormData } from "@/lib/scita-report-form";
 import { appendClientScitaReport } from "@/lib/scita-reports-client-storage";
 import { withRole } from "@/lib/viewer";
@@ -47,7 +48,24 @@ export function ScitaFieldReportFormClient({
     if (persistMode === "live" && submitAction) {
       startTransition(async () => {
         try {
-          await submitAction(formData);
+          let submitFormData = formData;
+
+          if (
+            parsed.data.evidenceFile &&
+            (parsed.data.formato === "imagen" || parsed.data.formato === "voz")
+          ) {
+            const uploaded = await uploadScitaEvidenceDirect(
+              parsed.data.evidenceFile,
+              parsed.data.formato,
+            );
+            submitFormData = appendScitaEvidenceFields(
+              new FormData(event.currentTarget),
+              uploaded.reportId,
+              uploaded.evidence,
+            );
+          }
+
+          await submitAction(submitFormData);
         } catch (err) {
           console.error("SCITA report server action failed:", err);
           setError(

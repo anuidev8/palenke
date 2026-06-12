@@ -6,6 +6,11 @@ export type ScitaReport = {
   nombre?: string | null;
   contacto?: string | null;
   tablero_origen?: string | null;
+  evidence_bucket?: string | null;
+  evidence_path?: string | null;
+  evidence_mime_type?: string | null;
+  evidence_size_bytes?: number | null;
+  evidence_original_name?: string | null;
   created_at: string;
 };
 

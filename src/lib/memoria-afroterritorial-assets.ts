@@ -4,6 +4,6 @@ export const MEMORIA_NUESTRA_MEMORIA_IMAGE_URL =
 
 /** Hero presentation video for /memoria-afroterritorial. */
 export const MEMORIA_AFROTERRITORIAL_HERO_VIDEO_SRC =
-  "/videos/memoria-afroterritorial-presentacion-hero.mp4";
+  "/videos/events-slideshow.mp4";
 
-export const MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION = "0:45";
+export const MEMORIA_AFROTERRITORIAL_HERO_VIDEO_DURATION = "0:12";

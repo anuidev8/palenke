@@ -33,25 +33,25 @@ export function HeroCards({
       title: "Memoria Afroterritorial",
       desc: "Archivo histórico y cultural comunitario.",
       href: "/memoria-afroterritorial",
-      image: "/assets/hero-cards/memoria-afroterritorial.png",
+      image: "/assets/hero-cards/memoria-afroterritorial.jpg",
     },
     {
       title: "Gobierno Propio",
       desc: "Instrumentos de protección y autonomía.",
       href: "/gobierno-propio",
-      image: "/assets/hero-cards/gobierno-propio.png",
+      image: "/assets/hero-cards/gobierno-propio.jpg",
     },
     {
       title: "SCITA",
       desc: "Sistema Comunitario de Información Territorial y Ambiental.",
       href: "/scita",
-      image: "/assets/hero-cards/scita.png",
+      image: "/assets/hero-cards/scita.jpg",
     },
     {
       title: "Incidencia",
       desc: "Pronunciamientos, agenda y memoria viva del territorio.",
       href: "/incidencia",
-      image: "/assets/hero-cards/incidencia.png",
+      image: "/assets/hero-cards/incidencia.jpg",
     },
   ];
 
@@ -73,9 +73,10 @@ export function HeroCards({
               alt={card.title}
               fill
               sizes="(min-width: 1280px) 24vw, (min-width: 1024px) 23vw, 48vw"
-              className="absolute inset-0 h-full w-full object-cover opacity-40 transition-all duration-500 group-hover:scale-105 group-hover:opacity-70"
+              className="absolute inset-0 h-full w-full object-cover opacity-50 transition-all duration-500 group-hover:scale-105 group-hover:opacity-65"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-60" />
+            <div className="absolute inset-0 bg-black/35 transition-opacity duration-300 group-hover:bg-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/75 to-black/25 opacity-95 transition-opacity duration-300 group-hover:opacity-70" />
 
             <div className="relative z-10 translate-y-2 transition-transform duration-300 group-hover:translate-y-0 sm:translate-y-4">
               <h3 className="font-display text-base text-white sm:text-2xl">{card.title}</h3>

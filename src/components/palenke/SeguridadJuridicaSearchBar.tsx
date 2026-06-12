@@ -3,14 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Filter, Search, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, ChevronDown, Filter, Search, X } from "lucide-react";
 import type { ViewerRole } from "@/lib/mock-data";
 import { withRole } from "@/lib/viewer";
 import {
-  SEGURIDAD_JURIDICA_FEATURED_KEYWORDS,
   getDocumentTypeFilterLabel,
   type SeguridadJuridicaFacetOptions,
   type SeguridadJuridicaFilters,
+  type SeguridadJuridicaFrequentTopic,
 } from "@/lib/seguridad-juridica-filters";
 
 type SeguridadJuridicaSearchBarProps = {
@@ -20,6 +21,7 @@ type SeguridadJuridicaSearchBarProps = {
   accentColor: string;
   filters: SeguridadJuridicaFilters;
   facets: SeguridadJuridicaFacetOptions;
+  frequentTopics: SeguridadJuridicaFrequentTopic[];
 };
 
 export function SeguridadJuridicaSearchBar({
@@ -29,6 +31,7 @@ export function SeguridadJuridicaSearchBar({
   accentColor,
   filters,
   facets,
+  frequentTopics,
 }: SeguridadJuridicaSearchBarProps) {
   const router = useRouter();
   const [draftQuery, setDraftQuery] = useState(filters.query);
@@ -38,6 +41,7 @@ export function SeguridadJuridicaSearchBar({
   const [draftCouncil, setDraftCouncil] = useState(filters.council);
   const [draftType, setDraftType] = useState(filters.documentType);
   const [draftTheme, setDraftTheme] = useState(filters.theme);
+  const [topicsExpanded, setTopicsExpanded] = useState(false);
 
   useEffect(() => {
     setDraftQuery(filters.query);
@@ -55,13 +59,50 @@ export function SeguridadJuridicaSearchBar({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [mobileDrawerOpen]);
 
+  const themeTopics = useMemo(
+    () => frequentTopics.filter((topic) => topic.kind === "theme"),
+    [frequentTopics],
+  );
+  const contentTopics = useMemo(
+    () => frequentTopics.filter((topic) => topic.kind === "topic"),
+    [frequentTopics],
+  );
+  const suggestionLabels = useMemo(
+    () => frequentTopics.map((topic) => topic.label),
+    [frequentTopics],
+  );
+
   const suggestions = useMemo(() => {
     const query = draftQuery.trim().toLowerCase();
     if (query.length < 2) return [];
-    return SEGURIDAD_JURIDICA_FEATURED_KEYWORDS.filter((keyword) =>
-      keyword.toLowerCase().includes(query),
-    ).slice(0, 6);
-  }, [draftQuery]);
+    return suggestionLabels.filter((keyword) => keyword.toLowerCase().includes(query)).slice(0, 6);
+  }, [draftQuery, suggestionLabels]);
+
+  function isTopicSelected(topic: SeguridadJuridicaFrequentTopic) {
+    if (topic.kind === "theme") {
+      return filters.theme === topic.label;
+    }
+    return filters.query.toLowerCase() === topic.label.toLowerCase();
+  }
+
+  function toggleTopic(topic: SeguridadJuridicaFrequentTopic) {
+    if (topic.kind === "theme") {
+      applyFilters({ theme: filters.theme === topic.label ? "" : topic.label });
+      return;
+    }
+
+    const isSelected = filters.query.toLowerCase() === topic.label.toLowerCase();
+    applyFilters({ query: isSelected ? "" : topic.label });
+  }
+
+  const activeTopicLabel = useMemo(() => {
+    if (filters.theme) return filters.theme;
+    const matchedTopic = frequentTopics.find(
+      (topic) =>
+        topic.kind === "topic" && filters.query.toLowerCase() === topic.label.toLowerCase(),
+    );
+    return matchedTopic?.label ?? null;
+  }, [filters.query, filters.theme, frequentTopics]);
 
   const activeFiltersCount = [
     Boolean(filters.year),
@@ -265,36 +306,90 @@ export function SeguridadJuridicaSearchBar({
         ) : null}
       </div>
 
-      <div className="space-y-3">
-        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#7a756e]">
-          Temas frecuentes
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {SEGURIDAD_JURIDICA_FEATURED_KEYWORDS.map((keyword) => {
-            const isSelected = filters.query.toLowerCase() === keyword.toLowerCase();
-            return (
-              <button
-                key={keyword}
-                type="button"
-                onClick={() => applyFilters({ query: isSelected ? "" : keyword })}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition active:scale-95 ${
-                  isSelected
-                    ? "border-transparent text-white shadow-sm"
-                    : "border-[#e8dfd3] bg-[#fcfaf7] text-[#4a4540] hover:border-[#d1ccc5] hover:bg-[#f4f1ec]"
-                }`}
-                style={
-                  isSelected
-                    ? { backgroundColor: accentColor, borderColor: accentColor }
-                    : undefined
-                }
+      {frequentTopics.length > 0 ? (
+        <section className="overflow-hidden rounded-[24px] border border-[#ebe4da] bg-white/80">
+          <button
+            type="button"
+            onClick={() => setTopicsExpanded((open) => !open)}
+            className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition hover:bg-[#faf8f5] sm:px-5"
+            aria-expanded={topicsExpanded}
+            aria-controls="sj-frequent-topics-panel"
+          >
+            <div className="min-w-0 space-y-0.5">
+              <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-[#7a756e]">
+                Temas frecuentes
+              </h3>
+              <p className="truncate text-sm text-[#6a625a]">
+                {activeTopicLabel
+                  ? `Filtro activo: ${activeTopicLabel}`
+                  : `${frequentTopics.length} temas del repositorio documental`}
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2">
+              {!topicsExpanded && activeTopicLabel ? (
+                <span
+                  className="hidden rounded-full px-2.5 py-1 text-[11px] font-semibold text-white sm:inline-flex"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  {activeTopicLabel}
+                </span>
+              ) : null}
+              <motion.span
+                animate={{ rotate: topicsExpanded ? 180 : 0 }}
+                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                className="inline-flex"
               >
-                {isSelected ? <Check className="h-3 w-3 shrink-0" /> : null}
-                <span>{keyword}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                <ChevronDown className="h-4 w-4 text-[#7a756e]" aria-hidden="true" />
+              </motion.span>
+            </span>
+          </button>
+
+          <AnimatePresence initial={false}>
+            {topicsExpanded ? (
+              <motion.div
+                id="sj-frequent-topics-panel"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                className="overflow-hidden border-t border-[#ebe4da]"
+              >
+                <motion.div
+                  initial={{ y: -8 }}
+                  animate={{ y: 0 }}
+                  exit={{ y: -8 }}
+                  transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                  className="space-y-4 px-4 pb-4 pt-4 sm:px-5 sm:pb-5"
+                >
+                  <p className="text-sm text-[#6a625a]">
+                    Extraídos de los temas abordados en el repositorio documental.
+                  </p>
+
+                  {themeTopics.length > 0 ? (
+                    <TopicGroup
+                      label="Áreas temáticas"
+                      topics={themeTopics}
+                      accentColor={accentColor}
+                      isSelected={isTopicSelected}
+                      onToggle={toggleTopic}
+                    />
+                  ) : null}
+
+                  {contentTopics.length > 0 ? (
+                    <TopicGroup
+                      label="Temas abordados"
+                      topics={contentTopics}
+                      accentColor={accentColor}
+                      isSelected={isTopicSelected}
+                      onToggle={toggleTopic}
+                    />
+                  ) : null}
+                </motion.div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </section>
+      ) : null}
 
       {mobileDrawerOpen ? (
         <div
@@ -411,6 +506,58 @@ export function SeguridadJuridicaSearchBar({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function TopicGroup({
+  label,
+  topics,
+  accentColor,
+  isSelected,
+  onToggle,
+}: {
+  label: string;
+  topics: SeguridadJuridicaFrequentTopic[];
+  accentColor: string;
+  isSelected: (topic: SeguridadJuridicaFrequentTopic) => boolean;
+  onToggle: (topic: SeguridadJuridicaFrequentTopic) => void;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8a8074]">{label}</p>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {topics.map((topic) => {
+          const selected = isSelected(topic);
+          return (
+            <button
+              key={`${topic.kind}-${topic.label}`}
+              type="button"
+              onClick={() => onToggle(topic)}
+              className={`inline-flex min-h-11 items-center justify-between gap-3 rounded-[18px] border px-3.5 py-2.5 text-left text-sm font-medium transition active:scale-[0.99] ${
+                selected
+                  ? "border-transparent text-white shadow-sm"
+                  : "border-[#e8dfd3] bg-[#fcfaf7] text-[#4a4540] hover:border-[#d1ccc5] hover:bg-[#f4f1ec]"
+              }`}
+              style={
+                selected ? { backgroundColor: accentColor, borderColor: accentColor } : undefined
+              }
+            >
+              <span className="inline-flex min-w-0 items-center gap-2">
+                {selected ? <Check className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> : null}
+                <span className="truncate">{topic.label}</span>
+              </span>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${
+                  selected ? "bg-white/20 text-white" : "bg-[#efe8de] text-[#6a625a]"
+                }`}
+              >
+                {topic.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

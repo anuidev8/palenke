@@ -10,6 +10,8 @@
     "generate:hero-posters": "node scripts/generate-hero-card-posters.mjs",
     "generate:hero-poster": "node scripts/generate-hero-card-posters.mjs",
     "generate:home-hero-video": "node scripts/generate-home-hero-video.mjs",
+    "generate:gobierno-propio-hero-video": "node scripts/generate-slideshow-video.mjs --source \"/Users/usuario/Desktop/images/video2\" --output public/videos/gobierno-propio-hero-presentacion-ffmpeg.mp4 --duration 12 --assets-dir public/assets/gobierno-propio-hero-slider --assets-prefix gobierno",
+    "render:gobierno-propio-hero-video": "cd media/gobierno-propio-hero-slideshow && npx hyperframes render --quality high --output ../../public/videos/gobierno-propio-hero-presentacion.mp4",
     "sync:plan-instrumentos-storage": "node scripts/upload-plan-instrumentos-storage.mjs",
     "sync:plan-instrumentos-storage:dry": "node scripts/upload-plan-instrumentos-storage.mjs --dry-run",
     "sync:plan-instrumentos-storage:verify": "node scripts/upload-plan-instrumentos-storage.mjs --verify",

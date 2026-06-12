@@ -125,14 +125,88 @@ export function hasActiveSeguridadJuridicaFilters(filters: SeguridadJuridicaFilt
   );
 }
 
-export const SEGURIDAD_JURIDICA_FEATURED_KEYWORDS = [
-  "Titulación",
-  "Fortalecimiento",
-  "Protección",
-  "Género",
-  "Consejo Comunitario",
-  "Diplomado",
-  "territorio ancestral",
-  "SIG",
-  "ciénaga",
-] as const;
+export type SeguridadJuridicaFrequentTopic = {
+  label: string;
+  count: number;
+  kind: "theme" | "topic";
+};
+
+type TopicPattern = {
+  label: string;
+  patterns: RegExp[];
+};
+
+const SEGURIDAD_JURIDICA_TOPIC_PATTERNS: TopicPattern[] = [
+  { label: "Territorio ancestral", patterns: [/territorio ancestral/i] },
+  { label: "Minería", patterns: [/miner[ií]a/i] },
+  { label: "Ciénaga de La Zapatosa", patterns: [/ci[eé]naga/i, /zapatosa/i] },
+  { label: "SIG", patterns: [/\bSIG\b/] },
+  {
+    label: "Soberanía alimentaria",
+    patterns: [/soberan[ií]a alimentaria/i, /seguridad y soberan[ií]a alimentaria/i, /seguridad alimentaria/i],
+  },
+  { label: "Resguardos indígenas", patterns: [/resguardos ind[ií]genas/i] },
+  { label: "Planificación territorial", patterns: [/planificaci[oó]n territorial/i] },
+  { label: "Actividades extractivas", patterns: [/extractivas/i] },
+  { label: "Producción agrícola", patterns: [/producci[oó]n agr[ií]cola/i] },
+  { label: "Población afropesquera", patterns: [/afropesquera/i] },
+  { label: "Información propia", patterns: [/informaci[oó]n propia/i] },
+  { label: "Centros poblados", patterns: [/centros poblados/i] },
+  { label: "Derechos colectivos", patterns: [/derechos colectivos/i] },
+  {
+    label: "Relaciones de género",
+    patterns: [/relaciones de g[eé]nero/i, /diferencias construidas/i],
+  },
+  { label: "Titulación colectiva", patterns: [/titulaci[oó]n colectiva/i] },
+  { label: "Conflictos socioterritoriales", patterns: [/conflictos socioterritoriales/i] },
+  { label: "Cosmovisión del territorio", patterns: [/cosmovisi[oó]n/i] },
+];
+
+function getDocumentTopicText(doc: SeguridadJuridicaFilterableDoc) {
+  const subtheme = doc.subtheme?.split("/")[0]?.trim() ?? "";
+  return [doc.title, subtheme].filter(Boolean).join(" ");
+}
+
+function countByLabel(
+  docs: SeguridadJuridicaFilterableDoc[],
+  getLabels: (doc: SeguridadJuridicaFilterableDoc) => string[],
+) {
+  const counts = new Map<string, number>();
+
+  for (const doc of docs) {
+    const labels = new Set(getLabels(doc));
+    for (const label of labels) {
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+  }
+
+  return counts;
+}
+
+export function getSeguridadJuridicaFrequentTopics(
+  docs: SeguridadJuridicaFilterableDoc[],
+): SeguridadJuridicaFrequentTopic[] {
+  const themeCounts = countByLabel(docs, (doc) => (doc.theme ? [doc.theme] : []));
+  const topicCounts = countByLabel(docs, (doc) => {
+    const text = getDocumentTopicText(doc);
+    return SEGURIDAD_JURIDICA_TOPIC_PATTERNS.filter(({ patterns }) =>
+      patterns.some((pattern) => pattern.test(text)),
+    ).map(({ label }) => label);
+  });
+
+  const themes: SeguridadJuridicaFrequentTopic[] = [...themeCounts.entries()]
+    .map(([label, count]) => ({ label, count, kind: "theme" as const }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "es"));
+
+  const topics: SeguridadJuridicaFrequentTopic[] = [...topicCounts.entries()]
+    .map(([label, count]) => ({ label, count, kind: "topic" as const }))
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "es"));
+
+  return [...themes, ...topics];
+}
+
+export function getSeguridadJuridicaFrequentTopicLabels(
+  topics: SeguridadJuridicaFrequentTopic[],
+) {
+  return topics.map((topic) => topic.label);
+}

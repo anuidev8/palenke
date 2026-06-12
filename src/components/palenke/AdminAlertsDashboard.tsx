@@ -23,6 +23,7 @@ import {
 import type { ScitaReport } from "@/lib/mock-reports-store";
 import { loadClientScitaReports, mergeScitaReports } from "@/lib/scita-reports-client-storage";
 import { AdminAlertsCharts } from "@/components/palenke/AdminAlertsCharts";
+import { ScitaReportEvidencePreview } from "@/components/palenke/ScitaReportEvidencePreview";
 
 // Map categories to labels, colors, and icons
 const CATEGORIES = {
@@ -36,7 +37,7 @@ const CATEGORIES = {
 // Map formats to labels and icons
 const FORMATS = {
   texto: { label: "Texto escrito", icon: FileText, color: "#455a64" },
-  imagen: { label: "Imagen / Video", icon: FileImage, color: "#7b1fa2" },
+  imagen: { label: "Imagen", icon: FileImage, color: "#7b1fa2" },
   voz: { label: "Nota de voz", icon: Mic, color: "#e65100" },
 } as const;
 
@@ -556,6 +557,8 @@ export function AdminAlertsDashboard({
                   {selectedReport.descripcion}
                 </div>
               </div>
+
+              <ScitaReportEvidencePreview report={selectedReport} />
 
               {/* Grid Metadata */}
               <div className="grid grid-cols-2 gap-4">

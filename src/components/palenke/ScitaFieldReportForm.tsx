@@ -1,20 +1,8 @@
 import Link from "next/link";
-import { AlertTriangle, Droplets, FileImage, HelpCircle, LayoutDashboard, MessageSquare, Mic, TreePine, Waves, X, Zap } from "lucide-react";
+import { AlertTriangle, LayoutDashboard, X } from "lucide-react";
+import { ScitaReportCategorySection } from "@/components/palenke/ScitaReportCategorySection";
+import { ScitaReportMediaSection } from "@/components/palenke/ScitaReportMediaSection";
 import { normalizeScitaBoardOrigin, SCITA_BOARD_OPTIONS } from "@/lib/scita-report-form";
-
-const categories = [
-  { id: "hidrica", label: "Amenaza hídrica", sublabel: "Ríos, cuencas, contaminación", icon: Droplets, color: "#1565c0", bg: "#e3f2fd", border: "#1565c0" },
-  { id: "deforestacion", label: "Deforestación", sublabel: "Tala, quema, pérdida de bosque", icon: TreePine, color: "#2e7d32", bg: "#d8f3dc", border: "#2e7d32" },
-  { id: "mineria", label: "Minería ilegal", sublabel: "Retroexcavadoras, dragas, mercurio", icon: Zap, color: "#d32f2f", bg: "#fddede", border: "#d32f2f" },
-  { id: "fauna", label: "Fauna y flora", sublabel: "Caza ilegal, especies en riesgo", icon: Waves, color: "#2e7d32", bg: "#c8e6c9", border: "#388e3c" },
-  { id: "otro", label: "Otro", sublabel: "Amenaza no listada", icon: HelpCircle, color: "#7a756e", bg: "#f0eae0", border: "#bab4ac" },
-] as const;
-
-const mediaTypes = [
-  { id: "texto", label: "Texto", sublabel: "Escribe tu reporte", icon: MessageSquare },
-  { id: "imagen", label: "Imagen / Video", sublabel: "Adjunta una foto o video", icon: FileImage },
-  { id: "voz", label: "Nota de voz", sublabel: "Graba un mensaje de audio", icon: Mic },
-] as const;
 
 type ScitaFieldReportFormProps = {
   formAction?: any;
@@ -88,91 +76,14 @@ export function ScitaFieldReportForm({
         <p className="eyebrow mb-1">Paso 1</p>
         <h2 className="font-display text-xl text-[#1a1a1a]">¿Qué tipo de amenaza observaste?</h2>
         <p className="mt-1 text-sm text-[#7a756e]">Selecciona la categoría que mejor describe lo que viste.</p>
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <label key={cat.id} className="relative cursor-pointer">
-                <input type="radio" name="categoria" value={cat.id} defaultChecked={isSelected} className="peer sr-only" required />
-                <div
-                  className="flex flex-col gap-2 rounded-[20px] border-2 p-4 transition peer-checked:shadow-md"
-                  style={{ borderColor: isSelected ? cat.border : "#e8dfd3", background: isSelected ? cat.bg : "white" }}
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: cat.bg }}>
-                    <Icon className="h-5 w-5" style={{ color: cat.color }} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1a1a1a]">{cat.label}</p>
-                    <p className="mt-0.5 text-[11px] leading-4 text-[#7a756e]">{cat.sublabel}</p>
-                  </div>
-                </div>
-              </label>
-            );
-          })}
-        </div>
+        <ScitaReportCategorySection initialCategory={selectedCategory} />
       </div>
 
       <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">
         <p className="eyebrow mb-1">Paso 2</p>
         <h2 className="font-display text-xl text-[#1a1a1a]">¿Cómo quieres enviar la información?</h2>
         <p className="mt-1 text-sm text-[#7a756e]">Elige el formato que más te resulte fácil desde el campo.</p>
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          {mediaTypes.map((mt) => {
-            const Icon = mt.icon;
-            const isSelected = selectedMedia === mt.id;
-            return (
-              <label key={mt.id} className="flex-1 cursor-pointer">
-                <input type="radio" name="media" value={mt.id} defaultChecked={isSelected} className="peer sr-only" required />
-                <div
-                  className="flex items-center gap-3 rounded-[20px] border-2 p-4 transition peer-checked:border-[#2e7d32] peer-checked:bg-[#d8f3dc] peer-checked:shadow-sm"
-                  style={{ borderColor: isSelected ? "#2e7d32" : "#e8dfd3" }}
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f0eae0]">
-                    <Icon className="h-5 w-5 text-[#1a1a1a]" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1a1a1a]">{mt.label}</p>
-                    <p className="text-[11px] text-[#7a756e]">{mt.sublabel}</p>
-                  </div>
-                </div>
-              </label>
-            );
-          })}
-        </div>
-
-        <div className="mt-5">
-          <textarea
-            name="descripcion"
-            rows={4}
-            required
-            placeholder="Cuéntanos qué está pasando… (ej: 'La quebrada lleva semanas con agua oscura y con olor raro')"
-            className="w-full resize-vertical rounded-[14px] border border-[#e8dfd3] px-4 py-3 text-sm text-[#1a1a1a] placeholder:text-[#bab4ac] focus:border-[#2e7d32] focus:outline-none focus:ring-2 focus:ring-[#2e7d32]/20"
-          />
-          <div className="mt-3 flex items-center gap-3 rounded-[14px] border-2 border-dashed border-[#e8dfd3] px-5 py-5 text-center">
-            <FileImage className="h-8 w-8 shrink-0 text-[#bab4ac]" aria-hidden="true" />
-            <div className="text-left">
-              <p className="text-sm font-semibold text-[#4a4540]">Adjuntar imagen o video</p>
-              <p className="mt-0.5 text-xs text-[#7a756e]">JPG, PNG, MP4 — máx. 20 MB</p>
-            </div>
-            <input type="file" name="archivo" accept="image/*,video/*" className="sr-only" id="archivo" />
-            <label htmlFor="archivo" className="ml-auto cursor-pointer rounded-full border border-[#e8dfd3] bg-white px-4 py-2 text-xs font-semibold text-[#4a4540] transition hover:bg-[#f0eae0]">
-              Seleccionar
-            </label>
-          </div>
-          <div className="mt-3 flex items-center gap-3 rounded-[14px] border border-[#e8dfd3] bg-[#f8f5f2] px-5 py-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#d32f2f]">
-              <Mic className="h-5 w-5 text-white" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-[#1a1a1a]">Nota de voz</p>
-              <p className="text-xs text-[#7a756e]">Presiona para grabar desde tu dispositivo</p>
-            </div>
-            <button type="button" className="rounded-full bg-[#d32f2f] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#b71c1c]">
-              Grabar
-            </button>
-          </div>
-        </div>
+        <ScitaReportMediaSection initialMedia={selectedMedia} />
       </div>
 
       <div className="mb-4 overflow-hidden rounded-[28px] bg-white p-7 shadow-sm">

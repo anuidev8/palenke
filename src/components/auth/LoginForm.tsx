@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState, useEffect } from "react";
+import { isInternalRole } from "@/lib/auth/permissions";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -9,16 +10,20 @@ type LoginFormProps = {
 };
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, viewerRole } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const safeRedirectTo = useMemo(() => {
     if (!redirectTo.startsWith("/")) {
-      return "/studio";
+      return "/";
+    }
+
+    if (!isInternalRole(viewerRole)) {
+      return "/";
     }
 
     return redirectTo;
-  }, [redirectTo]);
+  }, [redirectTo, viewerRole]);
 
   useEffect(() => {
     if (!loading && user) {
@@ -68,7 +73,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       }
 
       if (data.session) {
-        window.location.replace(safeRedirectTo);
+        setIsSubmitting(false);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error inesperado al iniciar sesión.";

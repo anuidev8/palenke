@@ -1,9 +1,11 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { normalizeViewerRole } from "@/lib/auth/permissions";
 import { hasSupabaseServiceConfig } from "@/lib/config";
 import { addMockReport } from "@/lib/mock-reports-store";
+import { uploadScitaEvidence } from "@/lib/scita-evidence";
 import { parseScitaFieldReportFormData } from "@/lib/scita-report-form";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { withRole } from "@/lib/viewer";
@@ -14,19 +16,39 @@ export async function submitScitaFieldReportAction(formData: FormData) {
     throw new Error(parsed.error);
   }
 
-  const { categoria, formato, descripcion, nombre, contacto, tablero_origen, role } = parsed.data;
+  const {
+    categoria,
+    formato,
+    descripcion,
+    nombre,
+    contacto,
+    tablero_origen,
+    role,
+    reportId: providedReportId,
+    evidenceFile,
+    evidenceMetadata,
+  } = parsed.data;
   const viewerRole = normalizeViewerRole(role);
+  const reportId = providedReportId || randomUUID();
 
   if (hasSupabaseServiceConfig()) {
     try {
       const supabase = createSupabaseService();
+      let evidenceFields = evidenceMetadata ?? {};
+
+      if (!evidenceMetadata && evidenceFile) {
+        evidenceFields = await uploadScitaEvidence(supabase, reportId, evidenceFile);
+      }
+
       const { error } = await supabase.from("scita_reports").insert({
+        id: reportId,
         categoria,
         formato,
         descripcion,
         nombre,
         contacto,
         tablero_origen,
+        ...evidenceFields,
       });
 
       if (error) {
@@ -41,7 +63,7 @@ export async function submitScitaFieldReportAction(formData: FormData) {
         });
       }
     } catch (err) {
-      console.error("Supabase report insertion failed, falling back to mock store:", err);
+      console.error("Supabase report submission failed, falling back to mock store:", err);
       addMockReport({
         categoria,
         formato,

@@ -4,10 +4,11 @@ import * as React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronRight, 
-  Lock, 
-  ExternalLink, 
+import {
+  ChevronRight,
+  Download,
+  Lock,
+  ExternalLink,
   Folder as FolderIcon,
   Search,
   Home,
@@ -205,10 +206,40 @@ function FileCard({
   onOpenRequestModal?: () => void;
   instrumento?: string;
 }) {
+  const [isLoading, setIsLoading] = useState(false);
   const hasAccess = canDownloadDocument(role, doc.visibility) || hasGrant;
   const showApprovalMessage = doc.visibility === "sensitive";
   const showLoginCta = !isAuthenticated || doc.visibility !== "sensitive";
   const typeVisual = getDocumentTypeVisual(doc.type);
+
+  const handleDownload = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!doc.usesSignedUrl) return;
+
+    e.preventDefault();
+    if (isLoading) return;
+    setIsLoading(true);
+
+    try {
+      const url = doc.url.replace("?mode=redirect", "");
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to get download URL");
+      }
+      const data = await res.json();
+      if (data.url) {
+        const link = document.createElement("a");
+        link.href = data.url;
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error("Download failed", error);
+    } finally {
+      setTimeout(() => setIsLoading(false), 800);
+    }
+  };
 
   return (
     <motion.div
@@ -284,6 +315,46 @@ function FileCard({
               >
                 <Eye className="h-4 w-4" aria-hidden="true" />
                 Ver documento
+              </a>
+            ) : null}
+            {doc.action === "file" ? (
+              <a
+                href={doc.url}
+                onClick={handleDownload}
+                {...(doc.usesSignedUrl ? {} : { download: true })}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition-all shadow-sm hover:shadow-md ${isLoading ? "opacity-80 cursor-not-allowed scale-[0.98]" : "hover:-translate-y-0.5"}`}
+                style={{ backgroundColor: color }}
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Preparando...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    Descargar
+                  </>
+                )}
               </a>
             ) : null}
             {doc.sourceUrl ? (
