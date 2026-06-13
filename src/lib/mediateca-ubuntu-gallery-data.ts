@@ -1,13 +1,22 @@
 import type { PalenkeGalleryMedia } from "@/lib/palenke-gallery-media";
 import type { ViewerRole } from "@/lib/mock-data";
 
+const MEDIATECA_VIDEO_POSTER = "/assets/gobierno-propio/memoria-video-poster-2026.png";
+/** Working Cloudinary source paired with memoria-video-poster-2026.png (see gobierno-gallery-data). */
+const MEDIATECA_COLECCION_GENERAL_VIDEO =
+  "https://res.cloudinary.com/dnmjmjdsj/video/upload/v1778886165/image/Generated_Video_May_15_2026_-_6_01PM_yglziv.mp4";
+const MEDIATECA_SUPABASE_PUBLIC_BASE =
+  "https://xtbdgwlwxslcpyholwuz.supabase.co/storage/v1/object/public/mediateca-ubuntu";
+
 export const MEDIATECA_UBUNTU_CATEGORIES = [
   { id: "todas", label: "Todas las categorías" },
+  { id: "all", label: "Colección general" },
   { id: "areas-bioculturales-2024", label: "Áreas bioculturales de conservación" },
   { id: "foro-global-tierra", label: "Foro Global de la Tierra" },
   { id: "instrumento-gobierno-propio", label: "Instrumento de Gobierno Propio" },
-  { id: "proyectos-productivos-2024", label: "Proyectos Productivos 2024" },
-  { id: "taller-genero", label: "Taller de Género" },
+  { id: "proyectos-productivos-2024", label: "Soberanía alimentaria" },
+  { id: "taller-genero", label: "Generación, género y familia" },
+  { id: "cc-diego-luis-cordoba", label: "C.C. Diego Luis Córdoba" },
 ] as const;
 
 export type MediatecaUbuntuCategoryId = (typeof MEDIATECA_UBUNTU_CATEGORIES)[number]["id"];
@@ -24,6 +33,40 @@ export type ForoGlobalTierraSubcategoryId =
   (typeof FORO_GLOBAL_TIERRA_SUBCATEGORIES)[number]["id"];
 
 export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
+  {
+    id: "mediateca-all-mvi-7142-mp4",
+    title: "Registro audiovisual en colección general",
+    section: "Mediateca Ubuntu",
+    type: "Video",
+    description:
+      "Registro audiovisual de la colección general — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Colección general",
+    council: "Palenke de Pensamiento · PCN",
+    year: 2026,
+    kind: "video",
+    posterUrl: MEDIATECA_VIDEO_POSTER,
+    mediaUrl: MEDIATECA_COLECCION_GENERAL_VIDEO,
+    playbackMuted: true,
+    visibility: "public",
+    categoryId: "all",
+  },
+  {
+    id: "mediateca-cc-diego-luis-cordoba-video-de-whatsapp-2023-06-29-a-las-15-40-37-mp4",
+    title: "Registro audiovisual en C.C. Diego Luis Córdoba",
+    section: "Mediateca Ubuntu",
+    type: "Video",
+    description:
+      "Registro audiovisual del consejo comunitario Diego Luis Córdoba — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "C.C. Diego Luis Córdoba",
+    council: "Palenke de Pensamiento · PCN",
+    year: 2023,
+    kind: "video",
+    posterUrl: MEDIATECA_VIDEO_POSTER,
+    mediaUrl:
+      "/assets/mediateca-ubuntu/cc-diego-luis-cordoba/Video de WhatsApp 2023-06-29 a las 15.40.37.mp4",
+    visibility: "public",
+    categoryId: "cc-diego-luis-cordoba",
+  },
   {
     id: "mediateca-areas-bioculturales-2024-img-8694-jpg",
     title: "Fotografía comunitaria en Áreas bioculturales de conservación · 1",
@@ -699,11 +742,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-proyectos-productivos-2024-foto-n-7-jpeg",
-    title: "Fotografía comunitaria en Proyectos Productivos 2024 · 1",
+    title: "Fotografía comunitaria en Soberanía alimentaria · 1",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Proyectos Productivos 2024 — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Proyectos Productivos 2024",
+    description: "Registro audiovisual de la colección Soberanía alimentaria — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Soberanía alimentaria",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -714,11 +757,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-proyectos-productivos-2024-foto-n-1-jpeg",
-    title: "Fotografía comunitaria en Proyectos Productivos 2024 · 2",
+    title: "Fotografía comunitaria en Soberanía alimentaria · 2",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Proyectos Productivos 2024 — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Proyectos Productivos 2024",
+    description: "Registro audiovisual de la colección Soberanía alimentaria — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Soberanía alimentaria",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -729,11 +772,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-proyectos-productivos-2024-foto-n-10-jpeg",
-    title: "Fotografía comunitaria en Proyectos Productivos 2024 · 3",
+    title: "Fotografía comunitaria en Soberanía alimentaria · 3",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Proyectos Productivos 2024 — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Proyectos Productivos 2024",
+    description: "Registro audiovisual de la colección Soberanía alimentaria — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Soberanía alimentaria",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -744,11 +787,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-proyectos-productivos-2024-foto-n-9-jpeg",
-    title: "Fotografía comunitaria en Proyectos Productivos 2024 · 4",
+    title: "Fotografía comunitaria en Soberanía alimentaria · 4",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Proyectos Productivos 2024 — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Proyectos Productivos 2024",
+    description: "Registro audiovisual de la colección Soberanía alimentaria — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Soberanía alimentaria",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -759,11 +802,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-proyectos-productivos-2024-foto-n-3-jpeg",
-    title: "Fotografía comunitaria en Proyectos Productivos 2024 · 5",
+    title: "Fotografía comunitaria en Soberanía alimentaria · 5",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Proyectos Productivos 2024 — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Proyectos Productivos 2024",
+    description: "Registro audiovisual de la colección Soberanía alimentaria — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Soberanía alimentaria",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -774,11 +817,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-taller-genero-foto-n-12-jpeg",
-    title: "Fotografía comunitaria en Taller de Género · 1",
+    title: "Fotografía comunitaria en Generación, género y familia · 1",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Taller de Género — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Taller de Género",
+    description: "Registro audiovisual de la colección Generación, género y familia — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Generación, género y familia",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -789,11 +832,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-taller-genero-foto-n-15-jpeg",
-    title: "Fotografía comunitaria en Taller de Género · 2",
+    title: "Fotografía comunitaria en Generación, género y familia · 2",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Taller de Género — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Taller de Género",
+    description: "Registro audiovisual de la colección Generación, género y familia — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Generación, género y familia",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -804,11 +847,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-taller-genero-foto-n-8-jpeg",
-    title: "Fotografía comunitaria en Taller de Género · 3",
+    title: "Fotografía comunitaria en Generación, género y familia · 3",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Taller de Género — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Taller de Género",
+    description: "Registro audiovisual de la colección Generación, género y familia — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Generación, género y familia",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -819,11 +862,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-taller-genero-foto-n-10-jpeg",
-    title: "Fotografía comunitaria en Taller de Género · 4",
+    title: "Fotografía comunitaria en Generación, género y familia · 4",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Taller de Género — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Taller de Género",
+    description: "Registro audiovisual de la colección Generación, género y familia — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Generación, género y familia",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -834,11 +877,11 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
   },
   {
     id: "mediateca-taller-genero-foto-n-7-jpeg",
-    title: "Fotografía comunitaria en Taller de Género · 5",
+    title: "Fotografía comunitaria en Generación, género y familia · 5",
     section: "Mediateca Ubuntu",
     type: "Fotografía comunitaria",
-    description: "Registro audiovisual de la colección Taller de Género — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "Taller de Género",
+    description: "Registro audiovisual de la colección Generación, género y familia — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Generación, género y familia",
     council: "Palenke de Pensamiento · PCN",
     year: 2024,
     kind: "image",
@@ -853,9 +896,15 @@ export function getVisibleMediatecaUbuntuGalleryMedia(
   _role: ViewerRole,
   categoryId?: MediatecaUbuntuCategoryId,
 ): PalenkeGalleryMedia[] {
-  return mediatecaUbuntuGalleryMedia.filter((item) => {
-    if (item.visibility === "sensitive") return false;
-    if (categoryId && categoryId !== "todas" && item.categoryId !== categoryId) return false;
-    return true;
-  });
+  return mediatecaUbuntuGalleryMedia
+    .filter((item) => {
+      if (item.visibility === "sensitive") return false;
+      if (categoryId && categoryId !== "todas" && item.categoryId !== categoryId) return false;
+      return true;
+    })
+    .toSorted((a, b) => {
+      if (a.kind === "video" && b.kind !== "video") return -1;
+      if (a.kind !== "video" && b.kind === "video") return 1;
+      return b.year - a.year;
+    });
 }

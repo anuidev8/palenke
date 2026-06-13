@@ -12,9 +12,7 @@ export default async function MediatecaUbuntuPage({
 }) {
   const params = await searchParams;
   const role = await getViewerRoleFromRequest(params);
-  const galleryMedia = getVisibleMediatecaUbuntuGalleryMedia(role).toSorted(
-    (a, b) => b.year - a.year,
-  );
+  const galleryMedia = getVisibleMediatecaUbuntuGalleryMedia(role);
 
   return (
     <SiteLayout
@@ -29,8 +27,8 @@ export default async function MediatecaUbuntuPage({
 
       <section className="relative overflow-hidden border-b border-[#e8dfd3] bg-[#F7F5F0] px-4 py-14 sm:px-6 lg:px-8">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          <div className="absolute top-[20%] right-[20%] h-[420px] w-[420px] rounded-full bg-gradient-to-br from-[#2e7d32]/[0.06] to-transparent blur-[120px]" />
-          <div className="absolute bottom-0 left-[10%] h-[360px] w-[360px] rounded-full bg-gradient-to-t from-[#fbc02d]/[0.07] to-transparent blur-[100px]" />
+          <div className="absolute top-[20%] right-[20%] h-[320px] w-[320px] rounded-full bg-gradient-to-br from-[#2e7d32]/[0.05] to-transparent blur-3xl" />
+          <div className="absolute bottom-0 left-[10%] h-[280px] w-[280px] rounded-full bg-gradient-to-t from-[#fbc02d]/[0.06] to-transparent blur-3xl" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-7xl">

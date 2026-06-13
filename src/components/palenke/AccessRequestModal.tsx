@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldAlert } from "lucide-react";
 import { AccessRequestForm } from "./AccessRequestForm";
+import { getAccessValidationCopy } from "@/lib/access-validation-copy";
 
 type AccessRequestModalProps = {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export function AccessRequestModal({
   accessLevel,
 }: AccessRequestModalProps) {
   const isCoordination = accessLevel === "coordination";
+  const validationCopy = getAccessValidationCopy(accessLevel);
 
   // Prevent scrolling when modal is open
   useEffect(() => {
@@ -94,19 +96,13 @@ export function AccessRequestModal({
 
                 {isCoordination ? (
                   <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4">
-                    <h4 className="font-bold text-orange-900 mb-1">Revisión especial de coordinación</h4>
-                    <p className="text-sm text-orange-800">
-                      Este documento requiere una validación adicional por sensibilidad territorial. Después de
-                      enviarlo, deberás esperar la revisión del equipo antes de recibir acceso o el enlace de entrega.
-                    </p>
+                    <h4 className="mb-1 font-bold text-orange-900">{validationCopy.modalTitle}</h4>
+                    <p className="text-sm text-orange-800">{validationCopy.modalBody}</p>
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-                    <h4 className="font-bold text-blue-900 mb-1">Revisión administrativa</h4>
-                    <p className="text-sm text-blue-800">
-                      El equipo administrador revisará tu solicitud y te avisará por correo cuando sea aprobada,
-                      rechazada o cuando el documento haya sido enviado. Tiempo estimado: 1 día hábil.
-                    </p>
+                    <h4 className="mb-1 font-bold text-blue-900">{validationCopy.modalTitle}</h4>
+                    <p className="text-sm text-blue-800">{validationCopy.modalBody}</p>
                   </div>
                 )}
 

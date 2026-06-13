@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { SiteLayout } from "@/components/mock/ui";
 import { MemoriaAfroterritorialSubnav } from "@/components/palenke/MemoriaAfroterritorialSubnav";
 import { MemoriaAfroterritorialHeroVideo } from "@/components/palenke/MemoriaAfroterritorialHeroVideo";
+import { OrientationNetworkSection } from "@/components/palenke/OrientationNetworkSection";
 import {
   getVisibleMediatecaUbuntuGalleryMedia,
 } from "@/lib/mediateca-ubuntu-gallery-data";
@@ -457,6 +458,8 @@ export default async function MemoriaAfroterritorialPage({
           </div>
         </div>
       </section>
+
+      <OrientationNetworkSection />
 
     </SiteLayout>
   );

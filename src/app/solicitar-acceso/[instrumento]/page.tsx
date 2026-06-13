@@ -3,6 +3,7 @@ import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Callout, SiteLayout } from "@/components/mock/ui";
 import { AccessRequestForm } from "@/components/palenke/AccessRequestForm";
+import { getAccessValidationCopy } from "@/lib/access-validation-copy";
 import { getViewerRoleFromRequest } from "@/lib/viewer-server";
 import { getFirstParam, type SearchParams, withRole } from "@/lib/viewer";
 
@@ -53,6 +54,7 @@ export default async function SolicitarAccesoPage({
   }
 
   const inst = instrumentRequestConfig[instrumento as InstrumentSlug];
+  const validationCopy = getAccessValidationCopy(inst.accessLevel);
   const isCoordination = inst.accessLevel === "coordination";
 
   return (
@@ -89,18 +91,12 @@ export default async function SolicitarAccesoPage({
           </div>
 
           {isCoordination ? (
-            <Callout tone="warning" title="Validación de coordinación">
-              <p>
-                Este instrumento requiere revisión especial por sensibilidad territorial. Incluye
-                las medidas de protección de datos en tu solicitud.
-              </p>
+            <Callout tone="warning" title={validationCopy.calloutTitle}>
+              <p>{validationCopy.calloutBody}</p>
             </Callout>
           ) : (
-            <Callout tone="info" title="Validación administrativa">
-              <p>
-                El equipo admin revisa la solicitud y responde por correo. Tiempo estimado: 1 día
-                hábil.
-              </p>
+            <Callout tone="info" title={validationCopy.calloutTitle}>
+              <p>{validationCopy.calloutBody}</p>
             </Callout>
           )}
 

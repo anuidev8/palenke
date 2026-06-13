@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   LayoutGroup,
   motion,
@@ -34,6 +35,15 @@ function isDirectVideoFileUrl(url: string) {
   return false;
 }
 
+function isStaticPosterUrl(url: string | undefined) {
+  return Boolean(url && !isDirectVideoFileUrl(url));
+}
+
+function resolveMediaSrc(url: string) {
+  if (url.startsWith("/")) return encodeURI(url);
+  return url;
+}
+
 function isSupabaseStorageAsset(url: string) {
   return url.includes(".supabase.co/storage/v1/object/public/");
 }
@@ -61,22 +71,31 @@ function MediaPreview({
   className,
   priority,
   imageOverlay = false,
+  disableHoverScale = false,
   sizes = COMPACT_CARD_IMAGE_SIZES,
 }: {
   item: PalenkeGalleryMedia;
   className?: string;
   priority?: boolean;
   imageOverlay?: boolean;
+  disableHoverScale?: boolean;
   sizes?: string;
 }) {
   const src = item.posterUrl || item.mediaUrl;
-  const imageSrc = item.kind === "image" ? item.mediaUrl || src : src;
-  const imageClassName = `object-cover object-center${
-    imageOverlay ? " transition-transform duration-700 ease-out group-hover:scale-[1.03]" : ""
-  }`;
+  const staticPoster = isStaticPosterUrl(item.posterUrl) ? item.posterUrl : null;
+  const imageSrc =
+    staticPoster ?? (item.kind === "image" ? item.mediaUrl || src : src);
+  const hoverScaleClass =
+    imageOverlay && !disableHoverScale
+      ? " transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+      : "";
+  const imageClassName = `object-cover object-center${hoverScaleClass}`;
 
+  // Local videos can use the file as a thumbnail; remote/broken sources fall back to poster art.
   const isVideoThumb =
-    item.kind === "video" && isDirectVideoFileUrl(item.mediaUrl || item.posterUrl);
+    item.kind === "video" &&
+    isDirectVideoFileUrl(item.mediaUrl) &&
+    item.mediaUrl.startsWith("/");
   const isSupabaseImage = isSupabaseStorageAsset(imageSrc);
   const useImageElement =
     !isVideoThumb &&
@@ -91,8 +110,8 @@ function MediaPreview({
     >
       {isVideoThumb ? (
         <video
-          src={item.mediaUrl || item.posterUrl}
-          className={`h-full w-full object-cover object-center${imageOverlay ? " transition-transform duration-700 ease-out group-hover:scale-[1.03]" : ""}`}
+          src={resolveMediaSrc(item.mediaUrl)}
+          className={`h-full w-full object-cover object-center${hoverScaleClass}`}
           muted
           playsInline
           preload="metadata"
@@ -141,6 +160,8 @@ type GalleryCardProps = {
   hiddenForMorphId: string | null;
   onOpen: () => void;
   reduceMotion: boolean;
+  /** Skip layout/entry animations — used for paginated full grids (e.g. Mediateca). */
+  staticPresentation?: boolean;
   layoutIdPrefix: string;
   cardVariant?: GalleryCardVariant;
 };
@@ -153,6 +174,7 @@ function GalleryCard({
   hiddenForMorphId,
   onOpen,
   reduceMotion,
+  staticPresentation = false,
   layoutIdPrefix,
   cardVariant = "dark-panel",
 }: GalleryCardProps) {
@@ -161,7 +183,8 @@ function GalleryCard({
   const isHero = variant === "hero";
   const isOverlay = cardVariant === "image-overlay";
   const accent = ACCENTS[index % ACCENTS.length];
-  const lid = reduceMotion ? undefined : layoutIdFor(source, item.id, layoutIdPrefix);
+  const animateCard = !reduceMotion && !staticPresentation;
+  const lid = animateCard ? layoutIdFor(source, item.id, layoutIdPrefix) : undefined;
 
   const sizeClass = isOverlay
     ? isHero
@@ -171,28 +194,23 @@ function GalleryCard({
       ? "min-h-[480px] sm:min-h-[540px]"
       : "min-h-[300px] sm:min-h-[340px]";
 
-  return (
-    <motion.article
-      layout={!reduceMotion}
-      layoutId={lid}
-      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-24px" }}
-      transition={{
-        layout: reduceMotion ? { duration: 0 } : { ...layoutSpring },
-        opacity: { duration: reduceMotion ? 0 : 0.4, delay: Math.min(index * 0.04, 0.2) },
-        y: { duration: reduceMotion ? 0 : 0.45, ease: softEase },
-      }}
-      className={`group relative isolate flex w-full flex-col overflow-hidden rounded-[2rem] text-white will-change-transform [backface-visibility:hidden] ${
-        isOverlay
-          ? "bg-neutral-900 shadow-[0_12px_40px_rgba(0,0,0,0.14)] transition-shadow duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
-          : "bg-[#1f1f1f] shadow-[0_16px_48px_rgba(0,0,0,0.12)]"
-      } ${sizeClass}`}
-    >
+  const cardClassName = `group relative isolate flex w-full flex-col overflow-hidden rounded-[2rem] text-white ${
+    animateCard ? "will-change-transform [backface-visibility:hidden]" : ""
+  } ${
+    isOverlay
+      ? animateCard
+        ? "bg-neutral-900 shadow-[0_12px_40px_rgba(0,0,0,0.14)] transition-shadow duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
+        : "bg-neutral-900 shadow-[0_12px_40px_rgba(0,0,0,0.14)]"
+      : "bg-[#1f1f1f] shadow-[0_16px_48px_rgba(0,0,0,0.12)]"
+  } ${sizeClass}`;
+
+  const cardBody = (
+    <>
       <MediaPreview
         item={item}
         priority={isHero && source === "preview"}
         imageOverlay={isOverlay}
+        disableHoverScale={staticPresentation}
         sizes={isHero ? HERO_CARD_IMAGE_SIZES : COMPACT_CARD_IMAGE_SIZES}
       />
       {isOverlay ? (
@@ -225,26 +243,39 @@ function GalleryCard({
           </div>
 
           {(item.kind === "video" || item.kind === "audio") && (
-            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-80 transition group-hover:opacity-100">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/45 shadow-lg backdrop-blur-md sm:h-14 sm:w-14">
+            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-80">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpen();
+                }}
+                aria-label={openActionLabel(item.kind)}
+                className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/45 shadow-lg backdrop-blur-md sm:h-14 sm:w-14"
+              >
                 {item.kind === "audio" ? (
                   <Headphones className="h-6 w-6 text-white sm:h-7 sm:w-7" />
                 ) : (
                   <span className="ml-1 h-0 w-0 border-y-[7px] border-l-[12px] border-y-transparent border-l-white sm:border-y-8 sm:border-l-[14px]" />
                 )}
-              </span>
+              </button>
             </div>
           )}
 
-          <div className="mt-auto pt-10">
+          <div className="relative z-[3] mt-auto pt-10">
             <div className="flex flex-wrap items-center gap-3 border-t border-white/15 pt-4">
               <span className="text-[11px] font-medium uppercase tracking-widest text-white/60">
                 {item.year}
               </span>
               <button
                 type="button"
-                onClick={onOpen}
-                className="ml-auto inline-flex rounded-full border border-white/25 bg-black/45 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md transition hover:bg-black/60"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpen();
+                }}
+                className={`relative z-[3] ml-auto inline-flex rounded-full border border-white/25 bg-black/45 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md${
+                  staticPresentation ? "" : " transition hover:bg-black/60"
+                }`}
               >
                 {openActionLabel(item.kind)}
               </button>
@@ -300,7 +331,9 @@ function GalleryCard({
               <button
                 type="button"
                 onClick={onOpen}
-                className="ml-auto inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#111] transition hover:scale-[1.02] active:scale-[0.98]"
+                className={`ml-auto inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#111]${
+                  staticPresentation ? "" : " transition hover:scale-[1.02] active:scale-[0.98]"
+                }`}
               >
                 {openActionLabel(item.kind)}
               </button>
@@ -308,6 +341,28 @@ function GalleryCard({
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (staticPresentation) {
+    return <article className={cardClassName}>{cardBody}</article>;
+  }
+
+  return (
+    <motion.article
+      layout={animateCard}
+      layoutId={lid}
+      initial={animateCard ? { opacity: 0, y: 20 } : false}
+      whileInView={animateCard ? { opacity: 1, y: 0 } : undefined}
+      viewport={{ once: true, margin: "-24px" }}
+      transition={{
+        layout: animateCard ? { ...layoutSpring } : { duration: 0 },
+        opacity: { duration: animateCard ? 0.4 : 0, delay: Math.min(index * 0.04, 0.2) },
+        y: { duration: animateCard ? 0.45 : 0, ease: softEase },
+      }}
+      className={cardClassName}
+    >
+      {cardBody}
     </motion.article>
   );
 }
@@ -317,19 +372,170 @@ type DetailOverlayProps = {
   source: ExpandSource;
   onClose: () => void;
   reduceMotion: boolean;
+  staticPresentation?: boolean;
   layoutIdPrefix: string;
 };
+
+function DetailPlaybackMedia({ item }: { item: PalenkeGalleryMedia }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const playbackMuted = item.playbackMuted === true;
+
+  useEffect(() => {
+    if (item.kind === "video") {
+      const video = videoRef.current;
+      if (!video) return;
+
+      if (playbackMuted) {
+        video.muted = true;
+        video.defaultMuted = true;
+      }
+
+      const lockMuted = () => {
+        if (playbackMuted) video.muted = true;
+      };
+
+      const tryPlay = () => {
+        if (playbackMuted) video.muted = true;
+        void video.play().catch(() => undefined);
+      };
+
+      if (playbackMuted) {
+        video.addEventListener("volumechange", lockMuted);
+      }
+
+      if (video.readyState >= 2) {
+        tryPlay();
+      } else {
+        video.addEventListener("loadeddata", tryPlay, { once: true });
+      }
+
+      return () => {
+        video.removeEventListener("loadeddata", tryPlay);
+        if (playbackMuted) video.removeEventListener("volumechange", lockMuted);
+        video.pause();
+        video.currentTime = 0;
+      };
+    }
+
+    if (item.kind === "audio") {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      const tryPlay = () => {
+        void audio.play().catch(() => undefined);
+      };
+
+      if (audio.readyState >= 2) {
+        tryPlay();
+      } else {
+        audio.addEventListener("loadeddata", tryPlay, { once: true });
+      }
+
+      return () => {
+        audio.removeEventListener("loadeddata", tryPlay);
+        audio.pause();
+        audio.currentTime = 0;
+      };
+    }
+  }, [item.id, item.kind, item.mediaUrl, playbackMuted]);
+
+  if (item.kind === "image") {
+    return (
+      <Image
+        src={item.mediaUrl}
+        alt={item.title}
+        fill
+        className="object-contain"
+        sizes="(max-width: 1280px) 100vw, 1280px"
+        quality={90}
+        priority
+        unoptimized={isSupabaseStorageAsset(item.mediaUrl)}
+      />
+    );
+  }
+
+  if (item.kind === "audio") {
+    return (
+      <div className="absolute inset-0">
+        <Image
+          src={item.posterUrl || "/assets/hero-cards/memoria-afroterritorial.png"}
+          alt=""
+          fill
+          className="object-cover opacity-45"
+          sizes="(max-width: 1280px) 100vw, 1280px"
+          quality={85}
+          priority
+          unoptimized={Boolean(item.posterUrl && isSupabaseStorageAsset(item.posterUrl))}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/65 to-black/45" />
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
+          <span className="inline-flex h-16 w-16 items-center justify-center rounded-full border border-white/25 bg-black/35 backdrop-blur-sm">
+            <Headphones className="h-8 w-8 text-white" />
+          </span>
+          <p className="max-w-xl text-sm font-medium uppercase tracking-[0.2em] text-white/75">
+            Reproductor de audio
+          </p>
+          <audio
+            ref={audioRef}
+            controls
+            autoPlay
+            preload="auto"
+            className="w-full max-w-2xl"
+            src={resolveMediaSrc(item.mediaUrl)}
+          >
+            Tu navegador no reproduce audio HTML5.
+          </audio>
+        </div>
+      </div>
+    );
+  }
+
+  if (isDirectVideoFileUrl(item.mediaUrl)) {
+    return (
+      <video
+        ref={videoRef}
+        className={`absolute inset-0 h-full w-full bg-black object-contain${
+          playbackMuted ? " gallery-video-no-audio" : ""
+        }`}
+        controls
+        autoPlay
+        muted={playbackMuted}
+        playsInline
+        preload="auto"
+        poster={isStaticPosterUrl(item.posterUrl) ? item.posterUrl : undefined}
+        src={resolveMediaSrc(item.mediaUrl)}
+      >
+        Tu navegador no reproduce video HTML5.
+      </video>
+    );
+  }
+
+  return (
+    <iframe
+      title={item.title}
+      src={item.mediaUrl}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowFullScreen
+      className="absolute inset-0 h-full w-full border-0"
+    />
+  );
+}
 
 function DetailOverlay({
   item,
   source,
   onClose,
   reduceMotion,
+  staticPresentation = false,
   layoutIdPrefix,
 }: DetailOverlayProps) {
-  const lid = reduceMotion ? undefined : layoutIdFor(source, item.id, layoutIdPrefix);
+  const animateLayoutMorph = !reduceMotion && !staticPresentation;
+  const animateOverlay = !reduceMotion;
+  const useSoftModalAnimation = staticPresentation && animateOverlay;
+  const lid = animateLayoutMorph ? layoutIdFor(source, item.id, layoutIdPrefix) : undefined;
 
-  return (
+  const overlay = (
     <motion.div
       role="dialog"
       aria-modal="true"
@@ -337,85 +543,45 @@ function DetailOverlay({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: reduceMotion ? 0 : 0.28 }}
-      className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 md:p-10"
+      transition={{ duration: animateOverlay ? 0.28 : 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 md:p-10"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-[#050505]/76 backdrop-blur-md" />
 
       <motion.article
-        layout={!reduceMotion}
+        layout={animateLayoutMorph}
         layoutId={lid}
-        transition={reduceMotion ? { duration: 0 } : { layout: layoutSpring }}
+        initial={useSoftModalAnimation ? { opacity: 0, scale: 0.97, y: 10 } : false}
+        animate={useSoftModalAnimation ? { opacity: 1, scale: 1, y: 0 } : undefined}
+        exit={
+          useSoftModalAnimation
+            ? { opacity: 0, scale: 0.98, y: 8 }
+            : animateOverlay
+              ? { opacity: 0 }
+              : undefined
+        }
+        transition={
+          animateLayoutMorph
+            ? { layout: layoutSpring }
+            : useSoftModalAnimation
+              ? { duration: 0.55, ease: softEase }
+              : { duration: 0 }
+        }
         onClick={(e) => e.stopPropagation()}
         className="relative z-10 flex max-h-[calc(100dvh-24px)] w-full max-w-5xl flex-col overflow-hidden rounded-[28px] bg-[#141414] shadow-[0_36px_100px_rgba(0,0,0,0.55)]"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-[2] inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md transition hover:bg-black/75"
+          className="absolute right-4 top-4 z-[2] inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md hover:bg-black/75"
           aria-label="Cerrar"
         >
           <X className="h-5 w-5" />
         </button>
 
         <div className="relative aspect-video w-full shrink-0 bg-black sm:aspect-[16/9]">
-          {item.kind === "image" ? (
-            <Image
-              src={item.mediaUrl}
-              alt={item.title}
-              fill
-              className="object-contain"
-              sizes="(max-width: 1280px) 100vw, 1280px"
-              quality={90}
-              priority
-              unoptimized={isSupabaseStorageAsset(item.mediaUrl)}
-            />
-          ) : item.kind === "audio" ? (
-            <div className="absolute inset-0">
-              <Image
-                src={item.posterUrl || "/assets/hero-cards/memoria-afroterritorial.png"}
-                alt=""
-                fill
-                className="object-cover opacity-45"
-                sizes="(max-width: 1280px) 100vw, 1280px"
-                quality={85}
-                priority
-                unoptimized={Boolean(item.posterUrl && isSupabaseStorageAsset(item.posterUrl))}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/65 to-black/45" />
-              <div className="relative z-10 flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
-                <span className="inline-flex h-16 w-16 items-center justify-center rounded-full border border-white/25 bg-black/35 backdrop-blur-sm">
-                  <Headphones className="h-8 w-8 text-white" />
-                </span>
-                <p className="max-w-xl text-sm font-medium uppercase tracking-[0.2em] text-white/75">
-                  Reproductor de audio
-                </p>
-                <audio controls preload="metadata" className="w-full max-w-2xl" src={item.mediaUrl}>
-                  Tu navegador no reproduce audio HTML5.
-                </audio>
-              </div>
-            </div>
-          ) : isDirectVideoFileUrl(item.mediaUrl) ? (
-            <video
-              className="absolute inset-0 h-full w-full bg-black object-contain"
-              controls
-              playsInline
-              preload="metadata"
-              poster={item.posterUrl}
-              src={item.mediaUrl}
-            >
-              Tu navegador no reproduce video HTML5.
-            </video>
-          ) : (
-            <iframe
-              title={item.title}
-              src={item.mediaUrl}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              className="absolute inset-0 h-full w-full border-0"
-            />
-          )}
+          <DetailPlaybackMedia item={item} />
         </div>
 
         <div className="flex max-h-[40vh] flex-col gap-3 overflow-y-auto p-6 sm:p-8">
@@ -441,6 +607,9 @@ function DetailOverlay({
       </motion.article>
     </motion.div>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(overlay, document.body);
 }
 
 type CollectionOverlayProps = {
@@ -555,6 +724,7 @@ export default function GobiernoPropioMediaGallery({
   cardVariant = "dark-panel",
   previewColumnsLg = 3,
   collectionGridLg = 3,
+  uniformPreviewGrid = false,
 }: {
   items: PalenkeGalleryMedia[];
   collectionOpen: boolean;
@@ -571,8 +741,11 @@ export default function GobiernoPropioMediaGallery({
   previewColumnsLg?: 2 | 3;
   /** Large-screen column count for the full collection overlay grid. */
   collectionGridLg?: 2 | 3;
+  /** When true, skip the hero card and render all preview items in a uniform grid. */
+  uniformPreviewGrid?: boolean;
 }) {
   const reduceMotion = useReducedMotion();
+  const staticPresentation = showAllPreview;
   const [detailId, setDetailId] = useState<string | null>(null);
   const [detailSource, setDetailSource] = useState<ExpandSource | null>(null);
 
@@ -581,8 +754,8 @@ export default function GobiernoPropioMediaGallery({
     [items, showAllPreview],
   );
 
-  const heroItem = previewItems[0];
-  const masonryPreview = previewItems.slice(1);
+  const heroItem = uniformPreviewGrid ? null : previewItems[0];
+  const masonryPreview = uniformPreviewGrid ? previewItems : previewItems.slice(1);
 
   const detailItem =
     detailId != null ? items.find((doc) => doc.id === detailId) ?? null : null;
@@ -639,63 +812,78 @@ export default function GobiernoPropioMediaGallery({
   }
 
   const previewMorphHidden =
-    detailSource === "preview" ? detailId : null;
+    staticPresentation ? null : detailSource === "preview" ? detailId : null;
   const collectionMorphHidden =
-    detailSource === "collection" ? detailId : null;
+    staticPresentation ? null : detailSource === "collection" ? detailId : null;
   const previewColsLgClass = previewColumnsLg === 2 ? "lg:columns-2" : "lg:columns-3";
 
-  return (
-    <LayoutGroup id={layoutGroupId}>
-      <motion.div layout className="flex flex-col gap-6">
-        {heroItem && previewMorphHidden !== heroItem.id && (
-          <GalleryCard
-            item={heroItem}
-            index={0}
-            variant="hero"
-            source="preview"
-            hiddenForMorphId={null}
-            reduceMotion={!!reduceMotion}
-            onOpen={() => openDetailFromPreview(heroItem.id)}
-            layoutIdPrefix={layoutIdPrefix}
-            cardVariant={cardVariant}
-          />
-        )}
+  const galleryGrid = (
+    <div className="flex flex-col gap-6">
+      {heroItem && previewMorphHidden !== heroItem.id && (
+        <GalleryCard
+          item={heroItem}
+          index={0}
+          variant="hero"
+          source="preview"
+          hiddenForMorphId={null}
+          reduceMotion={!!reduceMotion}
+          staticPresentation={staticPresentation}
+          onOpen={() => openDetailFromPreview(heroItem.id)}
+          layoutIdPrefix={layoutIdPrefix}
+          cardVariant={cardVariant}
+        />
+      )}
 
-        {masonryPreview.length > 0 && (
-          <motion.div
-            layout
-            className={`columns-1 gap-6 [column-fill:balance] sm:columns-2 ${previewColsLgClass}`}
-          >
-            {masonryPreview.map((doc, i) =>
-              previewMorphHidden === doc.id ? null : (
-                <motion.div
-                  key={doc.id}
-                  layout
-                  className="mb-6 inline-block w-full break-inside-avoid align-top"
-                  transition={{
-                    layout: reduceMotion ? { duration: 0 } : { duration: 0.48, ease: softEase },
-                  }}
-                >
-                  <GalleryCard
-                    item={doc}
-                    index={i + 1}
-                    variant="compact"
-                    source="preview"
-                    hiddenForMorphId={null}
-                    reduceMotion={!!reduceMotion}
-                    onOpen={() => openDetailFromPreview(doc.id)}
-                    layoutIdPrefix={layoutIdPrefix}
-                    cardVariant={cardVariant}
-                  />
-                </motion.div>
-              ),
-            )}
-          </motion.div>
-        )}
-      </motion.div>
+      {masonryPreview.length > 0 && (
+        <div
+          className={
+            staticPresentation
+              ? `grid grid-cols-1 gap-6 sm:grid-cols-2 ${previewColumnsLg === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`
+              : `columns-1 gap-6 [column-fill:balance] sm:columns-2 ${previewColsLgClass}`
+          }
+        >
+          {masonryPreview.map((doc, i) =>
+            previewMorphHidden === doc.id ? null : (
+              <div
+                key={doc.id}
+                className={
+                  staticPresentation
+                    ? "w-full"
+                    : "mb-6 inline-block w-full break-inside-avoid align-top"
+                }
+              >
+                <GalleryCard
+                  item={doc}
+                  index={i + 1}
+                  variant="compact"
+                  source="preview"
+                  hiddenForMorphId={null}
+                  reduceMotion={!!reduceMotion}
+                  staticPresentation={staticPresentation}
+                  onOpen={() => openDetailFromPreview(doc.id)}
+                  layoutIdPrefix={layoutIdPrefix}
+                  cardVariant={cardVariant}
+                />
+              </div>
+            ),
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      {staticPresentation ? (
+        galleryGrid
+      ) : (
+        <LayoutGroup id={layoutGroupId}>
+          <motion.div layout>{galleryGrid}</motion.div>
+        </LayoutGroup>
+      )}
 
       <AnimatePresence>
-        {collectionOpen && (
+        {collectionOpen && !staticPresentation && (
           <CollectionOverlay
             items={items}
             activeMorphId={collectionMorphHidden}
@@ -720,10 +908,11 @@ export default function GobiernoPropioMediaGallery({
             source={detailSource}
             onClose={closeDetail}
             reduceMotion={!!reduceMotion}
+            staticPresentation={staticPresentation}
             layoutIdPrefix={layoutIdPrefix}
           />
         )}
       </AnimatePresence>
-    </LayoutGroup>
+    </>
   );
 }

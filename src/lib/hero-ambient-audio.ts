@@ -1,8 +1,19 @@
-/** Ambient audio duration shown on hero banners. */
-export const HERO_AMBIENT_AUDIO_DURATION = "0:35";
-export const HERO_AMBIENT_PLAYBACK_SECONDS = 35;
+/** Ambient audio duration shown on hero banners (home segment: 00:00–01:00). */
+export const HERO_AMBIENT_AUDIO_DURATION = "1:00";
+export const HERO_AMBIENT_PLAYBACK_SECONDS = 60;
 
-/** Source clip used when building home-hero-presentacion.mp4 (muxed into home video). */
+/** Memoria segment: 01:00–02:00 on the full track. */
+export const MEMORIA_HERO_AUDIO_DURATION = "1:00";
+export const MEMORIA_HERO_AUDIO_PLAYBACK_SECONDS = 60;
+
+/** Gobierno segment: 02:00–03:05 on the full track. */
+export const GOBIERNO_HERO_AUDIO_DURATION = "1:05";
+export const GOBIERNO_HERO_AUDIO_PLAYBACK_SECONDS = 65;
+
+/** Presentation video for the home hero (visual only; audio plays separately). */
+export const HOME_HERO_VIDEO_SRC = "/videos/home-hero-presentacion.mp4";
+
+/** Home segment: 00:00–01:00 on the full track. */
 export const HOME_HERO_AUDIO_SRC = "/audio/somos-la-voz-home.mp3";
 export const MEMORIA_HERO_AUDIO_SRC = "/audio/somos-la-voz-memoria-afroterritorial.mp3";
 export const GOBIERNO_HERO_AUDIO_SRC = "/audio/somos-la-voz-gobierno-propio.mp3";

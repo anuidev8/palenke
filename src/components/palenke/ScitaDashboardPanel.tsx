@@ -681,7 +681,7 @@ export function ScitaDashboardPanel({
               href={hrefWithCurrentSearch("/geoportal", searchString)}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-3 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/18 sm:px-4 sm:py-3 sm:text-[15px]"
             >
-              Abrir SIG completo
+              Abrir Geovisor
               <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
             </Link>
 

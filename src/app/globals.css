@@ -285,3 +285,9 @@ h6 {
   box-sizing: border-box;
   background: #051008;
 }
+
+/* Gallery modal videos flagged as silent — hide native volume/mute controls. */
+video.gallery-video-no-audio::-webkit-media-controls-volume-slider,
+video.gallery-video-no-audio::-webkit-media-controls-mute-button {
+  display: none !important;
+}

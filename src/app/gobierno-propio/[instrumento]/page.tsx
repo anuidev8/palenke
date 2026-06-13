@@ -19,6 +19,10 @@ import {
   listSeguridadJuridicaSlugs,
 } from "@/lib/seguridad-juridica-catalog";
 import { createSupabaseService } from "@/lib/supabase/service";
+import {
+  getAccessValidationCopy,
+  VERIFIED_ACCESS_COPY,
+} from "@/lib/access-validation-copy";
 import { getViewerRequestState } from "@/lib/viewer-server";
 import { type SearchParams, withRole } from "@/lib/viewer";
 import { SubmoduleOptionsColumn } from "@/components/palenke/SubmoduleOptionsColumn";
@@ -492,6 +496,7 @@ export default async function InstrumentoPage({
 
   const isPublic = role === "public";
   const accessLevel = inst.accessLevel as AccessLevel;
+  const validationCopy = getAccessValidationCopy(accessLevel);
   const requestHref = withRole(`/solicitar-acceso/${instrumento}`, role);
   const canDownloadBaseSupabaseDoc = baseSupabaseDoc
     ? canDownloadDocument(role, baseSupabaseDoc.visibility)
@@ -640,7 +645,11 @@ export default async function InstrumentoPage({
                   </span>
                 </div>
                 
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-[#1a1a1a] mb-6 tracking-tight">¿Qué es este instrumento?</h2>
+                {instrumentoKey !== "seguridad-juridica" ? (
+                  <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-[#1a1a1a] mb-6 tracking-tight">
+                    ¿Qué es este instrumento?
+                  </h2>
+                ) : null}
                 <div className="prose prose-lg max-w-none text-[#4a4540]">
                   <p className="font-medium text-[#1a1a1a] text-xl lg:text-2xl leading-relaxed mb-6 border-l-4 pl-4" style={{ borderColor: inst.color }}>
                     {inst.definition}
@@ -743,21 +752,33 @@ export default async function InstrumentoPage({
             <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
               <div>
                 {isPublic ? (
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-[#b45309] mb-4 border border-orange-200">
-                    <Lock className="w-3.5 h-3.5" />
-                    <span className="text-xs font-bold uppercase tracking-wider">
-                      {accessLevel === "coordination" ? "Validación de coordinación" : "Validación administrativa"}
-                    </span>
+                  <div className="mb-4 space-y-2">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[#b45309]">
+                      <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span className="text-xs font-bold uppercase tracking-wider">
+                        {validationCopy.badgeLabel}
+                      </span>
+                    </div>
+                    <p className="max-w-2xl text-sm leading-relaxed text-[#6b5f53]">
+                      {validationCopy.badgeHint}
+                    </p>
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e3f2fd] text-[#1565c0] mb-4">
-                    <Lock className="w-3.5 h-3.5" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Acceso verificado</span>
+                  <div className="mb-4 space-y-2">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-[#e3f2fd] px-3 py-1 text-[#1565c0]">
+                      <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span className="text-xs font-bold uppercase tracking-wider">
+                        {VERIFIED_ACCESS_COPY.badgeLabel}
+                      </span>
+                    </div>
+                    <p className="max-w-2xl text-sm leading-relaxed text-[#6b5f53]">
+                      {VERIFIED_ACCESS_COPY.badgeHint}
+                    </p>
                   </div>
                 )}
                 <h2 className="font-display text-3xl text-[#1a1a1a]">Archivo de documentos</h2>
-                <p className="mt-2 text-[#4a4540] text-lg">
-                  Explora los instrumentos y herramientas de gobierno propio de los Consejos Comunitarios.
+                <p className="mt-2 text-lg text-[#4a4540]">
+                  {isPublic ? validationCopy.sectionDescription : VERIFIED_ACCESS_COPY.sectionDescription}
                 </p>
               </div>
             </div>

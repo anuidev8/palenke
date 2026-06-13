@@ -20,4 +20,6 @@ export type PalenkeGalleryMedia = {
   categoryId?: string;
   /** Optional subcategory slug within a parent category (e.g. foro-global-tierra) */
   subcategoryId?: string;
+  /** When true, modal playback is forced silent with volume controls hidden. */
+  playbackMuted?: boolean;
 };

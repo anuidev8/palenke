@@ -7,22 +7,18 @@ import { withRole } from "@/lib/viewer";
 import type { ViewerRole } from "@/lib/mock-data";
 import { HeroCards } from "@/components/home/HeroCards";
 import { ExpandableVideo } from "@/components/home/ExpandableVideo";
-import { HERO_AMBIENT_AUDIO_DURATION } from "@/lib/hero-ambient-audio";
+import {
+  HERO_AMBIENT_AUDIO_DURATION,
+  HOME_HERO_AUDIO_SRC,
+  HOME_HERO_VIDEO_SRC,
+} from "@/lib/hero-ambient-audio";
+import { useHeroAmbientAudio } from "@/lib/useHeroAmbientAudio";
 
-const HERO_VIDEO_SRC = "/videos/home-hero-presentacion.mp4";
-const HERO_AUDIO_TARGET_VOLUME = 0.16;
-const AUDIO_FADE_DURATION_MS = 900;
-
-function clampVolume(value: number) {
-  return Math.max(0, Math.min(1, value));
-}
+const HERO_VIDEO_SRC = HOME_HERO_VIDEO_SRC;
 
 export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const cardVideoRef = useRef<HTMLVideoElement>(null);
-  const volumeFadeRafRef = useRef<number | null>(null);
   const isHeroMediaPlayingRef = useRef(true);
-  const isHeroAudioEnabledRef = useRef(false);
-  const hasScrolledPastHeroTopRef = useRef(false);
   const isExpandedRef = useRef(false);
 
   const [isHeroMediaPlaying, setIsHeroMediaPlaying] = useState(true);
@@ -31,83 +27,31 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   isHeroMediaPlayingRef.current = isHeroMediaPlaying;
-  isHeroAudioEnabledRef.current = isHeroAudioEnabled;
-  hasScrolledPastHeroTopRef.current = hasScrolledPastHeroTop;
   isExpandedRef.current = isExpanded;
 
-  const stopVolumeFade = useCallback(() => {
-    if (volumeFadeRafRef.current !== null) {
-      cancelAnimationFrame(volumeFadeRafRef.current);
-      volumeFadeRafRef.current = null;
+  const audioRef = useHeroAmbientAudio({
+    audioSrc: HOME_HERO_AUDIO_SRC,
+    enabled: isHeroAudioEnabled && !hasScrolledPastHeroTop && !isExpanded,
+    paused: !isHeroMediaPlaying,
+    targetVolume: 0.16,
+    fadeDurationMs: 900,
+  });
+
+  const syncVideoPlayback = useCallback(async () => {
+    const video = cardVideoRef.current;
+    if (!video || isExpandedRef.current) {
+      return;
     }
+
+    if (!isHeroMediaPlayingRef.current) {
+      video.pause();
+      return;
+    }
+
+    video.muted = true;
+    video.volume = 0;
+    await video.play().catch(() => {});
   }, []);
-
-  const fadeVideoVolumeTo = useCallback(
-    (target: number, durationMs: number) => {
-      const video = cardVideoRef.current;
-      if (!video) {
-        return;
-      }
-
-      const safeTarget = clampVolume(target);
-      stopVolumeFade();
-
-      const startVolume = clampVolume(video.volume);
-      if (durationMs <= 0 || Math.abs(startVolume - safeTarget) < 0.005) {
-        video.volume = safeTarget;
-        return;
-      }
-
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        const progress = Math.min(1, (now - startTime) / durationMs);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        video.volume = clampVolume(startVolume + (safeTarget - startVolume) * eased);
-
-        if (progress < 1) {
-          volumeFadeRafRef.current = requestAnimationFrame(step);
-          return;
-        }
-
-        volumeFadeRafRef.current = null;
-        video.volume = safeTarget;
-      };
-
-      volumeFadeRafRef.current = requestAnimationFrame(step);
-    },
-    [stopVolumeFade],
-  );
-
-  const syncVideoPlayback = useCallback(
-    async (fromUserGesture = false) => {
-      const video = cardVideoRef.current;
-      if (!video || isExpandedRef.current) {
-        return;
-      }
-
-      if (!isHeroMediaPlayingRef.current) {
-        video.pause();
-        return;
-      }
-
-      const shouldPlayAudio =
-        isHeroAudioEnabledRef.current && !hasScrolledPastHeroTopRef.current;
-
-      if (shouldPlayAudio && fromUserGesture) {
-        video.muted = false;
-        await video.play().catch(() => {});
-        fadeVideoVolumeTo(HERO_AUDIO_TARGET_VOLUME, AUDIO_FADE_DURATION_MS);
-        return;
-      }
-
-      stopVolumeFade();
-      video.muted = true;
-      video.volume = 0;
-      await video.play().catch(() => {});
-    },
-    [fadeVideoVolumeTo, stopVolumeFade],
-  );
 
   useEffect(() => {
     const video = cardVideoRef.current;
@@ -134,7 +78,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
 
   useEffect(() => {
     void syncVideoPlayback();
-  }, [hasScrolledPastHeroTop, isHeroMediaPlaying, isExpanded, syncVideoPlayback]);
+  }, [isHeroMediaPlaying, isExpanded, syncVideoPlayback]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -152,12 +96,6 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
       window.removeEventListener("scroll", updateScrollState);
     };
   }, []);
-
-  useEffect(() => {
-    return () => {
-      stopVolumeFade();
-    };
-  }, [stopVolumeFade]);
 
   function handleExpandedChange(open: boolean) {
     isExpandedRef.current = open;
@@ -181,6 +119,8 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
 
   return (
     <section className="relative overflow-hidden bg-[#1a2a1a]">
+      <audio ref={audioRef} src={HOME_HERO_AUDIO_SRC} preload="metadata" className="sr-only" />
+
       <div className="absolute inset-0 z-0">
         <div
           className="absolute inset-0"
@@ -269,7 +209,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
               <ExpandableVideo
                 videoId="hero"
                 fullSrc={HERO_VIDEO_SRC}
-                expandedMuted={!isHeroAudioEnabled}
+                expandedMuted
                 expandedLoop
                 open={isExpanded}
                 onOpenChange={handleExpandedChange}
@@ -321,12 +261,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
         <div className="flex flex-col items-end gap-2">
           <button
             type="button"
-            onClick={() => {
-              const next = !isHeroAudioEnabled;
-              isHeroAudioEnabledRef.current = next;
-              setIsHeroAudioEnabled(next);
-              void syncVideoPlayback(true);
-            }}
+            onClick={() => setIsHeroAudioEnabled((prev) => !prev)}
             aria-label={isHeroAudioEnabled ? "Silenciar sonido ambiente" : "Activar sonido ambiente"}
             aria-pressed={isHeroAudioEnabled}
             className={controlButtonClass(isHeroAudioEnabled)}
@@ -344,7 +279,7 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
               const next = !isHeroMediaPlaying;
               isHeroMediaPlayingRef.current = next;
               setIsHeroMediaPlaying(next);
-              void syncVideoPlayback(true);
+              void syncVideoPlayback();
             }}
             aria-label={isHeroMediaPlaying ? "Pausar video y sonido" : "Reanudar video y sonido"}
             aria-pressed={isHeroMediaPlaying}

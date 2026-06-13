@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Splits «Somos la voz del territorio» into hero audio tracks (~35s).
- * Home: muxes audio into home-hero-presentacion.mp4 (video + audio merged).
- * Memoria / Gobierno: keeps separate MP3 files for independent playback.
+ * Splits «Somos la voz del territorio» (~3:05) into hero audio tracks per module.
+ * Home: 00:00–01:00 · Memoria: 01:00–02:00 · Gobierno: 02:00–03:05
+ *
+ * Video files are not modified — each module plays its MP3 via useHeroAmbientAudio.
  *
  * Usage:
  *   node scripts/split-hero-presentation-audio.mjs
@@ -21,6 +22,8 @@ const DEFAULT_SOURCE = path.join(
   ROOT,
   "public/assets/Somos la voz del territorio .mp3.mpeg",
 );
+const DOWNLOADS_SOURCE =
+  "/Users/usuario/Downloads/Somos la voz del territorio .mp3 (1).mpeg";
 const DESKTOP_SOURCE =
   "/Users/usuario/Desktop/Somos la voz del territorio .mp3 (1).mpeg";
 
@@ -33,27 +36,19 @@ const GOBIERNO_AUDIO = path.join(
   ROOT,
   "public/audio/somos-la-voz-gobierno-propio.mp3",
 );
-const HOME_VIDEO_SILENT = path.join(
-  ROOT,
-  "public/videos/home-hero-presentacion-silent.mp4",
-);
-const HOME_VIDEO_OUT = path.join(ROOT, "public/videos/home-hero-presentacion.mp4");
 
-/** Natural song section break before GANCHO (Memoria = intro/verso, Gobierno = gancho/outro). */
-const DEFAULT_SPLIT_AT = 101.053;
-const CLIP_SECONDS = 35;
+/** Segment boundaries on the full track (total ~3:05). */
+const SEGMENTS = {
+  home: { start: 0, duration: 60 },
+  memoria: { start: 60, duration: 60 },
+  gobierno: { start: 120, duration: 65 },
+};
 
 function parseArgs(argv) {
-  const options = { source: null, splitAt: DEFAULT_SPLIT_AT, clipSeconds: CLIP_SECONDS };
+  const options = { source: null };
   for (let i = 2; i < argv.length; i += 1) {
     if (argv[i] === "--source" && argv[i + 1]) {
       options.source = argv[i + 1];
-      i += 1;
-    } else if (argv[i] === "--split-at" && argv[i + 1]) {
-      options.splitAt = Number(argv[i + 1]);
-      i += 1;
-    } else if (argv[i] === "--clip-seconds" && argv[i + 1]) {
-      options.clipSeconds = Number(argv[i + 1]);
       i += 1;
     }
   }
@@ -62,10 +57,11 @@ function parseArgs(argv) {
 
 function resolveSource(explicit) {
   if (explicit && fs.existsSync(explicit)) return explicit;
+  if (fs.existsSync(DOWNLOADS_SOURCE)) return DOWNLOADS_SOURCE;
   if (fs.existsSync(DESKTOP_SOURCE)) return DESKTOP_SOURCE;
   if (fs.existsSync(DEFAULT_SOURCE)) return DEFAULT_SOURCE;
   throw new Error(
-    "Source audio not found. Pass --source or place the file on Desktop.",
+    "Source audio not found. Pass --source or place the file in Downloads/Desktop.",
   );
 }
 
@@ -76,102 +72,44 @@ function run(command, args) {
   }
 }
 
-function main() {
-  const { source: sourceArg, splitAt, clipSeconds } = parseArgs(process.argv);
-  const source = resolveSource(sourceArg);
-
-  fs.mkdirSync(path.dirname(HOME_AUDIO), { recursive: true });
-
-  console.log(`Source: ${source}`);
-  console.log(`Split at ${splitAt.toFixed(2)}s, clip length ${clipSeconds}s`);
-
-  run("ffmpeg", [
-    "-y",
-    "-i",
-    source,
-    "-t",
-    String(clipSeconds),
-    "-c:a",
-    "libmp3lame",
-    "-q:a",
-    "2",
-    HOME_AUDIO,
-  ]);
-
-  run("ffmpeg", [
-    "-y",
-    "-i",
-    source,
-    "-t",
-    String(clipSeconds),
-    "-c:a",
-    "libmp3lame",
-    "-q:a",
-    "2",
-    MEMORIA_AUDIO,
-  ]);
-
+function extractSegment(source, output, { start, duration }) {
   run("ffmpeg", [
     "-y",
     "-i",
     source,
     "-ss",
-    String(splitAt),
+    String(start),
     "-t",
-    String(clipSeconds),
+    String(duration),
     "-c:a",
     "libmp3lame",
     "-q:a",
     "2",
-    GOBIERNO_AUDIO,
+    output,
   ]);
+}
 
-  if (!fs.existsSync(HOME_VIDEO_SILENT) && fs.existsSync(HOME_VIDEO_OUT)) {
-    fs.copyFileSync(HOME_VIDEO_OUT, HOME_VIDEO_SILENT);
-    console.log(`Saved silent home video: ${path.relative(ROOT, HOME_VIDEO_SILENT)}`);
-  }
+function main() {
+  const { source: sourceArg } = parseArgs(process.argv);
+  const source = resolveSource(sourceArg);
 
-  if (fs.existsSync(HOME_VIDEO_SILENT)) {
-    run("ffmpeg", [
-      "-y",
-      "-stream_loop",
-      "-1",
-      "-i",
-      HOME_VIDEO_SILENT,
-      "-i",
-      HOME_AUDIO,
-      "-map",
-      "0:v:0",
-      "-map",
-      "1:a:0",
-      "-c:v",
-      "libx264",
-      "-preset",
-      "fast",
-      "-crf",
-      "18",
-      "-pix_fmt",
-      "yuv420p",
-      "-c:a",
-      "aac",
-      "-b:a",
-      "128k",
-      "-t",
-      String(clipSeconds),
-      "-movflags",
-      "+faststart",
-      `${HOME_VIDEO_OUT}.tmp.mp4`,
-    ]);
-    fs.renameSync(`${HOME_VIDEO_OUT}.tmp.mp4`, HOME_VIDEO_OUT);
-    console.log(`Home video (merged): ${path.relative(ROOT, HOME_VIDEO_OUT)}`);
-  } else {
-    console.warn("Skip home mux: home-hero-presentacion-silent.mp4 not found.");
-  }
+  fs.mkdirSync(path.dirname(HOME_AUDIO), { recursive: true });
+
+  console.log(`Source: ${source}`);
+  console.log(
+    `Segments: home ${SEGMENTS.home.start}s–${SEGMENTS.home.start + SEGMENTS.home.duration}s, ` +
+      `memoria ${SEGMENTS.memoria.start}s–${SEGMENTS.memoria.start + SEGMENTS.memoria.duration}s, ` +
+      `gobierno ${SEGMENTS.gobierno.start}s–${SEGMENTS.gobierno.start + SEGMENTS.gobierno.duration}s`,
+  );
+
+  extractSegment(source, HOME_AUDIO, SEGMENTS.home);
+  extractSegment(source, MEMORIA_AUDIO, SEGMENTS.memoria);
+  extractSegment(source, GOBIERNO_AUDIO, SEGMENTS.gobierno);
 
   console.log(`Home audio: ${path.relative(ROOT, HOME_AUDIO)}`);
   console.log(`Memoria audio: ${path.relative(ROOT, MEMORIA_AUDIO)}`);
   console.log(`Gobierno audio: ${path.relative(ROOT, GOBIERNO_AUDIO)}`);
-  console.log("Done.");
+  console.log("Done. (Video files unchanged.)");
 }
 
 main();

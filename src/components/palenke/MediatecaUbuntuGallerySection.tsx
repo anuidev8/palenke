@@ -33,6 +33,7 @@ export default function MediatecaUbuntuGallerySection({
   items: PalenkeGalleryMedia[];
 }) {
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [videoCollectionOpen, setVideoCollectionOpen] = useState(false);
   const [categoryId, setCategoryId] = useState<MediatecaUbuntuCategoryId>("todas");
   const [subcategoryId, setSubcategoryId] = useState<"todas" | ForoGlobalTierraSubcategoryId>(
     "todas",
@@ -104,12 +105,25 @@ export default function MediatecaUbuntuGallerySection({
     return kindBaseItems.filter((item) => item.kind === mediaKind);
   }, [kindBaseItems, mediaKind]);
 
+  const videoItems = useMemo(
+    () => filteredItems.filter((item) => item.kind === "video"),
+    [filteredItems],
+  );
+  const photoItems = useMemo(
+    () => filteredItems.filter((item) => item.kind !== "video"),
+    [filteredItems],
+  );
+
+  const showVideos = mediaKind === "all" || mediaKind === "video";
+  const showPhotos = mediaKind === "all" || mediaKind === "image";
+
   const totalCount = filteredItems.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const photoTotalCount = photoItems.length;
+  const totalPages = Math.max(1, Math.ceil(photoTotalCount / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
   const pageStart = (safePage - 1) * PAGE_SIZE;
-  const pageEnd = Math.min(pageStart + PAGE_SIZE, totalCount);
-  const pageItems = filteredItems.slice(pageStart, pageEnd);
+  const pageEnd = Math.min(pageStart + PAGE_SIZE, photoTotalCount);
+  const photoPageItems = photoItems.slice(pageStart, pageEnd);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -319,16 +333,62 @@ export default function MediatecaUbuntuGallerySection({
 
         {totalCount > 0 ? (
           <p className="text-sm text-[#7a756e]">
-            Mostrando {pageStart + 1}–{pageEnd} de {totalCount} pieza{totalCount !== 1 ? "s" : ""}
+            {showVideos && videoItems.length > 0 ? (
+              <>
+                {videoItems.length} video{videoItems.length !== 1 ? "s" : ""}
+                {showPhotos && photoTotalCount > 0 ? " · " : ""}
+              </>
+            ) : null}
+            {showPhotos && photoTotalCount > 0 ? (
+              <>
+                {photoTotalCount} imagen{photoTotalCount !== 1 ? "es" : ""}
+                {photoTotalCount > PAGE_SIZE
+                  ? ` (mostrando ${pageStart + 1}–${pageEnd})`
+                  : ""}
+              </>
+            ) : null}
             {searchQuery ? ` · consulta: “${searchQuery}”` : ""}
           </p>
         ) : null}
       </div>
 
-      {pageItems.length > 0 ? (
-        <>
+      {showVideos && videoItems.length > 0 ? (
+        <section className="mb-10" aria-label="Videos de la Mediateca Ubuntu">
+          <div className="mb-5">
+            <p className="eyebrow mb-2">Videos</p>
+            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
+              Registros audiovisuales del territorio
+            </h3>
+          </div>
           <GobiernoPropioMediaGallery
-            items={pageItems}
+            items={videoItems}
+            collectionOpen={videoCollectionOpen}
+            onCollectionOpenChange={setVideoCollectionOpen}
+            layoutGroupId="mediateca-ubuntu-videos"
+            layoutIdPrefix="mediateca-video"
+            showAllPreview
+            uniformPreviewGrid
+            previewColumnsLg={2}
+            cardVariant="image-overlay"
+            collectionAriaLabel="Videos de Mediateca Ubuntu"
+            collectionTitle="Videos — Mediateca Ubuntu"
+            collectionSubtitle={`${videoItems.length} video${videoItems.length !== 1 ? "s" : ""}`}
+          />
+        </section>
+      ) : null}
+
+      {showPhotos && photoPageItems.length > 0 ? (
+        <>
+          {showVideos && videoItems.length > 0 ? (
+            <div className="mb-5">
+              <p className="eyebrow mb-2">Fotografías</p>
+              <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
+                Imágenes del archivo comunitario
+              </h3>
+            </div>
+          ) : null}
+          <GobiernoPropioMediaGallery
+            items={photoPageItems}
             collectionOpen={collectionOpen}
             onCollectionOpenChange={setCollectionOpen}
             layoutGroupId="mediateca-ubuntu-gallery"
@@ -338,7 +398,7 @@ export default function MediatecaUbuntuGallerySection({
             collectionAriaLabel="Colección completa de Mediateca Ubuntu"
             collectionTitle="Mediateca Ubuntu — colección completa"
             collectionSubtitle={
-              `${filteredItems.length} piezas` +
+              `${photoTotalCount} imagen${photoTotalCount !== 1 ? "es" : ""}` +
               (mediaKind !== "all"
                 ? ` · ${MEDIA_KIND_OPTIONS.find((option) => option.id === mediaKind)?.label ?? ""}`
                 : "") +
@@ -377,7 +437,9 @@ export default function MediatecaUbuntuGallerySection({
             </div>
           ) : null}
         </>
-      ) : (
+      ) : null}
+
+      {totalCount === 0 ? (
         <div className="rounded-[24px] border border-[#e8dfd3] bg-white p-8 text-[#4a4540]">
           <p className="font-semibold text-[#1a1a1a]">No hay piezas con estos criterios</p>
           <p className="mt-2 text-sm leading-6">
@@ -398,7 +460,7 @@ export default function MediatecaUbuntuGallerySection({
             </button>
           ) : null}
         </div>
-      )}
+      ) : null}
     </>
   );
 }
