@@ -551,8 +551,8 @@ export default async function InstrumentoPage({
             <source
               src={
                 instrumentoKey === "genero-familia"
-                  ? "/videos/genero-familia-hero.mp4"
-                  : "/videos/justicia-libertad.mp4"
+                  ? "/videos/genero-familia-hero.mp4?v=20250618"
+                  : "/videos/justicia-libertad.mp4?v=20250618"
               }
               type="video/mp4"
             />
