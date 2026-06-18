@@ -32,7 +32,8 @@
     "sync:seguridad-juridica-documents:dry": "node scripts/sync-seguridad-juridica-documents.mjs --dry-run",
     "sync:rutas-metodologicas": "node scripts/sync-rutas-metodologicas.mjs",
     "sync:rutas-metodologicas:dry": "node scripts/sync-rutas-metodologicas.mjs --dry-run",
-    "sync:rutas-metodologicas:verify": "node scripts/sync-rutas-metodologicas.mjs --verify"
+    "sync:rutas-metodologicas:verify": "node scripts/sync-rutas-metodologicas.mjs --verify",
+    "upload:genero-familia-document": "node scripts/upload-genero-familia-document.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",

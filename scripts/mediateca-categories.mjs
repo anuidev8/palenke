@@ -30,4 +30,16 @@ export const MEDIATECA_CATEGORIES = [
     dir: "taller-genero",
     sourceDir: "TALLER DE GENERO",
   },
+  {
+    id: "encuentro-nacional-2024",
+    label: "Encuentro Nacional de Delegados y Autoridades Afrodescendientes",
+    dir: "encuentro-nacional-2024",
+    sourceDir: "ENCUENTRO NACIONAL DE DELAGADOS Y AUTORIDADES AFRODECENDIENTES - 2024",
+  },
+  {
+    id: "reglamentos-internos",
+    label: "Reglamentos Internos",
+    dir: "reglamentos-internos",
+    sourceDir: "reglamentos internos",
+  },
 ];

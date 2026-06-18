@@ -539,7 +539,7 @@ export default async function InstrumentoPage({
       {/* ── Hero with Background Image ── */}
       <section className="relative w-full h-[55vh] min-h-[500px] flex items-end pb-32 bg-[#1a1a1a]">
         {/* Immersive Background Image or Video */}
-        {instrumentoKey === "seguridad-juridica" ? (
+        {instrumentoKey === "seguridad-juridica" || instrumentoKey === "genero-familia" ? (
           <video
             autoPlay
             loop
@@ -548,7 +548,14 @@ export default async function InstrumentoPage({
             preload="metadata"
             className="absolute inset-0 w-full h-full object-cover opacity-85"
           >
-            <source src="/videos/justicia-libertad.mp4" type="video/mp4" />
+            <source
+              src={
+                instrumentoKey === "genero-familia"
+                  ? "/videos/genero-familia-hero.mp4"
+                  : "/videos/justicia-libertad.mp4"
+              }
+              type="video/mp4"
+            />
           </video>
         ) : (
           inst.imageUrl && (
@@ -576,7 +583,7 @@ export default async function InstrumentoPage({
             className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-white/80 transition hover:text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Volver a instrumentos
+            {instrumentoKey === "genero-familia" ? "Volver a Gobierno Propio" : "Volver a instrumentos"}
           </Link>
           
           <div className="flex flex-col sm:flex-row items-start gap-6">
@@ -587,9 +594,11 @@ export default async function InstrumentoPage({
               <Icon className="h-10 w-10 text-white" aria-hidden="true" />
             </div>
             <div className="max-w-3xl">
-              <p className="mb-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-white/80">
-                {inst.eyebrow}
-              </p>
+              {instrumentoKey !== "genero-familia" && (
+                <p className="mb-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-white/80">
+                  {inst.eyebrow}
+                </p>
+              )}
               <h1 className="font-display text-4xl leading-[1.1] text-white sm:text-5xl lg:text-6xl drop-shadow-lg">
                 {inst.title}
               </h1>
@@ -773,31 +782,7 @@ export default async function InstrumentoPage({
           {instrumentoKey !== "seguridad-juridica" ? (
             <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-b border-[#e8dfd3] pb-6">
               <div>
-                {isPublic ? (
-                  <div className="mb-4 space-y-2">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[#b45309]">
-                      <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span className="text-xs font-bold uppercase tracking-wider">
-                        {validationCopy.badgeLabel}
-                      </span>
-                    </div>
-                    <p className="max-w-2xl text-sm leading-relaxed text-[#6b5f53]">
-                      {validationCopy.badgeHint}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mb-4 space-y-2">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[#e3f2fd] px-3 py-1 text-[#1565c0]">
-                      <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span className="text-xs font-bold uppercase tracking-wider">
-                        {VERIFIED_ACCESS_COPY.badgeLabel}
-                      </span>
-                    </div>
-                    <p className="max-w-2xl text-sm leading-relaxed text-[#6b5f53]">
-                      {VERIFIED_ACCESS_COPY.badgeHint}
-                    </p>
-                  </div>
-                )}
+
                 <h2 className="font-display text-3xl text-[#1a1a1a]">Archivo de documentos</h2>
                 <p className="mt-2 text-lg text-[#4a4540]">
                   {isPublic ? validationCopy.sectionDescription : VERIFIED_ACCESS_COPY.sectionDescription}
