@@ -80,19 +80,6 @@ const instruments = [
     imageUrl: "/assets/placeholders/proteccion-hidrica.png",
     fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
   },
-  {
-    id: "genero-familia",
-    title: "Género, Generación y Familia",
-    bullets: [
-      "Relaciones de cuidado y participación comunitaria",
-      "Liderazgo de mujeres, jóvenes y familias en el territorio",
-    ],
-    color: "#7b1fa2", // Deep Purple (Care/Family/Gender)
-    lightBg: "#f3e5f5",
-    href: "/gobierno-propio/genero-familia",
-    imageUrl: "/assets/placeholders/genero-familia.png",
-    fallbackImageUrl: "/assets/placeholders/genero-familia.svg",
-  },
 ];
 
 export default async function GobiernoPropioPage({
@@ -304,6 +291,116 @@ export default async function GobiernoPropioPage({
                 </div>
                 <h3 className="mb-2 font-display text-lg font-semibold text-white">Titulación y Ampliación</h3>
                 <p className="text-sm text-white/70 leading-relaxed">Titulación colectiva del territorio y ampliación de límites ancestrales.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5) CTA GÉNERO, GENERACIÓN Y FAMILIA ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#e8a537] via-[#e65100] to-[#d84315] py-20 px-4 sm:px-6 lg:px-8 text-white border-y border-[#c65000]">
+        {/* Glowing gradients & Organic shapes */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          <div className="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#ff9800]/20 to-transparent blur-[120px]" />
+          <div className="absolute -bottom-1/4 -right-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-t from-[#ff6f00]/30 to-transparent blur-[100px]" />
+
+          {/* Organic curves */}
+          <svg
+            className="absolute left-[5%] bottom-[10%] w-[450px] h-[450px] opacity-[0.08] rotate-45 text-[#ffb74d]"
+            viewBox="0 0 100 100"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path d="M 20 50 Q 40 20 60 50 T 100 50" />
+            <path d="M 20 60 Q 40 30 60 60 T 100 60" />
+            <path d="M 20 70 Q 40 40 60 70 T 100 70" />
+            <circle cx="50" cy="50" r="25" strokeDasharray="3 3" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
+            {/* Left Content */}
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-white">
+                  Módulo Palenke
+                </span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight">
+                Género, Generación <br />y Familia
+              </h2>
+              <p className="text-lg text-white/90 leading-relaxed max-w-2xl">
+                El módulo de Género, Generación y Familia es un espacio del Palenke de Pensamiento orientado a reconocer y fortalecer las relaciones de cuidado, participación, respeto y dignidad que sostienen la vida comunitaria, organizativa y territorial del Pueblo Negro.
+              </p>
+              <p className="text-base text-white/80 max-w-xl">
+                Visibiliza el papel de las mujeres, las juventudes, las personas mayores, las familias y los liderazgos comunitarios en los procesos de gobierno propio, memoria, protección del territorio y construcción colectiva.
+              </p>
+
+              <div className="pt-4">
+                <Link
+                  href={withRole("/gobierno-propio/genero-familia", role)}
+                  className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-[#e65100] shadow-lg transition-all duration-300 hover:bg-white/95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#e65100]/30"
+                >
+                  <span>Ingresar al módulo de Género, Generación y Familia</span>
+                  <svg
+                    className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Panel / Preview Feature Cards */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Relaciones de Cuidado</h3>
+                <p className="text-sm text-white/80 leading-relaxed">Participación y dignidad en la vida comunitaria y territorial.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Visibilización</h3>
+                <p className="text-sm text-white/80 leading-relaxed">Rol de mujeres, jóvenes y liderazgos comunitarios.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Territorio y Memoria</h3>
+                <p className="text-sm text-white/80 leading-relaxed">Protección comunitaria y construcción colectiva.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="mb-2 font-display text-lg font-semibold text-white">Espacios Inclusivos</h3>
+                <p className="text-sm text-white/80 leading-relaxed">Construcción libre de discriminación y corresponsabilidad.</p>
               </div>
             </div>
           </div>
