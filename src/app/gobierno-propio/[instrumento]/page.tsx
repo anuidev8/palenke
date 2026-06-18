@@ -545,10 +545,8 @@ export default async function InstrumentoPage({
             loop
             muted
             playsInline
-            preload="none"
-            poster={instrumentoKey === "genero-familia" ? "/assets/placeholders/genero-familia.svg" : undefined}
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover opacity-85"
-            style={{ backgroundSize: "cover" }}
           >
             <source
               src={
