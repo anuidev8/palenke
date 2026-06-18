@@ -324,15 +324,6 @@ export default async function GobiernoPropioPage({
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#e8dfd3] bg-white px-4 py-1.5 shadow-sm">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#d32f2f] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#d32f2f]"></span>
-                </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#d32f2f]">
-                  Módulo Palenke
-                </span>
-              </div>
               <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight text-[#1a1a1a]">
                 Género, Generación <br />y Familia
               </h2>
