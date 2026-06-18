@@ -298,15 +298,15 @@ export default async function GobiernoPropioPage({
       </section>
 
       {/* ── 5) CTA GÉNERO, GENERACIÓN Y FAMILIA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#e8a537] via-[#e65100] to-[#d84315] py-20 px-4 sm:px-6 lg:px-8 text-white border-y border-[#c65000]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#7cb342] via-[#689f38] to-[#558b2f] py-20 px-4 sm:px-6 lg:px-8 text-white border-y border-[#33691e]">
         {/* Glowing gradients & Organic shapes */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          <div className="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#ff9800]/20 to-transparent blur-[120px]" />
-          <div className="absolute -bottom-1/4 -right-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-t from-[#ff6f00]/30 to-transparent blur-[100px]" />
+          <div className="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#9ccc65]/20 to-transparent blur-[120px]" />
+          <div className="absolute -bottom-1/4 -right-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-t from-[#7cb342]/30 to-transparent blur-[100px]" />
 
           {/* Organic curves */}
           <svg
-            className="absolute left-[5%] bottom-[10%] w-[450px] h-[450px] opacity-[0.08] rotate-45 text-[#ffb74d]"
+            className="absolute left-[5%] bottom-[10%] w-[450px] h-[450px] opacity-[0.08] rotate-45 text-[#aed581]"
             viewBox="0 0 100 100"
             fill="none"
             stroke="currentColor"
@@ -325,8 +325,8 @@ export default async function GobiernoPropioPage({
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 backdrop-blur-md">
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c6ff00] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#c6ff00]"></span>
                 </span>
                 <span className="text-xs font-bold uppercase tracking-wider text-white">
                   Módulo Palenke
@@ -345,7 +345,7 @@ export default async function GobiernoPropioPage({
               <div className="pt-4">
                 <Link
                   href={withRole("/gobierno-propio/genero-familia", role)}
-                  className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-[#e65100] shadow-lg transition-all duration-300 hover:bg-white/95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#e65100]/30"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-[#558b2f] shadow-lg transition-all duration-300 hover:bg-white/95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#558b2f]/20"
                 >
                   <span>Ingresar al módulo de Género, Generación y Familia</span>
                   <svg
