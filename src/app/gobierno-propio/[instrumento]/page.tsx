@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, LayoutDashboard, Leaf, Scale, Lock, Shield } from "lucide-react";
+import { ArrowLeft, BookOpen, Droplets, FileText, Gavel, Heart, LayoutDashboard, Leaf, Scale, Lock, Shield, Users } from "lucide-react";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { SiteLayout } from "@/components/mock/ui";
@@ -41,6 +41,7 @@ import {
 const PLACEHOLDER_PNG_IDS = new Set([
   "conservacion",
   "etnodesarrollo",
+  "genero-familia",
   "planes-uso",
   "proteccion-hidrica",
   "reglamentos",
@@ -240,6 +241,26 @@ const instrumentos = {
     librarySection: "Seguridad jurídica de la tierra",
     accessLevel: "admin",
   },
+  "genero-familia": {
+    title: "Género, Generación y Familia",
+    eyebrow: "Módulo Palenke",
+    icon: Heart,
+    color: "#7b1fa2",
+    lightBg: "#f3e5f5",
+    imageUrl: resolvePlaceholderImage("genero-familia"),
+    definition:
+      "El módulo de Género, Generación y Familia es un espacio del Palenke de Pensamiento orientado a reconocer y fortalecer las relaciones de cuidado, participación, respeto y dignidad que sostienen la vida comunitaria, organizativa y territorial del Pueblo Negro.",
+    context:
+      "Este módulo permite visibilizar el papel de las mujeres, las juventudes, las personas mayores, las familias y los liderazgos comunitarios en los procesos de gobierno propio, memoria, protección del territorio y construcción colectiva. A través de este espacio se reúnen reflexiones, herramientas y aprendizajes que aportan a relaciones más justas, corresponsables y libres de discriminación, promoviendo una mirada integral sobre el género, las generaciones y la familia como dimensiones fundamentales para cuidar la vida, fortalecer la organización y avanzar en procesos comunitarios más incluyentes.",
+    keyPoints: [
+      "Relaciones de cuidado y participación comunitaria",
+      "Visibilización del rol de mujeres y jóvenes",
+      "Liderazgos comunitarios y familiares",
+      "Construcción de espacios libres de discriminación",
+    ],
+    librarySection: "Género, Generación y Familia",
+    accessLevel: "admin",
+  },
 } as const;
 
 type InstrumentoSlug = keyof typeof instrumentos;
@@ -270,6 +291,7 @@ const dbInstrumentMap: Partial<Record<InstrumentoSlug, string>> = {
   "planes-uso": "planes-uso",
   etnodesarrollo: "etnodesarrollo",
   conservacion: "conservacion",
+  "genero-familia": "genero-familia",
   "seguridad-juridica": "seguridad-juridica",
 };
 

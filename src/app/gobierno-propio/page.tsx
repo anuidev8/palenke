@@ -80,6 +80,19 @@ const instruments = [
     imageUrl: "/assets/placeholders/proteccion-hidrica.png",
     fallbackImageUrl: "/assets/placeholders/proteccion-hidrica.svg",
   },
+  {
+    id: "genero-familia",
+    title: "Género, Generación y Familia",
+    bullets: [
+      "Relaciones de cuidado y participación comunitaria",
+      "Liderazgo de mujeres, jóvenes y familias en el territorio",
+    ],
+    color: "#7b1fa2", // Deep Purple (Care/Family/Gender)
+    lightBg: "#f3e5f5",
+    href: "/gobierno-propio/genero-familia",
+    imageUrl: "/assets/placeholders/genero-familia.png",
+    fallbackImageUrl: "/assets/placeholders/genero-familia.svg",
+  },
 ];
 
 export default async function GobiernoPropioPage({
