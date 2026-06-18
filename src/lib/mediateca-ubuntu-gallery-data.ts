@@ -12,11 +12,11 @@ export const MEDIATECA_UBUNTU_CATEGORIES = [
   { id: "todas", label: "Todas las categorías" },
   { id: "all", label: "Colección general" },
   { id: "areas-bioculturales-2024", label: "Áreas bioculturales de conservación" },
+  { id: "areas-de-conservacion", label: "Áreas de conservación" },
   { id: "foro-global-tierra", label: "Foro Global de la Tierra" },
   { id: "instrumento-gobierno-propio", label: "Instrumento de Gobierno Propio" },
   { id: "proyectos-productivos-2024", label: "Soberanía alimentaria" },
   { id: "taller-genero", label: "Generación, género y familia" },
-  { id: "cc-diego-luis-cordoba", label: "C.C. Diego Luis Córdoba" },
 ] as const;
 
 export type MediatecaUbuntuCategoryId = (typeof MEDIATECA_UBUNTU_CATEGORIES)[number]["id"];
@@ -51,13 +51,47 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
     categoryId: "all",
   },
   {
-    id: "mediateca-cc-diego-luis-cordoba-video-de-whatsapp-2023-06-29-a-las-15-40-37-mp4",
-    title: "Registro audiovisual en C.C. Diego Luis Córdoba",
+    id: "mediateca-areas-de-conservacion-areas-de-conservacion-1-mp4",
+    title: "Registro audiovisual en Áreas de conservación · 1",
     section: "Mediateca Ubuntu",
     type: "Video",
     description:
-      "Registro audiovisual del consejo comunitario Diego Luis Córdoba — memoria comunitaria del Palenke de Pensamiento.",
-    territory: "C.C. Diego Luis Córdoba",
+      "Registro audiovisual de la colección Áreas de conservación — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Áreas de conservación",
+    council: "Palenke de Pensamiento · PCN",
+    year: 2026,
+    kind: "video",
+    posterUrl: MEDIATECA_VIDEO_POSTER,
+    mediaUrl:
+      "https://xtbdgwlwxslcpyholwuz.supabase.co/storage/v1/object/public/mediateca-ubuntu/areas-de-conservacion/areas_de_conservacion_1.mp4",
+    visibility: "public",
+    categoryId: "areas-de-conservacion",
+  },
+  {
+    id: "mediateca-areas-de-conservacion-areas-de-conservacion-2-mp4",
+    title: "Registro audiovisual en Áreas de conservación · 2",
+    section: "Mediateca Ubuntu",
+    type: "Video",
+    description:
+      "Registro audiovisual de la colección Áreas de conservación — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Áreas de conservación",
+    council: "Palenke de Pensamiento · PCN",
+    year: 2026,
+    kind: "video",
+    posterUrl: MEDIATECA_VIDEO_POSTER,
+    mediaUrl:
+      "https://xtbdgwlwxslcpyholwuz.supabase.co/storage/v1/object/public/mediateca-ubuntu/areas-de-conservacion/areas_de_conservacion_2.mp4",
+    visibility: "public",
+    categoryId: "areas-de-conservacion",
+  },
+  {
+    id: "mediateca-cc-diego-luis-cordoba-video-de-whatsapp-2023-06-29-a-las-15-40-37-mp4",
+    title: "Registro audiovisual en colección general",
+    section: "Mediateca Ubuntu",
+    type: "Video",
+    description:
+      "Registro audiovisual de la colección general — memoria comunitaria del Palenke de Pensamiento.",
+    territory: "Colección general",
     council: "Palenke de Pensamiento · PCN",
     year: 2023,
     kind: "video",
@@ -65,7 +99,7 @@ export const mediatecaUbuntuGalleryMedia: PalenkeGalleryMedia[] = [
     mediaUrl:
       "/assets/mediateca-ubuntu/cc-diego-luis-cordoba/Video de WhatsApp 2023-06-29 a las 15.40.37.mp4",
     visibility: "public",
-    categoryId: "cc-diego-luis-cordoba",
+    categoryId: "all",
   },
   {
     id: "mediateca-areas-bioculturales-2024-img-8694-jpg",
