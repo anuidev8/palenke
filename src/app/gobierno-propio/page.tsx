@@ -212,15 +212,7 @@ export default async function GobiernoPropioPage({
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 backdrop-blur-md">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8ce08e] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#8ce08e]"></span>
-                </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#8ce08e]">
-                  Módulo Especial Destacado
-                </span>
-              </div>
+
               <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight">
                 Seguridad jurídica <br />de la tierra y el territorio
               </h2>

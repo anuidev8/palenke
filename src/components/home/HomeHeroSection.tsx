@@ -31,9 +31,9 @@ export function HomeHeroSection({ role }: { role: ViewerRole }) {
 
   const audioRef = useHeroAmbientAudio({
     audioSrc: HOME_HERO_AUDIO_SRC,
-    enabled: isHeroAudioEnabled && !hasScrolledPastHeroTop && !isExpanded,
+    enabled: isHeroAudioEnabled && !hasScrolledPastHeroTop,
     paused: !isHeroMediaPlaying,
-    targetVolume: 0.16,
+    targetVolume: 1,
     fadeDurationMs: 900,
   });
 

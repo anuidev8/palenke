@@ -25,7 +25,7 @@ export function HomeVideoGallery() {
     audioSrc: ORIENTACION_POLITICA_AUDIO_SRC,
     enabled: isAudioEnabled,
     paused: false,
-    targetVolume: 0.16,
+    targetVolume: 1,
     fadeDurationMs: 900,
   });
 

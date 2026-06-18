@@ -13,12 +13,6 @@ export const MEDIATECA_CATEGORIES = [
     sourceDir: "FORO GLOBAL DE LA TIERRA",
   },
   {
-    id: "instrumento-gobierno-propio",
-    label: "Instrumento de Gobierno Propio",
-    dir: "instrumento-gobierno-propio",
-    sourceDir: "INSTRUMENTO DE GOBIERNO PROPIO",
-  },
-  {
     id: "proyectos-productivos-2024",
     label: "Proyectos Productivos 2024",
     dir: "proyectos-productivos-2024",
