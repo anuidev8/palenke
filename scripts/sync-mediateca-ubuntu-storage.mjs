@@ -250,12 +250,10 @@ function buildGalleryEntry(item, urls) {
   const id = `mediateca-${item.category.id}-${slugify(item.filename)}`;
   const posterUrl =
     item.kind === "video"
-      ? urls.mediaUrl.includes("supabase.co") || urls.mediaUrl.startsWith("/")
-        ? urls.mediaUrl
-        : (urls.posterUrl ?? VIDEO_POSTER_FALLBACK)
+      ? VIDEO_POSTER_FALLBACK
       : item.kind === "audio"
         ? AUDIO_POSTER_FALLBACK
-      : urls.mediaUrl;
+        : urls.mediaUrl;
 
   return {
     id,
@@ -292,7 +290,6 @@ export const MEDIATECA_UBUNTU_CATEGORIES = [
   { id: "todas", label: "Todas las categorías" },
   { id: "areas-bioculturales-2024", label: "Áreas bioculturales de conservación" },
   { id: "foro-global-tierra", label: "Foro Global de la Tierra" },
-  { id: "instrumento-gobierno-propio", label: "Instrumento de Gobierno Propio" },
   { id: "proyectos-productivos-2024", label: "Proyectos Productivos 2024" },
   { id: "taller-genero", label: "Taller de Género" },
 ] as const;
