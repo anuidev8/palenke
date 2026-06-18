@@ -81,6 +81,17 @@ function MediaPreview({
   disableHoverScale?: boolean;
   sizes?: string;
 }) {
+  const isVideoWithoutPoster = item.kind === "video" && !item.posterUrl;
+
+  if (isVideoWithoutPoster) {
+    return (
+      <div
+        className={`absolute inset-0 z-0 h-full w-full overflow-hidden bg-gradient-to-b from-[#0d0d0d]/92 via-[#0d0d0d]/45 to-transparent ${className ?? ""}`}
+        aria-hidden
+      />
+    );
+  }
+
   const src = item.posterUrl || item.mediaUrl;
   const staticPoster = isStaticPosterUrl(item.posterUrl) ? item.posterUrl : null;
   const imageSrc =
@@ -226,62 +237,87 @@ function GalleryCard({
       )}
 
       {isOverlay ? (
-        <div className="relative z-10 flex min-h-[inherit] flex-1 flex-col p-6 sm:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <span
-              className="inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm"
-              style={{
-                backgroundColor: accent,
-                color: accent === "#1a1a1a" ? "#fff" : "#1a1a1a",
-              }}
-            >
-              {item.type}
-            </span>
-            <span className="inline-flex rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+        item.kind === "video" && !item.posterUrl ? (
+          <div className="relative z-10 flex min-h-[inherit] flex-1 flex-col items-center justify-center p-6 sm:p-7 text-center">
+            <h3 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-white mb-3">
+              {item.title}
+            </h3>
+            <p className="text-sm sm:text-base leading-relaxed text-white/85 mb-6 max-w-sm">
               {item.territory}
-            </span>
+            </p>
+            <p className="text-xs font-medium uppercase tracking-widest text-white/60 mb-6">
+              Click preview to watch
+            </p>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpen();
+              }}
+              aria-label={openActionLabel(item.kind)}
+              className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/35 bg-black/45 shadow-lg backdrop-blur-md hover:bg-black/60 transition"
+            >
+              <span className="ml-1 h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-white" />
+            </button>
           </div>
-
-          {(item.kind === "video" || item.kind === "audio") && (
-            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-80">
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpen();
+        ) : (
+          <div className="relative z-10 flex min-h-[inherit] flex-1 flex-col p-6 sm:p-7">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <span
+                className="inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm"
+                style={{
+                  backgroundColor: accent,
+                  color: accent === "#1a1a1a" ? "#fff" : "#1a1a1a",
                 }}
-                aria-label={openActionLabel(item.kind)}
-                className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/45 shadow-lg backdrop-blur-md sm:h-14 sm:w-14"
               >
-                {item.kind === "audio" ? (
-                  <Headphones className="h-6 w-6 text-white sm:h-7 sm:w-7" />
-                ) : (
-                  <span className="ml-1 h-0 w-0 border-y-[7px] border-l-[12px] border-y-transparent border-l-white sm:border-y-8 sm:border-l-[14px]" />
-                )}
-              </button>
-            </div>
-          )}
-
-          <div className="relative z-[3] mt-auto pt-10">
-            <div className="flex flex-wrap items-center gap-3 border-t border-white/15 pt-4">
-              <span className="text-[11px] font-medium uppercase tracking-widest text-white/60">
-                {item.year}
+                {item.type}
               </span>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpen();
-                }}
-                className={`relative z-[3] ml-auto inline-flex rounded-full border border-white/25 bg-black/45 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md${
-                  staticPresentation ? "" : " transition hover:bg-black/60"
-                }`}
-              >
-                {openActionLabel(item.kind)}
-              </button>
+              <span className="inline-flex rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+                {item.territory}
+              </span>
+            </div>
+
+            {(item.kind === "video" || item.kind === "audio") && (
+              <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center opacity-80">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onOpen();
+                  }}
+                  aria-label={openActionLabel(item.kind)}
+                  className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/45 shadow-lg backdrop-blur-md sm:h-14 sm:w-14"
+                >
+                  {item.kind === "audio" ? (
+                    <Headphones className="h-6 w-6 text-white sm:h-7 sm:w-7" />
+                  ) : (
+                    <span className="ml-1 h-0 w-0 border-y-[7px] border-l-[12px] border-y-transparent border-l-white sm:border-y-8 sm:border-l-[14px]" />
+                  )}
+                </button>
+              </div>
+            )}
+
+            <div className="relative z-[3] mt-auto pt-10">
+              <div className="flex flex-wrap items-center gap-3 border-t border-white/15 pt-4">
+                <span className="text-[11px] font-medium uppercase tracking-widest text-white/60">
+                  {item.year}
+                </span>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onOpen();
+                  }}
+                  className={`relative z-[3] ml-auto inline-flex rounded-full border border-white/25 bg-black/45 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md${
+                    staticPresentation ? "" : " transition hover:bg-black/60"
+                  }`}
+                >
+                  {openActionLabel(item.kind)}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )
       ) : (
         <div
           className={`relative z-10 flex flex-1 flex-col justify-end ${isHero ? "p-6 md:p-10 lg:flex-row lg:gap-12" : "p-6"}`}

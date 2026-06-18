@@ -352,41 +352,14 @@ export default function MediatecaUbuntuGallerySection({
         ) : null}
       </div>
 
-      {showVideos && videoItems.length > 0 ? (
-        <section className="mb-10" aria-label="Videos de la Mediateca Ubuntu">
-          <div className="mb-5">
-            <p className="eyebrow mb-2">Videos</p>
-            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
-              Registros audiovisuales del territorio
-            </h3>
-          </div>
-          <GobiernoPropioMediaGallery
-            items={videoItems}
-            collectionOpen={videoCollectionOpen}
-            onCollectionOpenChange={setVideoCollectionOpen}
-            layoutGroupId="mediateca-ubuntu-videos"
-            layoutIdPrefix="mediateca-video"
-            showAllPreview
-            uniformPreviewGrid
-            previewColumnsLg={2}
-            cardVariant="image-overlay"
-            collectionAriaLabel="Videos de Mediateca Ubuntu"
-            collectionTitle="Videos — Mediateca Ubuntu"
-            collectionSubtitle={`${videoItems.length} video${videoItems.length !== 1 ? "s" : ""}`}
-          />
-        </section>
-      ) : null}
-
       {showPhotos && photoPageItems.length > 0 ? (
         <>
-          {showVideos && videoItems.length > 0 ? (
-            <div className="mb-5">
-              <p className="eyebrow mb-2">Fotografías</p>
-              <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
-                Imágenes del archivo comunitario
-              </h3>
-            </div>
-          ) : null}
+          <div className="mb-5">
+            <p className="eyebrow mb-2">Fotografías</p>
+            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
+              Imágenes del archivo comunitario
+            </h3>
+          </div>
           <GobiernoPropioMediaGallery
             items={photoPageItems}
             collectionOpen={collectionOpen}
@@ -437,6 +410,31 @@ export default function MediatecaUbuntuGallerySection({
             </div>
           ) : null}
         </>
+      ) : null}
+
+      {showVideos && videoItems.length > 0 ? (
+        <section className="mb-10" aria-label="Videos de la Mediateca Ubuntu">
+          <div className="mb-5">
+            <p className="eyebrow mb-2">Videos</p>
+            <h3 className="font-display text-2xl text-[#1a1a1a] sm:text-3xl">
+              Registros audiovisuales del territorio
+            </h3>
+          </div>
+          <GobiernoPropioMediaGallery
+            items={videoItems}
+            collectionOpen={videoCollectionOpen}
+            onCollectionOpenChange={setVideoCollectionOpen}
+            layoutGroupId="mediateca-ubuntu-videos"
+            layoutIdPrefix="mediateca-video"
+            showAllPreview
+            uniformPreviewGrid
+            previewColumnsLg={2}
+            cardVariant="image-overlay"
+            collectionAriaLabel="Videos de Mediateca Ubuntu"
+            collectionTitle="Videos — Mediateca Ubuntu"
+            collectionSubtitle={`${videoItems.length} video${videoItems.length !== 1 ? "s" : ""}`}
+          />
+        </section>
       ) : null}
 
       {totalCount === 0 ? (
