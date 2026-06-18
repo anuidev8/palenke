@@ -676,7 +676,7 @@ export default async function InstrumentoPage({
                   </span>
                 </div>
                 
-                {instrumentoKey !== "seguridad-juridica" ? (
+                {instrumentoKey !== "seguridad-juridica" && instrumentoKey !== "genero-familia" ? (
                   <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-[#1a1a1a] mb-6 tracking-tight">
                     ¿Qué es este instrumento?
                   </h2>
