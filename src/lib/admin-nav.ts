@@ -7,7 +7,10 @@ export function normalizeAdminEmail(email: string | null | undefined) {
 }
 
 export function canAccessVisualContentAdmin(email: string | null | undefined) {
-  return normalizeAdminEmail(email) === VISUAL_CONTENT_ADMIN_EMAIL;
+  // Visual content (AI) admin is temporarily hidden for everyone.
+  // To re-enable, restore: normalizeAdminEmail(email) === VISUAL_CONTENT_ADMIN_EMAIL
+  void email;
+  return false;
 }
 
 export function isAdminNavItemVisible(
