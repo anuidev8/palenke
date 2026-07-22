@@ -13,6 +13,7 @@
     "split:hero-presentation-audio": "node scripts/split-hero-presentation-audio.mjs",
     "generate:gobierno-propio-hero-video": "node scripts/generate-slideshow-video.mjs --source \"/Users/usuario/Desktop/images/video2\" --output public/videos/gobierno-propio-hero-presentacion-ffmpeg.mp4 --duration 12 --assets-dir public/assets/gobierno-propio-hero-slider --assets-prefix gobierno",
     "render:gobierno-propio-hero-video": "cd media/gobierno-propio-hero-slideshow && npx hyperframes render --quality high --output ../../public/videos/gobierno-propio-hero-presentacion.mp4",
+    "generate:memoria-afroterritorial-sora-video": "node scripts/generate-memoria-sora-video.mjs",
     "sync:plan-instrumentos-storage": "node scripts/upload-plan-instrumentos-storage.mjs",
     "sync:plan-instrumentos-storage:dry": "node scripts/upload-plan-instrumentos-storage.mjs --dry-run",
     "sync:plan-instrumentos-storage:verify": "node scripts/upload-plan-instrumentos-storage.mjs --verify",

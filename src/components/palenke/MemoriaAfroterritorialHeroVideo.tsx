@@ -7,7 +7,7 @@ import { ExpandableVideo } from "@/components/home/ExpandableVideo";
 import { useHeroAmbientAudio } from "@/lib/useHeroAmbientAudio";
 
 const TERRITORY_GREEN_OVERLAY =
-  "radial-gradient(ellipse at 35% 65%, rgba(46,125,50,0.6), transparent 55%), linear-gradient(160deg, #0d1f0d 0%, #1a2a1a 100%)";
+  "radial-gradient(ellipse at 50% 55%, rgba(46,125,50,0.55), transparent 58%), linear-gradient(160deg, #0d1f0d 0%, #1a2a1a 100%)";
 
 interface MemoriaAfroterritorialHeroVideoProps {
   videoSrc: string;
@@ -207,7 +207,7 @@ export function MemoriaAfroterritorialHeroVideo({
             muted
             playsInline
             preload="metadata"
-            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+            className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300"
             style={{ opacity: isMediaPlaying ? 0.85 : 0.45 }}
           />
 
@@ -238,8 +238,8 @@ export function MemoriaAfroterritorialHeroVideo({
               strokeWidth="1.5"
               fill="none"
             />
-            <ellipse cx="200" cy="220" rx="70" ry="48" fill="#2e7d32" opacity="0.35" />
-            <ellipse cx="430" cy="150" rx="90" ry="55" fill="#1b5e20" opacity="0.28" />
+            <ellipse cx="300" cy="210" rx="80" ry="50" fill="#2e7d32" opacity="0.32" />
+            <ellipse cx="360" cy="160" rx="90" ry="55" fill="#1b5e20" opacity="0.24" />
           </svg>
 
           {duration ? (
