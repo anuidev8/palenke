@@ -1,0 +1,12 @@
+{
+  "title": "Documentación Palenke",
+  "pages": [
+    "index",
+    "accesos",
+    "modulos-y-urls",
+    "informe-y-matriz",
+    "arquitectura-y-base-de-datos",
+    "como-esta-construido",
+    "repositorio-codigo"
+  ]
+}

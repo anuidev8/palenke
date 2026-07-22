@@ -75,6 +75,7 @@ export function SiteHeader({
     { label: "Memoria Afroterritorial", href: "/memoria-afroterritorial" },
     { label: "Gobierno Propio", href: "/gobierno-propio" },
     { label: "SCITA", href: "/scita" },
+    { label: "Docs", href: "/docs" },
   ];
 
   if (isInternal(effectiveRole)) {

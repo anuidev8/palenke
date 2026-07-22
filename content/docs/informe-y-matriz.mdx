@@ -1,0 +1,103 @@
+---
+title: Informe final y matriz de cumplimiento
+description: Qué son el DOCX y el XLSX del cierre contractual y cómo se relacionan con /docs.
+---
+
+# Informe final y matriz de cumplimiento
+
+Estos dos archivos son los **formatos de cierre contractual** (HILEROS 055-2026). Esta página `/docs` los explica en lenguaje claro. Los archivos originales viven en el repositorio (y se envían firmados por el canal institucional).
+
+## Archivos
+
+| Documento | Archivo | Para qué sirve |
+|-----------|---------|----------------|
+| Matriz de cumplimiento | `docs/final-formats/02_Matriz_cumplimiento_ANGEL_MATEUS_final.xlsx` | Lista cada obligación contractual, estado, avance % y **enlace/evidencia** |
+| Informe final administrativo | `docs/final-formats/INFORME_FINAL_ANGEL_MATEUS_HILEROS_055-2026.docx` | Narrativa del periodo + tabla de obligaciones tomada de la matriz + anexos |
+
+Contrato / proyecto: **HILEROS 055-2026** · **Turning Tides P1010**  
+Contratista: Angel Mateus Arrieta Morelo · Coordinación: Francy Conu
+
+---
+
+## Matriz (`02_…xlsx`)
+
+Tiene (al menos) dos hojas:
+
+1. **Matriz contractual** — una fila por obligación (Fase 1 MVP, Fase 2, entregables espejo 14.x / 25.x).
+2. **Cierre administrativo** — checklist de papelería (informe firmado, cuenta de cobro, etc.).
+
+### Cómo leer una fila de la matriz
+
+- **Obligación** — qué pide el contrato  
+- **Qué se hizo** — descripción del avance real  
+- **Producto / evidencia** — resultado verificable  
+- **Enlace / anexo** — preferentemente:
+  - URL del módulo en el producto (`https://dev-palenke-two.vercel.app/...`)
+  - y/o página de esta documentación (`/docs/...`)
+- **Estado** — Cumplido / En proceso / No iniciado / Insumo de continuidad  
+- **Avance %**
+
+### Criterio de evidencia (ya aplicado en la matriz)
+
+Para módulos del MVP **no se exigen capturas de pantalla**.  
+La evidencia es la **URL real** del módulo y, cuando aplica, la explicación en `/docs`.
+
+Ejemplos:
+
+| Tema | URL de evidencia |
+|------|------------------|
+| Catálogo de módulos | [/docs/modulos-y-urls](/docs/modulos-y-urls) |
+| Accesos admin/interno | [/docs/accesos](/docs/accesos) |
+| Arquitectura / DB | [/docs/arquitectura-y-base-de-datos](/docs/arquitectura-y-base-de-datos) |
+| Cómo está construido | [/docs/como-esta-construido](/docs/como-esta-construido) |
+| Código (privado) | [/docs/repositorio-codigo](/docs/repositorio-codigo) |
+| Producto | [https://dev-palenke-two.vercel.app/](https://dev-palenke-two.vercel.app/) |
+
+### Nota geoportal (matriz)
+
+El geoportal SIG **no cierra en el MVP**. Queda como **siguiente etapa**.  
+Solo existe un punto de acceso preparatorio: [https://dev-palenke-two.vercel.app/geoportal](https://dev-palenke-two.vercel.app/geoportal).
+
+---
+
+## Informe final (`INFORME_FINAL_…docx`)
+
+Es el formato administrativo Hileros rellenado con:
+
+- datos del contratista y periodo  
+- objeto contractual (MVP Palenke; geoportal fuera del cierre)  
+- tabla de obligaciones alineada a la matriz (sin filas espejo 14.x / 25.x duplicadas)  
+- anexos: matriz, URLs `/docs`, producto, GitHub, accesos  
+
+### Cómo usarlo en supervisión
+
+1. Leer el informe (narrativa + tabla).  
+2. Abrir los enlaces `/docs` y las URLs de producto citadas.  
+3. Contrastar con la matriz Excel si hace falta detalle por obligación.  
+4. Firmar / exportar PDF por el canal institucional (paso administrativo pendiente si aún no está firmado).
+
+El DOCX se regenera desde la matriz con el script del repo:  
+`scripts/generate_informe_final_angel.py`
+
+---
+
+## Relación entre los tres canales
+
+```text
+Matriz (XLSX)  ──►  enlaces a URLs producto + /docs (Fumadocs)
+Informe (DOCX) ──►  resume la matriz + anexos /docs
+Sitio /docs     ──►  toda la evidencia legible (esta sección)
+```
+
+No existe carpeta `evidences/`: la evidencia del MVP está **toda en Fumadocs** (`/docs`) y en las URLs reales del producto. No se requieren capturas de pantalla.
+
+---
+
+## Dónde están los archivos
+
+En el repositorio privado (tras invitación):
+
+- `docs/final-formats/02_Matriz_cumplimiento_ANGEL_MATEUS_final.xlsx`
+- `docs/final-formats/INFORME_FINAL_ANGEL_MATEUS_HILEROS_055-2026.docx`
+
+Ver también: [Repositorio de código](/docs/repositorio-codigo).

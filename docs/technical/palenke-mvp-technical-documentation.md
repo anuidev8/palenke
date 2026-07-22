@@ -172,9 +172,9 @@ Buckets usados en el proyecto (definidos/actualizados por migraciones):
 
 | Obligacion / evidencia | Que documenta del DB |
 |------------------------|----------------------|
-| Obl. 4 / `evidences/04` | Auth + roles (`users`, sesion Supabase) |
-| Obl. 11 / `evidences/11` | Este documento tecnico (incl. modelo de datos) |
-| Obl. 16 / `evidences/16` | Taxonomias/metadatos via migraciones sobre `documents` |
+| Obl. 4 | Auth + roles — ver `/docs/accesos` |
+| Obl. 11 | Documentación técnica + modelo de datos — ver `/docs/arquitectura-y-base-de-datos` |
+| Obl. 16 | Taxonomías/metadatos via migraciones sobre `documents` |
 | Obl. 20 | APIs que leen/escriben estas tablas |
 | Protocolo SIG–BI–Postgres | `docs/protocolo-sig-bi-postgresql-powerbi-y-palenke.md` (flujo tableros) |
 
@@ -248,9 +248,21 @@ Detalle del modelo relacional y RLS: ver **seccion 3A**.
 - URL: https://github.com/anuidev8/palenke
 - Visibilidad: **privado**
 - Acceso: la supervision / revisores deben ser invitados por **correo electronico** como colaboradores de GitHub para ver codigo, estructura, migraciones y documentacion tecnica.
-- Evidencia contractual: `docs/final-formats/evidences/10/REPOSITORIO_GITHUB.md` (obligacion 10)
+- Evidencia contractual: `/docs/repositorio-codigo` (obligación 10)
 
-### 7.5 Comandos operativos relevantes
+### 7.5 Accesos a la plataforma (validacion)
+
+- Documentacion legible en producto: https://dev-palenke-two.vercel.app/docs
+- Accesos: https://dev-palenke-two.vercel.app/docs/accesos
+- Modulos/URLs: https://dev-palenke-two.vercel.app/docs/modulos-y-urls
+- Arquitectura/DB: https://dev-palenke-two.vercel.app/docs/arquitectura-y-base-de-datos
+- Repositorio: https://dev-palenke-two.vercel.app/docs/repositorio-codigo
+- **Admin:** email `angelarrieta34@gmail.com` / password `welcome123` → https://dev-palenke-two.vercel.app/admin
+- **Interno:** email `fconu@renacientes.org` / password `@welcome123` → login con rol `internal`
+- Fuente markdown de `/docs`: `content/docs/`
+
+
+### 7.6 Comandos operativos relevantes
 
 - `npm run sync:plan-instrumentos-storage`
 - `npm run sync:plan-instrumentos-storage:verify`
@@ -293,9 +305,8 @@ Detalle del modelo relacional y RLS: ver **seccion 3A**.
 - `docs/plan_instrumentos_progress.md`
 - `docs/plan-usuarios-roles-cuentas.md`
 - `docs/pagina-inicial-presentacion/technical-design.md`
-- `docs/final-formats/evidences/11/` (anexo entregable documentacion tecnica basica)
+- `/docs/arquitectura-y-base-de-datos` (anexo legible del modelo de datos / documentación técnica básica)
 - `src/app/page.tsx`
 - `src/middleware.ts`
 - `src/app/api/access-requests/route.ts`
 - `src/app/api/documents/[id]/signed-url/route.ts`
-

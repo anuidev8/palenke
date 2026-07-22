@@ -105,6 +105,9 @@ function SiteFooter({ role, minimal = false }: { role: ViewerRole; minimal?: boo
                 <Link href={withRole("/accesibilidad", role)} className="text-white/70 transition hover:text-white">
                   Accesibilidad
                 </Link>
+                <Link href={withRole("/docs", role)} className="text-white/70 transition hover:text-white">
+                  Documentación técnica
+                </Link>
                 <ContactFooterLink />
               </div>
             </div>

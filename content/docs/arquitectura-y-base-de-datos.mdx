@@ -1,0 +1,50 @@
+---
+title: Arquitectura y base de datos
+description: Qué tipo de base de datos usa Palenke y cómo está modelada.
+---
+
+# Arquitectura y base de datos
+
+## Stack del MVP
+
+- **Frontend / servidor:** Next.js (App Router) + React + TypeScript
+- **Estilos:** Tailwind CSS
+- **Datos y seguridad:** Supabase (Auth + PostgreSQL + Storage + RLS)
+- **Analítica embebida:** Power BI (URLs de tableros)
+- **Geoportal SIG:** externo / siguiente etapa (no cierre MVP)
+
+## ¿Qué tipo de base de datos es?
+
+| Aspecto | Decisión |
+|---------|----------|
+| Motor | **PostgreSQL** (base relacional / RDBMS) |
+| Plataforma | **Supabase** (Postgres gestionado + Auth + Storage) |
+| Modelo | Tablas, claves, constraints, índices |
+| Seguridad | **RLS** (Row Level Security) por rol y visibilidad |
+| Archivos | Buckets de Storage (no BLOB en las filas) |
+
+**No es** MongoDB, ni un data warehouse, ni una geodatabase SIG.
+
+## ¿Por qué PostgreSQL + Supabase?
+
+1. Relaciones claras entre usuarios, documentos, solicitudes y permisos
+2. Control de acceso alineado a roles `public` / `internal` / `admin`
+3. Auth integrada con perfil de negocio (`public.users`)
+4. Migraciones SQL auditables en el repositorio (`supabase/migrations/`)
+
+## Tablas principales
+
+- `users` — perfil y rol
+- `documents` — catálogo documental + visibilidad
+- `access_requests` — solicitudes de acceso
+- `document_download_grants` — permisos puntuales de descarga
+- `scita_dashboards` — catálogo de embeds Power BI
+- `scita_reports` — reportes de campo
+- `contact_messages`, `admin_activity_log`, `internal_news`, `events`
+
+## Dónde está el detalle técnico completo
+
+- [Cómo está construido cada módulo](/docs/como-esta-construido) (rutas, libs, tablas y componentes reales)
+- Documento técnico en repo: `docs/technical/palenke-mvp-technical-documentation.md` (sección 3A)
+- DDL: carpeta `supabase/migrations/` en el repositorio privado
+- Explicación contractual: [Informe y matriz](/docs/informe-y-matriz)

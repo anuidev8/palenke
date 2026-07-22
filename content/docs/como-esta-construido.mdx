@@ -1,0 +1,332 @@
+---
+title: Cómo está construido cada módulo
+description: Mapa real del código App Router, datos y componentes por módulo del MVP.
+---
+
+# Cómo está construido cada módulo
+
+Documentación de **cómo está armado el código real** del MVP (rutas, libs, datos, auth). No son ejemplos inventados: son las rutas y archivos que existen en el repositorio.
+
+## Cómo leer las rutas de código
+
+Los textos como ``src/middleware.ts`` o ``src/app/biblioteca/page.tsx`` son **rutas de archivo dentro del repo GitHub** (`https://github.com/anuidev8/palenke`), no enlaces del sitio `/docs`.
+
+- Supervisión no técnica: use las URLs de producto en [Módulos y URLs](/docs/modulos-y-urls).
+- Supervisión técnica: abra el archivo en GitHub tras ser invitada al repo privado (ver [Repositorio](/docs/repositorio-codigo)).
+- Ejemplo directo: [src/middleware.ts en GitHub](https://github.com/anuidev8/palenke/blob/main/src/middleware.ts) (requiere acceso).
+
+## Patrón común de casi todos los módulos públicos
+
+1. Página **Server Component** en `src/app/<ruta>/page.tsx`
+2. Rol del visitante con `getViewerRoleFromRequest` / `getViewerRequestState` (`src/lib/viewer-server.ts`) → sesión Supabase Auth + fila `public.users`
+3. Layout visual `SiteLayout` (`src/components/mock/ui.tsx`)
+4. Datos desde Supabase, catálogos en código (`mock-data` / libs de galería), o feeds externos
+5. Enlaces con `withRole()` cuando se necesita preservar contexto de rol en query string
+
+**Roles:** `public` | `internal` | `admin`  
+**Visibilidad de contenido:** `public` | `internal` | `sensitive`
+
+**Middleware** (`src/middleware.ts`): solo protege `/admin/:path*` y `/api/admin/:path*` (sesión + rol admin). El resto de gates viven en la página (`redirect`, `requireAdmin`, checks de visibilidad).
+
+---
+
+## Inicio — `/`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Ruta | `src/app/page.tsx` (server) |
+| Hero / UI | `HomeHeroSection`, `HomeInfoAccordions`, `DeferredHomeVideoGallery`, `HomeNewsSection` |
+| Intro | `PageIntroOverlay` |
+| Copy | `src/lib/mock-data.ts` (`homeIntro`, pilares, funciones estratégicas) |
+| Noticias del home | `getExternalEnterateNews` (WP externo) + `listLoUltimoNews` (`content.ts` / `lo-ultimo-publications.ts`) |
+
+---
+
+## Biblioteca — `/biblioteca`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Listado / detalle | `src/app/biblioteca/page.tsx`, `src/app/biblioteca/[slug]/page.tsx` |
+| UI | `BibliotecaDocGrid`, `BibliotecaSearchBar`, `BibliotecaMemoriaGrid`, `BibliotecaFilterSummary` |
+| Memoria / catálogo general | `getVisibleDocuments(role)` + `mock-queries` |
+| Normativa vigente | `getNormativaDocumentRecords()` → Supabase `documents` (`instrument = normativa-vigente`) |
+| APIs | `/api/documents/[id]/signed-url`, `/api/documents/[id]/preview` |
+
+Detalle: `sensitive` → 404; `internal` sin rol interno → `/acceso-restringido`. Descarga no pública vía signed URL cuando hay service role.
+
+---
+
+## Memoria Afroterritorial — `/memoria-afroterritorial`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `src/app/memoria-afroterritorial/page.tsx` |
+| UI | `MemoriaAfroterritorialSubnav`, `MemoriaAfroterritorialHeroVideo`, `OrientationNetworkSection` |
+| Activos | `src/lib/memoria-afroterritorial-assets.ts` |
+| Preview Mediateca | `getVisibleMediatecaUbuntuGalleryMedia(role)` |
+
+Editorial + media; el archivo audiovisual denso está en Mediateca Ubuntu.
+
+---
+
+## Mediateca Ubuntu — `/memoria-afroterritorial/mediateca-ubuntu`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `src/app/memoria-afroterritorial/mediateca-ubuntu/page.tsx` |
+| Galería | `MediatecaUbuntuGallerySection` |
+| Catálogo | `mediateca-ubuntu-gallery-data.ts` (filtrado por rol) |
+| Storage | `mediateca-ubuntu-storage.ts` → bucket `mediateca-ubuntu` |
+
+---
+
+## Gobierno propio — `/gobierno-propio`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Hub / instrumento / doc | `gobierno-propio/page.tsx`, `[instrumento]/page.tsx`, `[instrumento]/[slug]/page.tsx` |
+| Solicitud de acceso | `src/app/solicitar-acceso/[instrumento]/page.tsx` |
+| Documentos DB | `gobierno-propio-documents.ts` → `documents` |
+| Seguridad jurídica | `seguridad-juridica-catalog.ts` (+ JSON `data/seguridad-juridica-catalog.json`) y `seguridad-juridica-filters.ts` |
+| Galería / hero | `GobiernoPropioGallerySection`, `GobiernoPropioHeroVideo`, `gobierno-gallery-data.ts` |
+| Grants | `document-access.ts` → `document_download_grants` |
+| APIs | `api/access-requests`, signed-url / preview de documentos |
+
+Hub editorial en código + filas `documents` + signed URLs / grants según visibilidad e instrumento.
+
+---
+
+## Mujeres, Juventudes y Niñez — `/mujeres-juventudes-ninez`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Hub / campaña | `mujeres-juventudes-ninez/page.tsx`, `campanas/[slug]/page.tsx` |
+| Datos | **solo catálogo en código**: `getVisibleMjnDocuments`, `getVisibleCampaigns`, `mjnStories` (`mock-data.ts`) |
+| UI | `HeroSection`, `DocumentCard`, `CampaignCard`, `PiezasAutorizadasSection` |
+| Tabs | `?tab=` (all / litigio / pedagogico / memorias) |
+
+---
+
+## Incidencia — `/incidencia`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Listado / detalle | `incidencia/page.tsx`, `incidencia/[slug]/page.tsx` |
+| Datos públicos | publicaciones Lo Último (`lo-ultimo-publications.ts` vía `listLoUltimoNews` / `content.ts`) |
+| CMS opcional | tabla `internal_news` (admin novedades; cuando el flujo DB está activo) |
+| Embeds | `SocialPostEmbed`, `XPostEmbed`, `social-embed.ts` |
+
+---
+
+## Noticias — `/noticias`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Listado | `noticias/page.tsx` → WP externo (`getExternalEnterateNews`) + preview de `events` |
+| Detalle | `noticias/[slug]/page.tsx` → `newsroom.ts` (`pcnNewsArticles`) |
+
+---
+
+## Agenda — `/agenda`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Calendario / evento | `agenda/page.tsx`, `agenda/[slug]/page.tsx` |
+| Datos | `listEvents` → Supabase `events` (con fallback en `content.ts`) |
+| Admin | `/admin/novedades/eventos` |
+
+---
+
+## Estadísticas (Mirador) — `/estadisticas`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Catálogo | `estadisticas/page.tsx` |
+| Detalle `[slug]` | `estadisticas/[slug]/page.tsx` → **redirige siempre a `/estadisticas`** |
+| Datos | catálogo mock `getVisibleDashboards` / `filterDashboards` |
+
+Los tableros Power BI **vivos** de producto están en **SCITA** (`scita_dashboards`), no en el detalle de `/estadisticas/[slug]`.
+
+---
+
+## SCITA — `/scita`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `scita/page.tsx` |
+| UI | `ScitaPageContent`, workspace / paneles Power BI (`ScitaPowerBiBoard`, etc.) |
+| Datos | `listScitaDashboardsForRole` → `scita-dashboards.ts` → tabla `scita_dashboards` (+ fallback embeds en la lib) |
+| Admin CRUD | `/admin/dashboards` |
+
+Campos clave por registro: `embed_url`, `visibility`, `module_key` (`gobierno` | `conservacion` | `titulacion`).
+
+---
+
+## Formulario SCITA — `/scita/formulario`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página + acción | `scita/formulario/page.tsx`, `actions.ts` |
+| Form cliente | `ScitaFieldReportFormClient` |
+| Persistencia | `scita_reports` + bucket `scita-evidence` |
+| APIs | `api/scita/reports/prepare-upload`, `api/scita/reports/[id]/evidence` |
+| Modo | `live` con service role; si no, `mock` (`mock-reports-store`) |
+
+---
+
+## Solicitud e historial de acceso
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Solicitud de acceso | `src/app/solicitar-acceso/[instrumento]/page.tsx` |
+| Historial del usuario | `src/app/mis-solicitudes/page.tsx` |
+| API | `src/app/api/access-requests/route.ts` |
+| Tablas | `access_requests` → grants en `document_download_grants` |
+| Copy / estados | `access-requests.ts`, `access-validation-copy.ts` |
+
+---
+
+## Geoportal — `/geoportal`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `geoportal/page.tsx` |
+| Visor | `ScitaGeovisor` → Power BI + `ScitaTerritorialMapCanvas` |
+| Auth | solo `internal` / `admin`; si no → `/login?redirect=/geoportal` |
+
+Punto de acceso preparatorio del MVP. SIG completo = **siguiente etapa**. No hay geodatabase en Postgres de Palenke.
+
+---
+
+## Login — `/login`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `login/page.tsx` (server) |
+| Form | `LoginForm` + Supabase browser client |
+| Sesión | `getViewerRequestState` |
+| Destino | query `redirect` o `/studio` |
+
+---
+
+## Recuperar contraseña — `/recuperar-contrasena`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `recuperar-contrasena/page.tsx` |
+| Flujo | pantalla de soporte para recuperación; vuelve a `/login` |
+
+---
+
+## Studio — `/studio`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Página | `studio/page.tsx` (**client**) |
+| Auth | `useAuth()` → `AuthContext` |
+| Guard | sin user → login; sin rol internal/admin → `/acceso-restringido` |
+| Contenido | `getVisibleDocuments(viewerRole)` |
+
+---
+
+## Admin — `/admin/*`
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Home | `admin/page.tsx` + `AdminLayout` |
+| Gate app | `requireAdmin()` (`admin-access.ts`) |
+| Gate edge | `middleware.ts` (`/admin/*`, `/api/admin/*`) |
+| Actividad | `admin_activity_log` |
+
+Carpetas reales visibles: `documentos`, `solicitudes`, `usuarios`, `dashboards`, `novedades` (noticias/eventos), `alertas`.
+
+Subrutas CRUD reales:
+
+- `documentos/nuevo`, `documentos/[id]/editar`, `documentos/rutas-metodologicas`
+- `novedades/noticias`, `novedades/noticias/[id]/editar`
+- `novedades/eventos`, `novedades/eventos/[id]/editar`
+- `dashboards/nuevo`, `dashboards/[id]/editar`
+- `usuarios/nuevo`, `usuarios/[id]/editar`
+- `solicitudes/[id]`
+
+Nav oculta hoy, aunque las rutas existen: `accs`, `campanas`, `contenido-visual` (`admin-nav.ts`).  
+API admin: `api/admin/visual-content`, `api/admin/visual-content/suggestions` (también protegidas por middleware).
+
+---
+
+## Páginas legales y soporte
+
+| Pieza | Ubicación real |
+|-------|----------------|
+| Política de datos | `src/app/politica-de-datos/page.tsx` |
+| Accesibilidad | `src/app/accesibilidad/page.tsx` |
+| Acceso restringido | `src/app/acceso-restringido/page.tsx` |
+| Contacto | `ContactModal`, `ContactForm`, `api/contact-messages` |
+
+---
+
+## APIs de producto
+
+| API | Uso |
+|-----|-----|
+| `api/documents/[id]/signed-url` | descarga con control de visibilidad / grants |
+| `api/documents/[id]/preview` | vista previa documental |
+| `api/access-requests` | creación y consulta administrativa de solicitudes |
+| `api/scita/reports/prepare-upload` | preparación de carga de evidencias SCITA |
+| `api/scita/reports/[id]/evidence` | evidencia asociada a reportes SCITA |
+| `api/contact-messages` | mensajes de contacto |
+| `api/admin/visual-content` | generación/gestión visual admin |
+| `api/admin/visual-content/suggestions` | sugerencias visuales admin |
+
+---
+
+## Matriz de fuente de datos (real)
+
+| Módulo | Fuente principal |
+|--------|------------------|
+| Inicio | Copy estático + WP externo + Lo Último |
+| Biblioteca | Mock docs + Supabase `documents` (normativa) |
+| Memoria / Mediateca | Catálogos en código + URLs Storage (`mediateca-ubuntu`) |
+| Gobierno propio | Supabase `documents` + catálogo JSON seguridad jurídica + Storage |
+| MJN | Solo catálogo en código (`mock-data`) |
+| Incidencia | Lo Último (código) + opcional `internal_news` |
+| Noticias | WP + `newsroom`; Agenda → `events` |
+| Estadísticas | Catálogo mock (detalle `[slug]` redirige) |
+| SCITA | `scita_dashboards` + Power BI; form → `scita_reports` + `scita-evidence` |
+| Geoportal | Visor cliente (login wall); sin geodatabase local |
+| Solicitudes | `access_requests` + `document_download_grants` |
+| Login / Studio | Supabase Auth + `users` |
+| Admin | Tablas CMS Supabase (+ mock residual en ACCS/campañas) |
+
+---
+
+## Capas transversales
+
+- **Auth clients:** `src/lib/supabase/{client,server,service}.ts`
+- **Permisos:** `src/lib/auth/permissions.ts`
+- **Sesión RSC:** `src/lib/viewer-server.ts`
+- **Buckets:** `docs-public`, `docs-internal`, `docs-sensitive`, `mediateca-ubuntu`, `memoria-afroterritorial`, `scita-evidence`
+- **DDL:** `supabase/migrations/`
+- **Docs Fumadocs:** `content/docs/` → `src/app/docs/[[...slug]]/page.tsx` + `src/lib/source.ts`
+
+## Mapa rápido URL → carpeta
+
+| URL | App Router |
+|-----|------------|
+| `/` | `src/app/page.tsx` |
+| `/biblioteca` | `src/app/biblioteca/` |
+| `/memoria-afroterritorial` | `src/app/memoria-afroterritorial/` |
+| `/gobierno-propio` | `src/app/gobierno-propio/` |
+| `/mujeres-juventudes-ninez` | `src/app/mujeres-juventudes-ninez/` |
+| `/incidencia` | `src/app/incidencia/` |
+| `/noticias` | `src/app/noticias/` |
+| `/agenda` | `src/app/agenda/` |
+| `/estadisticas` | `src/app/estadisticas/` |
+| `/scita` | `src/app/scita/` |
+| `/geoportal` | `src/app/geoportal/` |
+| `/login` · `/recuperar-contrasena` | `src/app/login|recuperar-contrasena/` |
+| `/studio` · `/mis-solicitudes` | `src/app/studio|mis-solicitudes/` |
+| `/solicitar-acceso/[instrumento]` | `src/app/solicitar-acceso/` |
+| `/admin` | `src/app/admin/` |
+| `/politica-de-datos` · `/accesibilidad` | `src/app/politica-de-datos|accesibilidad/` |
+| `/docs` | `src/app/docs/` + `content/docs/` |

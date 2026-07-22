@@ -1,0 +1,2 @@
+import { a as TemplatePluginContext, i as TemplatePlugin, n as PackageJsonType, o as create, r as Template, t as Options } from "./index-Dw7e2NvW.js";
+export { Options, PackageJsonType, Template, TemplatePlugin, TemplatePluginContext, create };

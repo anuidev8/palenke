@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Source_Sans_3 } from "next/font/google";
 import { Suspense } from "react";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import GlobalBibliotecaSearchDock from "@/components/palenke/GlobalBibliotecaSearchDock";
 import { getVisibleDocuments } from "@/lib/mock-data";
 import { AuthProvider } from "@/lib/auth/AuthContext";
@@ -33,14 +34,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className={`${sourceSans3.variable} ${dmSerifDisplay.variable} antialiased`}>
-        <AuthProvider>
-          {children}
-          <Suspense fallback={null}>
-           
-          </Suspense>
-        </AuthProvider>
+        <RootProvider
+          theme={{
+            enabled: false,
+          }}
+        >
+          <AuthProvider>
+            {children}
+            <Suspense fallback={null}>
+              <GlobalBibliotecaSearchDock documents={globalSearchDocuments} role="public" />
+            </Suspense>
+          </AuthProvider>
+        </RootProvider>
       </body>
     </html>
   );

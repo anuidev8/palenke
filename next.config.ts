@@ -1,14 +1,20 @@
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+const withMDX = createMDX();
 
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : null;
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/docs": ["./content/docs/**/*", "./.source/**/*"],
+    "/docs/[[...slug]]": ["./content/docs/**/*", "./.source/**/*"],
+  },
   // Prevent large source PDFs / media from being traced into serverless functions.
   // docs/files (~280MB) and public/videos are served from Supabase/CDN, not lambdas.
   outputFileTracingExcludes: {
@@ -28,7 +34,6 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ["@google/genai"],
   images: {
-    // Next.js 16: quality prop must be in this list (default is only [75])
     qualities: [75, 85, 90],
     remotePatterns: [
       {
@@ -64,4 +69,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);
