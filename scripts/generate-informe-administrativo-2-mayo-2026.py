@@ -14,7 +14,7 @@ OUTPUT = ROOT / "DOCUEMNTOS_HONONARIOS/Formato Informe Administrativo (2).docx"
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
-SITE = "https://dev-palenke-two.vercel.app"
+SITE = "https://pro-palenke-vw-two.vercel.app"
 
 CONTRACTOR = {
     "NOMBRE DEL/ LA CONTRATISTA": "Angel Mateus Arrieta Morelo",

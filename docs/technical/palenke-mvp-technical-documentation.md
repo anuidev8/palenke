@@ -252,12 +252,12 @@ Detalle del modelo relacional y RLS: ver **seccion 3A**.
 
 ### 7.5 Accesos a la plataforma (validacion)
 
-- Documentacion legible en producto: https://dev-palenke-two.vercel.app/docs
-- Accesos: https://dev-palenke-two.vercel.app/docs/accesos
-- Modulos/URLs: https://dev-palenke-two.vercel.app/docs/modulos-y-urls
-- Arquitectura/DB: https://dev-palenke-two.vercel.app/docs/arquitectura-y-base-de-datos
-- Repositorio: https://dev-palenke-two.vercel.app/docs/repositorio-codigo
-- **Admin:** email `angelarrieta34@gmail.com` / password `welcome123` → https://dev-palenke-two.vercel.app/admin
+- Documentacion legible en producto: https://pro-palenke-vw-two.vercel.app/docs
+- Accesos: https://pro-palenke-vw-two.vercel.app/docs/accesos
+- Modulos/URLs: https://pro-palenke-vw-two.vercel.app/docs/modulos-y-urls
+- Arquitectura/DB: https://pro-palenke-vw-two.vercel.app/docs/arquitectura-y-base-de-datos
+- Repositorio: https://pro-palenke-vw-two.vercel.app/docs/repositorio-codigo
+- **Admin:** email `angelarrieta34@gmail.com` / password `welcome123` → https://pro-palenke-vw-two.vercel.app/admin
 - **Interno:** email `fconu@renacientes.org` / password `@welcome123` → login con rol `internal`
 - Fuente markdown de `/docs`: `content/docs/`
 

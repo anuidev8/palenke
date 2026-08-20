@@ -14,7 +14,7 @@ OUTPUT = ROOT / "DOCUEMNTOS_HONONARIOS/FORMATO INORME ADM_ANGEL_ARRIETA_MAYO_202
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
-SITE = "https://dev-palenke-two.vercel.app"
+SITE = "https://pro-palenke-vw-two.vercel.app"
 
 ACTIVITIES: list[tuple[str, str, str]] = [
     (
