@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { Check, ChevronDown } from "lucide-react";
 
 export type MediatecaFilterOption = {
@@ -50,7 +56,7 @@ export default function MediatecaFilterSelect({
       }
     };
 
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
         setOpen(false);
@@ -70,7 +76,7 @@ export default function MediatecaFilterSelect({
     setOpen(false);
   };
 
-  const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const onTriggerKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
     if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       setOpen(true);
