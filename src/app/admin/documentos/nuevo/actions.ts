@@ -11,6 +11,10 @@ import {
   normalizeStoragePath,
 } from "@/lib/document-source";
 import { logAdminActivity, sectionForDocumentInstrument } from "@/lib/admin-activity";
+import {
+  isVisibility,
+  resolveDocumentStorageBucket,
+} from "@/lib/security/classification";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { getViewerRoleFromSession } from "@/lib/viewer-server";
 import { isAdmin } from "@/lib/viewer";
@@ -24,10 +28,6 @@ function asText(formData: FormData, key: string) {
 function asOptionalText(formData: FormData, key: string) {
   const value = asText(formData, key);
   return value || null;
-}
-
-function isValidVisibility(value: string): value is "public" | "internal" | "sensitive" {
-  return value === "public" || value === "internal" || value === "sensitive";
 }
 
 async function assertAdmin() {
@@ -119,7 +119,7 @@ export async function createDocumentAction(formData: FormData) {
     if (!instrument) {
       throw new Error("El instrumento es obligatorio.");
     }
-    if (!isValidVisibility(visibility)) {
+    if (!isVisibility(visibility)) {
       throw new Error("La visibilidad es inválida.");
     }
     if (preferredSourceRaw && !isDocumentSourcePreference(preferredSourceRaw)) {
@@ -142,7 +142,7 @@ export async function createDocumentAction(formData: FormData) {
       ? null
       : isStaticPublicPath
         ? null
-        : storageBucketRaw;
+        : resolveDocumentStorageBucket(visibility, storageBucketRaw);
     const preferredSource =
       preferredSourceRaw ??
       getEffectiveDocumentSource({

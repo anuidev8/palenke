@@ -13,6 +13,12 @@ export const MEDIATECA_CATEGORIES = [
     sourceDir: "FORO GLOBAL DE LA TIERRA",
   },
   {
+    id: "fospa-ecuador-2026",
+    label: "FOSPA Ecuador 2026",
+    dir: "fospa-ecuador-2026",
+    sourceDir: "fospa-ecuador-2026",
+  },
+  {
     id: "proyectos-productivos-2024",
     label: "Proyectos Productivos 2024",
     dir: "proyectos-productivos-2024",

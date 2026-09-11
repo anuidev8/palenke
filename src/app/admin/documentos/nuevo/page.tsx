@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VisibilityClassificationFields } from "@/components/admin/VisibilityClassificationFields";
 import { AdminLayout } from "@/components/mock/AdminLayout";
 import { Callout } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
@@ -80,14 +81,9 @@ export default async function NuevoDocumentoPage({
             </label>
           )}
 
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Visibilidad</span>
-            <select name="visibility" required defaultValue={isNormativa ? "public" : "internal"} className="input-shell">
-              <option value="public">public</option>
-              <option value="internal">internal</option>
-              <option value="sensitive">sensitive</option>
-            </select>
-          </label>
+          <VisibilityClassificationFields
+            defaultVisibility={isNormativa ? "public" : "internal"}
+          />
 
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Consejo comunitario</span>
@@ -170,16 +166,6 @@ export default async function NuevoDocumentoPage({
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Municipio / Ciudad</span>
             <input name="municipality" className="input-shell" placeholder="Bogotá, Montreal..." />
-          </label>
-
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Bucket</span>
-            <select name="storage_bucket" defaultValue="docs-internal" className="input-shell">
-              <option value="docs-internal">docs-internal</option>
-              <option value="docs-sensitive">docs-sensitive</option>
-              <option value="docs-public">docs-public</option>
-              <option value="">(sin bucket para ruta pública local)</option>
-            </select>
           </label>
 
           <label className="grid gap-2 text-sm">

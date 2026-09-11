@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Search, X } from "lucide-react";
 import GobiernoPropioMediaGallery from "@/components/palenke/GobiernoPropioMediaGallery";
+import MediatecaFilterSelect from "@/components/palenke/MediatecaFilterSelect";
 import type {
   PalenkeGalleryMedia,
   PalenkeGalleryMediaKind,
 } from "@/lib/palenke-gallery-media";
 import {
-  FORO_GLOBAL_TIERRA_SUBCATEGORIES,
+  MEDIATECA_SUBCATEGORIES_BY_CATEGORY,
   MEDIATECA_UBUNTU_CATEGORIES,
-  type ForoGlobalTierraSubcategoryId,
   type MediatecaUbuntuCategoryId,
 } from "@/lib/mediateca-ubuntu-gallery-data";
 import { runMediatecaGallerySearch } from "@/lib/ai-search";
@@ -35,13 +35,16 @@ export default function MediatecaUbuntuGallerySection({
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [videoCollectionOpen, setVideoCollectionOpen] = useState(false);
   const [categoryId, setCategoryId] = useState<MediatecaUbuntuCategoryId>("todas");
-  const [subcategoryId, setSubcategoryId] = useState<"todas" | ForoGlobalTierraSubcategoryId>(
-    "todas",
-  );
+  const [subcategoryId, setSubcategoryId] = useState<string>("todas");
   const [mediaKind, setMediaKind] = useState<"all" | PalenkeGalleryMediaKind>("all");
   const [searchDraft, setSearchDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const activeSubcategories = MEDIATECA_SUBCATEGORIES_BY_CATEGORY[categoryId];
+  const categoryLabel =
+    MEDIATECA_UBUNTU_CATEGORIES.find((option) => option.id === categoryId)?.label ??
+    "esta categoría";
 
   const { rankedItems: searchedItems, answer: searchAnswer } = useMemo(
     () => runMediatecaGallerySearch(items, searchQuery),
@@ -54,11 +57,11 @@ export default function MediatecaUbuntuGallerySection({
   }, [searchedItems, categoryId]);
 
   const subcategoryBaseItems = useMemo(() => {
-    if (categoryId !== "foro-global-tierra" || subcategoryId === "todas") {
+    if (!activeSubcategories || subcategoryId === "todas") {
       return categoryBaseItems;
     }
     return categoryBaseItems.filter((item) => item.subcategoryId === subcategoryId);
-  }, [categoryBaseItems, categoryId, subcategoryId]);
+  }, [categoryBaseItems, activeSubcategories, subcategoryId]);
 
   const kindBaseItems = subcategoryBaseItems;
 
@@ -130,9 +133,7 @@ export default function MediatecaUbuntuGallerySection({
   }, [searchQuery, mediaKind, categoryId, subcategoryId]);
 
   useEffect(() => {
-    if (categoryId !== "foro-global-tierra") {
-      setSubcategoryId("todas");
-    }
+    setSubcategoryId("todas");
   }, [categoryId]);
 
   useEffect(() => {
@@ -166,80 +167,41 @@ export default function MediatecaUbuntuGallerySection({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5a554d]">
-            Filtrar por categoría
-          </p>
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtrar por categoría">
-            {MEDIATECA_UBUNTU_CATEGORIES.map((option) => {
-              const selected = categoryId === option.id;
-              const count = categoryCounts[option.id] ?? 0;
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={selected}
-                  onClick={() => setCategoryId(option.id)}
-                  className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
-                    selected
-                      ? "bg-[#2e7d32] text-white shadow-sm"
-                      : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
-                  }`}
-                >
-                  {option.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <div className="relative z-20 flex flex-col gap-4 sm:flex-row sm:items-end">
+          <MediatecaFilterSelect
+            id="mediateca-category"
+            label="Filtrar por categoría"
+            value={categoryId}
+            onChange={(next) => setCategoryId(next as MediatecaUbuntuCategoryId)}
+            options={MEDIATECA_UBUNTU_CATEGORIES.map((option) => ({
+              value: option.id,
+              label: option.label,
+              count: categoryCounts[option.id] ?? 0,
+            }))}
+          />
 
-        {categoryId === "foro-global-tierra" ? (
-          <div className="flex flex-col gap-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5a554d]">
-              Subcategoría del Foro
-            </p>
-            <div
-              className="flex flex-wrap gap-2"
-              role="tablist"
-              aria-label="Filtrar por subcategoría del Foro Global de la Tierra"
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={subcategoryId === "todas"}
-                onClick={() => setSubcategoryId("todas")}
-                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
-                  subcategoryId === "todas"
-                    ? "bg-[#1a1a1a] text-white shadow-sm"
-                    : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
-                }`}
-              >
-                Todas ({categoryBaseItems.length})
-              </button>
-              {FORO_GLOBAL_TIERRA_SUBCATEGORIES.map((option) => {
-                const selected = subcategoryId === option.id;
-                const count = subcategoryCounts[option.id] ?? 0;
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    onClick={() => setSubcategoryId(option.id)}
-                    className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
-                      selected
-                        ? "bg-[#1a1a1a] text-white shadow-sm"
-                        : "border border-[#d9cfbe] bg-white text-[#4a4540] hover:bg-[#f7f3ed]"
-                    }`}
-                  >
-                    {option.label} ({count})
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
+          {activeSubcategories ? (
+            <MediatecaFilterSelect
+              id="mediateca-subcategory"
+              label="Subcategoría"
+              value={subcategoryId}
+              onChange={setSubcategoryId}
+              aria-label={`Filtrar por subcategoría de ${categoryLabel}`}
+              options={[
+                {
+                  value: "todas",
+                  label: "Todas",
+                  count: categoryBaseItems.length,
+                },
+                ...activeSubcategories.map((option) => ({
+                  value: option.id,
+                  label: option.label,
+                  count: subcategoryCounts[option.id] ?? 0,
+                })),
+              ]}
+            />
+          ) : null}
+        </div>
 
         <form
           onSubmit={(event) => {

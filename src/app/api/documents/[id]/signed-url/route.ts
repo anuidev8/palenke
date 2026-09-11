@@ -12,6 +12,10 @@ import {
   isMissingPreferredSourceColumnError,
 } from "@/lib/document-source";
 import { findDocumentById } from "@/lib/mock-data";
+import {
+  isVisibility,
+  signedUrlTtlForVisibility,
+} from "@/lib/security/classification";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { createSupabaseService } from "@/lib/supabase/service";
 
@@ -163,7 +167,9 @@ export async function GET(
     return NextResponse.json({ error: "Document storage path is missing." }, { status: 400 });
   }
 
-  const expiresIn = visibility === "sensitive" ? 1800 : 3600;
+  const expiresIn = isVisibility(visibility)
+    ? signedUrlTtlForVisibility(visibility)
+    : 3600;
   const { data: signedData, error: signedError } = await supabase.storage
     .from(document.storage_bucket)
     .createSignedUrl(document.storage_path, expiresIn, { download: !wantsPreview });

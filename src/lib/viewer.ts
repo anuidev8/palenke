@@ -101,12 +101,12 @@ export function formatDateRange(startDate: string, endDate?: string) {
 
 export function formatVisibility(visibility: Visibility) {
   if (visibility === "public") {
-    return { icon: "public", label: "Público", className: "badge-public" } as const;
+    return { icon: "public", label: "Público (no sensible)", className: "badge-public" } as const;
   }
 
   if (visibility === "internal") {
-    return { icon: "internal", label: "Solo miembros", className: "badge-internal" } as const;
+    return { icon: "internal", label: "Interno (restringido)", className: "badge-internal" } as const;
   }
 
-  return { icon: "sensitive", label: "Sensible", className: "badge-sensitive" } as const;
+  return { icon: "sensitive", label: "Sensible (máxima restricción)", className: "badge-sensitive" } as const;
 }

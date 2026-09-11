@@ -28,6 +28,7 @@
     "clean:mediateca-ubuntu-storage:dry": "node scripts/clean-mediateca-ubuntu-storage.mjs --dry-run",
     "upload:mediateca-category": "node scripts/upload-mediateca-category.mjs",
     "upload:foro-global-tierra": "node scripts/upload-foro-global-tierra.mjs --compress",
+    "upload:fospa-ecuador-2026": "node scripts/upload-fospa-ecuador-2026.mjs --all --compress",
     "sync:seguridad-juridica-storage": "node scripts/upload-seguridad-juridica-storage.mjs",
     "sync:seguridad-juridica-storage:dry": "node scripts/upload-seguridad-juridica-storage.mjs --dry-run",
     "sync:seguridad-juridica-storage:verify": "node scripts/upload-seguridad-juridica-storage.mjs --verify",

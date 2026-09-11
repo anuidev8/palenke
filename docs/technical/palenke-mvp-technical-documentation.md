@@ -1,8 +1,8 @@
 # Plataforma Palenke - Documentacion Tecnica MVP
 
-Version: 1.1  
-Fecha: 2026-07-17  
-Estado: Base tecnica para MVP (Fase 1) + modelo de datos Supabase/PostgreSQL
+Version: 1.2  
+Fecha: 2026-09-06  
+Estado: Base tecnica para MVP (Fase 1) + modelo de datos Supabase/PostgreSQL + clasificacion de seguridad
 
 ## 1) Objetivo
 
@@ -138,6 +138,7 @@ Fuente de verdad del DDL: `supabase/migrations/001_initial_schema.sql` y migraci
 ### 3A.5 Visibilidad y RLS (modelo de seguridad de datos)
 
 - **`documents.visibility`:** `public` | `internal` | `sensitive`
+- Clasificacion sensible / no sensible y controles: ver **seccion 5.2** y `src/lib/security/classification.ts`.
 - Politicas tipicas:
   - publico: lectura sin sesion;
   - interno: requiere usuario `internal` o `admin` activo;
@@ -197,17 +198,51 @@ Buckets usados en el proyecto (definidos/actualizados por migraciones):
 - `internal`: acceso autenticado a contenido interno.
 - `admin`: gestion de contenidos, usuarios y aprobaciones.
 
-### 5.2 Niveles de visibilidad
+### 5.2 Clasificacion de informacion (sensible / no sensible)
 
-- `public`: visible sin login.
-- `internal`: requiere sesion valida y permisos.
-- `sensitive`: no se expone en frontend publico.
+Toda la informacion de la plataforma se clasifica en tres niveles. Fuente de codigo: `src/lib/security/classification.ts`.
+
+| Visibilidad | Categoria | Bucket | Signed URL | Quien abre |
+|-------------|-----------|--------|------------|------------|
+| `public` | **No sensible** (publico) | `docs-public` | 60 min | Cualquiera |
+| `internal` | **Restringido** (sensible operativo) | `docs-internal` | 60 min | `internal` / `admin` (+ grants) |
+| `sensitive` | **Sensible** (maxima restriccion) | `docs-sensitive` | 30 min | `admin` o grant / solicitud aprobada |
+
+**Regla editorial:** si hay duda, clasificar como `sensitive` hasta revision.
+
+**Decision rapida:**
+
+1. ¿Cualquiera en internet puede verlo? → `public`
+2. ¿Solo equipo / usuarios con login? → `internal`
+3. ¿Una filtracion danaria personas, territorio o posicion juridica? → `sensitive`
+
+**Ejemplos:**
+
+- No sensible: Mediateca Ubuntu / FOSPA, normativa publica, Home.
+- Interno: reglamentos de consejos, etnodesarrollo, dashboards internos.
+- Sensible: PUMANE / planes de uso, litigio, detalle territorial de alto riesgo, secretos de entorno (nunca en Storage publico).
+
+El formulario admin de documentos alinea automaticamente el **bucket** con la clasificacion elegida.
 
 ### 5.3 Proteccion tecnica
 
 - `src/middleware.ts` protege rutas admin.
-- API de signed URL valida sesion, rol y aprobacion de solicitud.
-- Documentos sensibles se entregan con control adicional (no exposicion directa).
+- Cabeceras HTTP de seguridad en `next.config.ts` (HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy).
+- API de signed URL valida sesion, rol y aprobacion; TTL segun clasificacion (`signedUrlTtlForVisibility`).
+- Documentos sensibles no se listan en frontend publico; entrega controlada (incl. correo a admin cuando aplica).
+- Documentacion legible en producto: `/docs/seguridad-y-clasificacion`.
+
+### 5.4 Checklist de lanzamiento (seguridad)
+
+Antes del lanzamiento (estrategia al 25 sep / go-live 15 oct):
+
+- [ ] Todo documento nuevo tiene clasificacion `public` | `internal` | `sensitive` coherente con su bucket
+- [ ] Anonimo no accede a `/admin` ni a docs `internal`/`sensitive`
+- [ ] Signed URL de `sensitive` expira en 30 minutos
+- [ ] Cabeceras de seguridad activas en produccion
+- [ ] Sin claves/contrasenas reales en repositorio o docs publicas (rotar tras supervision)
+- [ ] Formularios publicos revisados (contacto / solicitudes)
+- [ ] Roadmap tecnico incluye esta seccion de seguridad
 
 ## 6) Flujo critico: solicitud y entrega de documentos
 
@@ -308,5 +343,7 @@ Detalle del modelo relacional y RLS: ver **seccion 3A**.
 - `/docs/arquitectura-y-base-de-datos` (anexo legible del modelo de datos / documentación técnica básica)
 - `src/app/page.tsx`
 - `src/middleware.ts`
+- `src/lib/security/classification.ts`
 - `src/app/api/access-requests/route.ts`
 - `src/app/api/documents/[id]/signed-url/route.ts`
+- `/docs/seguridad-y-clasificacion`

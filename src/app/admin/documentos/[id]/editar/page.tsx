@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { notFound } from "next/navigation";
+import { VisibilityClassificationFields } from "@/components/admin/VisibilityClassificationFields";
 import { AdminLayout } from "@/components/mock/AdminLayout";
 import { Callout } from "@/components/mock/ui";
 import { requireAdmin } from "@/lib/admin-access";
@@ -10,6 +11,10 @@ import {
   getEffectiveDocumentSource,
   isMissingPreferredSourceColumnError,
 } from "@/lib/document-source";
+import {
+  isDocumentStorageBucket,
+  isVisibility,
+} from "@/lib/security/classification";
 import { createSupabaseService } from "@/lib/supabase/service";
 import { updateDocumentAction } from "./actions";
 
@@ -117,6 +122,12 @@ export default async function EditarDocumentoPage({
   const isNormativa = document.instrument === "normativa-vigente";
   const effectiveSource = getEffectiveDocumentSource(document) ?? "storage";
   const formAction = updateDocumentAction.bind(null, document.id);
+  const defaultVisibility = isVisibility(document.visibility) ? document.visibility : "internal";
+  const defaultBucket = isDocumentStorageBucket(document.storage_bucket)
+    ? document.storage_bucket
+    : document.storage_bucket == null || document.storage_bucket === ""
+      ? ("" as const)
+      : undefined;
 
   return (
     <AdminLayout
@@ -178,14 +189,10 @@ export default async function EditarDocumentoPage({
             </label>
           )}
 
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Visibilidad</span>
-            <select name="visibility" required defaultValue={document.visibility} className="input-shell">
-              <option value="public">public</option>
-              <option value="internal">internal</option>
-              <option value="sensitive">sensitive</option>
-            </select>
-          </label>
+          <VisibilityClassificationFields
+            defaultVisibility={defaultVisibility}
+            defaultBucket={defaultBucket}
+          />
 
           <label className="grid gap-2 text-sm md:col-span-2">
             <span className="font-semibold text-[color:var(--forest)]">Consejo comunitario</span>
@@ -309,20 +316,6 @@ export default async function EditarDocumentoPage({
               className="input-shell"
               defaultValue={document.municipality ?? ""}
             />
-          </label>
-
-          <label className="grid gap-2 text-sm">
-            <span className="font-semibold text-[color:var(--forest)]">Bucket</span>
-            <select
-              name="storage_bucket"
-              defaultValue={document.storage_bucket ?? ""}
-              className="input-shell"
-            >
-              <option value="docs-internal">docs-internal</option>
-              <option value="docs-sensitive">docs-sensitive</option>
-              <option value="docs-public">docs-public</option>
-              <option value="">(sin bucket para ruta pública local)</option>
-            </select>
           </label>
 
           <label className="grid gap-2 text-sm">

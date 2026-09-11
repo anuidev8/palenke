@@ -1,0 +1,108 @@
+---
+title: Seguridad y clasificación
+description: Cómo se protege y clasifica la información en toda la plataforma Palenke (con video).
+---
+
+# Seguridad y clasificación en la plataforma
+
+La seguridad en Palenke no es solo de archivos: aplica a **páginas, catálogos, tableros, formularios y panel admin**. Toda la información se trata según **quién puede verla** y **qué daño causaría una filtración**.
+
+## Video explicativo
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl"
+  src="https://xtbdgwlwxslcpyholwuz.supabase.co/storage/v1/object/public/memoria-afroterritorial/docs/seguridad-clasificacion.mp4"
+>
+  Su navegador no reproduce video HTML5.
+</video>
+
+[~51 s · abrir en nueva pestaña](https://xtbdgwlwxslcpyholwuz.supabase.co/storage/v1/object/public/memoria-afroterritorial/docs/seguridad-clasificacion.mp4)
+
+## Roles de acceso
+
+| Rol | Quién | Qué puede hacer |
+|-----|--------|-----------------|
+| **Público** | Cualquiera sin login | Ver contenido abierto (Home, biblioteca pública, mediateca, noticias, etc.) |
+| **Interno** | Usuario autenticado autorizado | Ver material restringido del equipo + lo público |
+| **Admin** | Administrador | Gestionar contenidos, usuarios, solicitudes y material sensible |
+
+Entrada y credenciales de validación: [Accesos](/docs/accesos). Catálogo de URLs: [Módulos y URLs](/docs/modulos-y-urls).
+
+## Tres niveles de clasificación
+
+Se usan en documentos, y el mismo criterio guía el resto del sitio.
+
+| Nivel | Código | ¿Sensible? | Quién lo ve | Storage (si hay archivo) |
+|-------|--------|------------|-------------|--------------------------|
+| **Público (no sensible)** | `public` | No | Cualquiera | `docs-public` |
+| **Interno (restringido)** | `internal` | Sí (operativo) | `internal` / `admin` | `docs-internal` |
+| **Sensible (máxima restricción)** | `sensitive` | Sí (máxima) | Admin o permiso aprobado | `docs-sensitive` |
+
+### Regla rápida (para cualquier contenido)
+
+1. ¿Cualquiera en internet puede verlo? → **Público**
+2. ¿Solo el equipo o personas con login? → **Interno**
+3. ¿Una filtración dañaría personas, territorio o posición jurídica? → **Sensible**
+4. ¿Duda? → **Sensible** hasta revisión
+
+## Cómo se aplica en el sitio
+
+| Área del sitio | Tratamiento |
+|----------------|-------------|
+| **Inicio, noticias, agenda, páginas institucionales** | Contenido editorial público; sin datos sensibles en textos ni nombres de archivo |
+| **Biblioteca y Memoria Afroterritorial** | Solo listan lo que el rol puede ver; `sensitive` no aparece en catálogo público |
+| **Gobierno propio / instrumentos** | Documentos por visibilidad; solicitud de acceso en `/solicitar-acceso/...` |
+| **Mediateca Ubuntu** | Galería filtrada por rol; material abierto = no sensible |
+| **Estadísticas / Power BI** | Vista externa pública; detalle interno solo con sesión autorizada |
+| **SCITA (formulario y alertas)** | Reportes de campo con cuidado de datos; revisión en admin |
+| **Studio / mis solicitudes** | Requiere login; rutas internas protegidas en página |
+| **Admin (`/admin`)** | Solo rol `admin` (middleware); gestión de docs, usuarios, novedades, dashboards |
+| **Formularios públicos** (contacto, solicitudes) | Entrada abierta; no exponer datos internos en respuestas |
+
+## Controles técnicos (toda la plataforma)
+
+- **HTTPS** y cabeceras de seguridad (HSTS, anti-clickjacking, nosniff, etc.)
+- **Auth + roles** en Supabase; políticas **RLS** en tablas de negocio
+- **Middleware** en `/admin` y `/api/admin`
+- **Signed URL** para descargas restringidas (30 min si es `sensitive`, 60 min en el resto)
+- El admin **alinea el bucket** de Storage con la clasificación del documento
+- Solicitudes de acceso con trazabilidad (`access_requests` / grants)
+- Documentos sensibles: sin listado público; entrega controlada
+
+Detalle de código: `src/lib/security/classification.ts`. Arquitectura: [Arquitectura y base de datos](/docs/arquitectura-y-base-de-datos). Construcción por módulo: [Cómo está construido](/docs/como-esta-construido).
+
+## Ejemplos por sensibilidad
+
+**No sensible (público)**
+
+- Mediateca Ubuntu / registro fotográfico FOSPA
+- Normativa e información institucional abierta
+- Noticias y agenda publicadas
+- Vista externa de tableros
+
+**Interno**
+
+- Reglamentos internos de consejos
+- Planes de etnodesarrollo
+- Tableros o reportes con mayor detalle operativo
+- Contenido de studio / flujos solo para equipo
+
+**Sensible**
+
+- PUMANE y anexos de planes de uso
+- Material de litigio o riesgo comunitario
+- Detalle territorial de alto riesgo
+- Credenciales, claves API y secretos de entorno (nunca en Storage público ni en docs abiertas)
+
+## Checklist previo a lanzamiento
+
+- [ ] Cada documento tiene clasificación coherente con su bucket
+- [ ] Anónimo no entra a admin ni a material interno/sensible
+- [ ] Páginas públicas no muestran fichas ni enlaces a contenido restringido
+- [ ] Tableros: vista externa ≠ detalle interno
+- [ ] Formularios públicos revisados (contacto / solicitudes SCITA)
+- [ ] Credenciales de validación rotadas tras supervisión
+- [ ] Cabeceras de seguridad activas en producción

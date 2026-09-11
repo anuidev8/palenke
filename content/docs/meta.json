@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "accesos",
+    "seguridad-y-clasificacion",
     "modulos-y-urls",
     "informe-y-matriz",
     "arquitectura-y-base-de-datos",
