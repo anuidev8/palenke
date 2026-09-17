@@ -6,10 +6,13 @@ import {
   DocsDescription,
   DocsPage,
   DocsTitle,
+  MarkdownCopyButton,
+  ViewOptionsPopover,
 } from "fumadocs-ui/layouts/docs/page";
+import { DocsDownloadAllButton } from "@/components/docs-download-all";
 import { getMDXComponents } from "@/components/docs-mdx";
 import { gitConfig } from "@/lib/docs-shared";
-import { source } from "@/lib/source";
+import { getPageMarkdownUrl, source } from "@/lib/source";
 
 type Props = {
   params: Promise<{ slug?: string[] }>;
@@ -21,11 +24,18 @@ export default async function Page({ params }: Props) {
   if (!page) notFound();
 
   const MDX = page.data.body;
+  const markdownUrl = getPageMarkdownUrl(page).url;
+  const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
+      <div className="mb-6 flex flex-row flex-wrap items-center gap-2 border-b border-fd-border pb-6">
+        <MarkdownCopyButton markdownUrl={markdownUrl} />
+        <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
+        <DocsDownloadAllButton />
+      </div>
       <DocsBody>
         <MDX
           components={getMDXComponents({

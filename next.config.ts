@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/docs": ["./content/docs/**/*", "./.source/**/*"],
     "/docs/[[...slug]]": ["./content/docs/**/*", "./.source/**/*"],
+    "/llms-full.txt": ["./content/docs/**/*", "./.source/**/*"],
+    "/llms.txt": ["./content/docs/**/*", "./.source/**/*"],
+    "/llms.mdx/docs/[[...slug]]": ["./content/docs/**/*", "./.source/**/*"],
+    "/docs-full.docx": ["./content/docs/**/*", "./.source/**/*"],
   },
   // Prevent large source PDFs / media from being traced into serverless functions.
   // docs/files (~280MB) and public/videos are served from Supabase/CDN, not lambdas.
@@ -59,6 +63,18 @@ const nextConfig: NextConfig = {
   },
   turbopack: {
     root: projectRoot,
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/docs.md",
+        destination: "/llms.mdx/docs",
+      },
+      {
+        source: "/docs/:path*.md",
+        destination: "/llms.mdx/docs/:path*",
+      },
+    ];
   },
   async headers() {
     return [
