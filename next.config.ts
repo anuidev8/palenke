@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
     "/llms-full.txt": ["./content/docs/**/*", "./.source/**/*"],
     "/llms.txt": ["./content/docs/**/*", "./.source/**/*"],
     "/llms.mdx/docs/[[...slug]]": ["./content/docs/**/*", "./.source/**/*"],
-    "/docs-full.docx": ["./content/docs/**/*", "./.source/**/*"],
+    "/api/docs/full": ["./content/docs/**/*", "./.source/**/*"],
   },
   // Prevent large source PDFs / media from being traced into serverless functions.
   // docs/files (~280MB) and public/videos are served from Supabase/CDN, not lambdas.
@@ -30,8 +30,13 @@ const nextConfig: NextConfig = {
       "./DOCUEMNTOS_HONONARIOS/**/*",
       "./public/videos/**/*",
       "./public/generated/**/*",
-      "./**/*.docx",
-      "./**/*.mp4",
+      // Exclude large workspace Word/video assets only — not App Router folders
+      // (a blanket `./**/*.docx` previously stripped `src/app/docs-full.docx`).
+      "./docs/**/*.docx",
+      "./DOCUEMNTOS_HONONARIOS/**/*.docx",
+      "./*.docx",
+      "./public/**/*.mp4",
+      "./media/**/*.mp4",
     ],
     "/admin/contenido-visual": ["./public/**/*"],
     "/api/**/*": ["./docs/**/*", "./public/**/*"],
@@ -73,6 +78,11 @@ const nextConfig: NextConfig = {
       {
         source: "/docs/:path*.md",
         destination: "/llms.mdx/docs/:path*",
+      },
+      // Old download URL used a .docx path that NFT tracing excluded in production.
+      {
+        source: "/docs-full.docx",
+        destination: "/api/docs/full",
       },
     ];
   },

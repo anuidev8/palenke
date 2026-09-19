@@ -3,8 +3,10 @@ export const docsRoute = "/docs";
 export const docsImageRoute = "/og/docs";
 export const docsContentRoute = "/llms.mdx/docs";
 export const docsFullTextRoute = "/llms-full.txt";
-export const docsFullDocxRoute = "/docs-full.docx";
+/** API route path (not *.docx) so NFT tracing excludes don't strip the handler in prod. */
+export const docsFullDocxRoute = "/api/docs/full";
 export const docsFullDownloadFilename = "palenke-docs.docx";
+export const docsFullTextFilename = "palenke-docs.md";
 
 export const gitConfig = {
   user: "anuidev8",
