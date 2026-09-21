@@ -147,37 +147,106 @@ async function compressImage(filePath) {
   return { buffer, storageFilename: `${basenameWithoutExt(filePath)}.jpg`, contentType: "image/jpeg" };
 }
 
-/** Compress video to H.264 MP4 (720p max, CRF 28). */
+/** Supabase project default object limit is ~50 MiB; stay under it. */
+const MAX_UPLOAD_BYTES = 45 * 1024 * 1024;
+
+async function probeDurationSeconds(filePath) {
+  try {
+    const { stdout } = await execFileAsync(
+      "ffprobe",
+      ["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", filePath],
+      { maxBuffer: 1024 * 1024 },
+    );
+    const duration = Number.parseFloat(stdout.trim());
+    return Number.isFinite(duration) && duration > 0 ? duration : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compress video to H.264 MP4 (720p max).
+ * Short clips use CRF 28; long clips use a bitrate budget so output stays under ~45 MiB.
+ */
 async function compressVideo(filePath) {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "mediateca-vid-"));
   const outputPath = path.join(tempDir, "compressed.mp4");
+  const duration = await probeDurationSeconds(filePath);
 
-  await execFileAsync(
-    "ffmpeg",
-    [
-      "-y",
-      "-i",
-      filePath,
-      "-vf",
-      "scale='min(1280,iw)':-2",
-      "-c:v",
-      "libx264",
-      "-preset",
-      "fast",
-      "-crf",
-      "28",
-      "-c:a",
-      "aac",
-      "-b:a",
-      "128k",
-      "-movflags",
-      "+faststart",
-      outputPath,
-    ],
-    { maxBuffer: 20 * 1024 * 1024 },
-  );
+  const args = [
+    "-y",
+    "-i",
+    filePath,
+    "-vf",
+    "scale='min(1280,iw)':-2",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "fast",
+    "-c:a",
+    "aac",
+    "-movflags",
+    "+faststart",
+  ];
 
-  const buffer = await fs.readFile(outputPath);
+  // ~3 min at CRF 28 is usually safe; longer videos need an explicit bitrate cap.
+  const needsBitrateCap = duration != null && duration > 180;
+  if (needsBitrateCap) {
+    const audioBitrate = 96_000;
+    const totalBitsPerSec = Math.floor((MAX_UPLOAD_BYTES * 8) / duration);
+    const videoBitrate = Math.max(200_000, totalBitsPerSec - audioBitrate);
+    args.push("-b:v", String(videoBitrate), "-maxrate", String(videoBitrate), "-bufsize", String(videoBitrate * 2));
+    args.push("-b:a", "96k");
+    console.log(`(bitrate-cap ${(videoBitrate / 1000).toFixed(0)}k for ${duration.toFixed(0)}s) `);
+  } else {
+    args.push("-crf", "28", "-b:a", "128k");
+  }
+
+  args.push(outputPath);
+
+  await execFileAsync("ffmpeg", args, { maxBuffer: 20 * 1024 * 1024 });
+
+  let buffer = await fs.readFile(outputPath);
+
+  // Safety net: if still over limit, re-encode harder at 960px.
+  if (buffer.length > MAX_UPLOAD_BYTES) {
+    const retryPath = path.join(tempDir, "compressed-retry.mp4");
+    const audioBitrate = 64_000;
+    const dur = duration ?? Math.max(1, buffer.length / (500_000 / 8));
+    const totalBitsPerSec = Math.floor((MAX_UPLOAD_BYTES * 8) / dur);
+    const videoBitrate = Math.max(150_000, totalBitsPerSec - audioBitrate);
+    console.log(`(retry under 45MB @ ${(videoBitrate / 1000).toFixed(0)}k) `);
+    await execFileAsync(
+      "ffmpeg",
+      [
+        "-y",
+        "-i",
+        filePath,
+        "-vf",
+        "scale='min(960,iw)':-2",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "fast",
+        "-b:v",
+        String(videoBitrate),
+        "-maxrate",
+        String(videoBitrate),
+        "-bufsize",
+        String(videoBitrate * 2),
+        "-c:a",
+        "aac",
+        "-b:a",
+        "64k",
+        "-movflags",
+        "+faststart",
+        retryPath,
+      ],
+      { maxBuffer: 20 * 1024 * 1024 },
+    );
+    buffer = await fs.readFile(retryPath);
+  }
+
   await fs.rm(tempDir, { recursive: true, force: true });
   return { buffer, storageFilename: `${basenameWithoutExt(filePath)}.mp4`, contentType: "video/mp4" };
 }
@@ -291,7 +360,14 @@ for (const subcategory of subcategories) {
       prepared = await prepareUpload(filePath, kind);
     } catch (error) {
       console.error(`\nCompress/prepare failed for ${filename}:`, error.message ?? error);
-      process.exit(1);
+      continue;
+    }
+
+    if (prepared.buffer.length > MAX_UPLOAD_BYTES) {
+      console.error(
+        `skip — still ${(prepared.buffer.length / (1024 * 1024)).toFixed(1)} MB after compress (max ~45 MB)`,
+      );
+      continue;
     }
 
     const storagePath = `${CATEGORY_DIR}/${subcategory.id}/${prepared.storageFilename}`;
@@ -304,8 +380,8 @@ for (const subcategory of subcategories) {
       });
 
     if (uploadError) {
-      console.error(`\nUpload failed for ${filename}:`, uploadError.message);
-      process.exit(1);
+      console.error(`Upload failed for ${filename}:`, uploadError.message);
+      continue;
     }
 
     const mediaUrl = publicObjectUrl(supabaseUrl, storagePath);
