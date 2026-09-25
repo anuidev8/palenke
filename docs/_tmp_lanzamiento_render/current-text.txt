@@ -1,0 +1,489 @@
+Palenke · Plan de lanzamiento y contenido | Sep–Nov 2026 · post-15 oct = propuesto
+
+PLATAFORMA PALENKE
+
+Plan de lanzamiento, pruebas y producción de contenido
+Calendario, packs multimedia, QA y tiempos del editor. Fechas post-15 oct = propuestas.
+Idea simple
+1) Aprobar este plan (25 sep). 2) Hasta el 15 oct: web estable. 3) Después: producir packs de 3 módulos. 4) Comunicaciones publica de a uno. 5) Fechas post-15 pueden acortarse o alargarse según editor,
+Comunicaciones y QA.
+
+Hito
+
+Fecha
+
+Qué
+
+Quién
+
+Aprobar plan
+
+25 sep
+
+Frank OK
+
+Angel + Karen
+
+Web estable
+
+15 oct (DURO)
+
+Toda la plataforma
+
+Angel + Karen
+
+1er anuncio
+
+~26–27 oct (propuesto)
+
+Mediateca
+
+Comunicaciones
+
+1. Aprobar el plan y cómo se anuncia
+Frank aprueba este documento (25 sep). Packs de 3 módulos listos; Comunicaciones publica de a uno.
+Etapa
+
+Módulo
+
+Qué pasa
+
+1ª
+
+Mediateca
+
+1er anuncio (~26–27 oct propuesto, sujeto a Comunicaciones/editor).
+
+2ª
+
+Instrumentos
+
+~1–2 semanas después (o cuando Comunicaciones pueda).
+
+3ª
+
+CID
+
+Cuando digamos / tras retoque si cambió el módulo.
+
+2. Calendario (con flexibilidad)
+Lectura
+Hasta 15 oct: firmes en lo posible. Después: propuestas — pueden moverse (ver flexibilidad y tiempos del editor abajo).
+Cuándo
+
+Qué
+
+Nota
+
+Esta semana
+
+Reunión Comunicaciones: pedirles estrategia + plazos.
+
+Confirmar malla.
+
+25 sep
+
+Aprobar plan con Frank.
+
+Firme.
+
+28 sep – 2 oct
+
+QA toda la web (Angel admin / Karen usuaria).
+
+Flexible: 3–5 días.
+
+5 – 9 oct
+
+Fixes (sin features nuevas).
+
+Flexible: más corto o más largo.
+
+10 – 15 oct
+
+Estabilizar web.
+
+15 oct DURO (salvo decisión Frank).
+
+~15 – 30 oct
+
+Producir 3 packs + video general (editor).
+
+Se alarga/acorta con editor.
+
+Al cerrar Mediateca
+
+Entregar pack Mediateca a Comunicaciones.
+
+Buffer ~2 sem. típico.
+
+~26/27 oct
+
+1er anuncio Mediateca.
+
+PROPUESTO.
+
+~2 nov
+
+Pedir anuncio Instrumentos.
+
+PROPUESTO.
+
+Después
+
+Pedir anuncio CID.
+
+PROPUESTO.
+
+2.1 Flexibilidad de fechas (pueden ser más cortas o más largas)
+Tramo
+
+Puede acortarse si…
+
+Puede alargarse si…
+
+QA 28 sep–2 oct
+
+Todo sale limpio en 3–4 días.
+
+Hace falta más barrido / tercera persona ocupada.
+
+Fixes 5–9 oct
+
+Pocos tickets → se cierra antes.
+
+Muchos bugs → se come días de estabilización.
+
+15 oct web estable
+
+Meta dura. Solo se mueve con decisión explícita de Frank.
+
+Riesgo si fixes no terminan — priorizar bloqueantes.
+
+Producción video ~15–30
+
+Editor rápido + pocos retoques.
+
+Editor ocupado, presupuesto tarde, o muchos crudos.
+
+1er anuncio ~26–27
+
+Comunicaciones tiene hueco antes.
+
+Su malla está llena / emergencias → +1–2 semanas.
+
+2º / 3º anuncio
+
+Packs listos + Comunicaciones disponible.
+
+Esperar medición del anuncio anterior o retoque CID.
+
+• Regla: fechas post-15 = propuestas. Se confirman cuando Frank aprueba + Comunicaciones da malla + editor confirma plazos.
+2.2 Timing del editor (rol y tiempos)
+Paso
+
+Quién / qué
+
+Tiempo estimado
+
+Confirmar editor + presupuesto
+
+Angel con Comprana (p. ej. Fernando)
+
+Esta semana / antes del 15
+
+Entrega de crudos
+
+Angel: screen-records de 3 módulos + general
+
+~15 oct (1 día de grabación)
+
+Guiones / copy
+
+Karen
+
+1–2 días
+
+Edición pack Mediateca (+ general)
+
+Editor
+
+~3–5 días hábiles (propuesto)
+
+Edición Instrumentos + CID
+
+Editor
+
+~4–7 días hábiles más (propuesto)
+
+Revisión / OK de Angel+Karen
+
+Equipo
+
+1 día por pack
+
+Entrega a Comunicaciones
+
+Angel/Karen
+
+Al cerrar cada pack (Mediateca primero)
+
+Si el editor tarda más, se alarga el 1er anuncio — no se corta calidad por forzar la fecha propuesta.
+
+2.3 Pack por módulo (recomendado)
+Pieza
+
+Cantidad
+
+Para qué
+
+Video principal del módulo
+
+1 (45–90 s)
+
+Post / reel principal
+
+Shorts
+
+3 (15–30 s)
+
+Historias / reposts de la semana
+
+Copy / pie de texto
+
+1
+
+Comunicaciones solo publica
+
+Stills
+
+2–3
+
+Posts estáticos
+
+Aviso siguiente módulo
+
+1 línea
+
+Teaser
+
+• Una vez: 1 video general de plataforma. Totales: 1 general + 3 videos módulo + 9 shorts + 3 copies.
+Fuente: reunión Angel–Karen 19 sep 2026 · fathom.video/calls/829928151 · p. 1
+
+Palenke · Plan de lanzamiento y contenido | Sep–Nov 2026 · post-15 oct = propuesto
+
+• Ajustable si Comunicaciones pide más/menos.
+2.4 Pedir estrategia a Comunicaciones
+
+• Canales, ritmo, si 1+3 está bien, días de anticipación, cómo entregar archivos.
+• Ellos proponen estrategia; nosotros entregamos packs listos.
+
+3. QA
+3.1 Roles
+Quién
+
+Qué
+
+Angel — admin
+
+Panel /admin, documentos, solicitudes, seguridad.
+
+Karen — usuaria
+
+Portal público, claridad, móvil/escritorio.
+
+Tercera persona
+
+Otra mirada.
+
+3.2 Checklist común + por módulo
+
+• Velocidad; textos/imágenes/botones; coherencia; enlaces/seguridad; móvil/escritorio
+Módulo
+
+Admin
+
+Usuaria
+
+☐ Inicio (/)
+
+Carga, hero, CTAs, navegación.
+
+Textos; botones correctos.
+
+Mirada
+A
+
+☐ Biblioteca
+
+Filtros, búsqueda, público/interno, descarga.
+
+Buscar y abrir fichas.
+
+U+A
+
+☐ Gobierno propio / Instrumentos
+
+Árbol, sensible, solicitar acceso.
+
+Navegar; pedidos de acceso.
+
+U+A
+
+☐ Memoria Afroterritorial
+
+Textos, enlaces, imágenes.
+
+Claridad del recorrido.
+
+U
+
+☐ Mediateca Ubuntu
+
+Galería, filtros FOSPA, móvil.
+
+Barrido visual.
+
+U
+
+☐ SCITA / Estadísticas
+
+Tableros, formulario, permisos.
+
+¿Se entiende el flujo?
+
+U+A
+
+☐ Geoportal
+
+Mapa/visor, login, vacío vs útil.
+
+¿Usable sin ayuda?
+
+U
+
+☐ Mujeres / juventudes / niñez
+
+Campañas, detalle, links.
+
+Contenido y navegación.
+
+U
+
+☐ Noticias / Agenda / Incidencia
+
+Listados, detalle, CTAs.
+
+Sin fichas rotas.
+
+U
+
+☐ Login / acceso / solicitudes
+
+Login, solicitar acceso, mis solicitudes.
+
+Flujo completo.
+
+U+A
+
+☐ Admin (panel)
+
+Documentos, solicitudes, usuarios, dashboards.
+
+Solo Angel: CRUD/subidas.
+
+A
+
+Regla: anotar y corregir lo existente (5–15 oct). PROHIBIDO features nuevas.
+
+4. Packs — qué se entrega a Comunicaciones
+Pack
+
+Contiene
+
+Cuándo se pide publicar
+
+General
+
+1 video recorrido
+
+Con 1er anuncio
+
+Mediateca
+
+1 video + 3 shorts + copy + stills
+
+PRIMERO
+
+Instrumentos
+
+1 video + 3 shorts + copy + stills
+
+Cuando digamos
+
+CID
+
+1 video + 3 shorts + copy + stills
+
+Cuando digamos / tras retoque
+
+5. Responsabilidades
+Persona
+
+Rol
+
+Angel
+
+Plan · QA admin · fixes · web ≤15 · grabar · confirmar editor/presupuesto · entregar packs.
+
+Karen
+
+Agendar Frank + Comunicaciones · pedir estrategia · QA usuaria · guiones/copy · OK de packs.
+
+Comunicaciones
+
+Proponer estrategia; confirmar plazos; publicar pack indicado (uno a la vez).
+
+Editor
+
+Editar packs (tiempos §2.2); avisar si se atrasa para mover fechas propuestas.
+
+Frank
+
+Aprobar este plan (25 sep); decidir si se mueve el 15 oct u otras fechas duras.
+
+6. Resumen
+sep
+
+QA/fixes
+
+15 oct
+
+15–30
+
+1er anuncio
+
+Luego
+
+Aprobar + Coms
+
+Flexible
+
+Web DURO
+
+Editor: 3 packs
+
+Mediateca
+
+Instr. → CID
+
+• Aprobar plan → web 15 oct → 3 packs (1+3) → Comunicaciones publica de a uno.
+• Fechas post-15: más cortas o más largas según editor, malla y QA.
+Para Frank
+Aprobar plan el 25 sep. 15 oct = web estable. Multimedia: 3 packs listos; anuncio por etapas. Comunicaciones define estrategia. Editor confirma tiempos.
+
+Referencia: https://fathom.video/calls/829928151 (19 sep 2026).
+
+Fuente: reunión Angel–Karen 19 sep 2026 · fathom.video/calls/829928151 · p. 2
+
+
